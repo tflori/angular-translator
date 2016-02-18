@@ -5,7 +5,7 @@
 #### JSON loader
 
 Customize directory and extension
-```TypeScript
+```typescript
 import {MyApp} from './myApp';
 import {bootstrap} from 'angular2/platform/browser';
 import {provide} from 'angular2/core';
