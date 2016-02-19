@@ -3,4 +3,10 @@ image: "node:5.6"
 before_script:
   - npm -v
   - which npm
+
+test:
+  script:
+    - npm install
+    - npm test
+    - npm run prepublish
   
