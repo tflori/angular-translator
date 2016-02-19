@@ -1,5 +1,6 @@
-test:
-  script:
-  - npm install
-  - npm test
+image: "node:5.6"
+
+before_script:
+  - npm -v
+  - which npm
   
