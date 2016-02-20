@@ -1,4 +1,4 @@
-image: "node:5.6"
+image: "iras/npmtest:1.0"
 
 variables:
   GIT_SSL_NO_VERIFY: "true"
