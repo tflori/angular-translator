@@ -2,8 +2,8 @@
   "name": "angular2-translator",
   "description": "A translate-service, translate-pipe and translate-component for angular2",
   "scripts": {
-    "test": "tsc && karma start",
-    "test-watch": "tsc && karma start --no-single-run --auto-watch",
+    "test": "typings install && tsc && karma start",
+    "test-watch": "typings install && tsc && karma start --no-single-run --auto-watch",
     "prepublish": "typings install && tsc && node make.js",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
