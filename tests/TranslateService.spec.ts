@@ -1,7 +1,8 @@
 import {it} from "angular2/testing";
 import {provide, Injector} from "angular2/core";
-import {TranslateService} from '../src/TranslateService';
 import {HTTP_PROVIDERS} from "angular2/http";
+import {TranslateService} from '../src/TranslateService';
+import {TranslateConfig} from "../src/TranslateConfig";
 
 export function main() {
     describe('TranslateService', function() {
@@ -11,6 +12,7 @@ export function main() {
         beforeEach(function() {
             injector = Injector.resolveAndCreate([
                 HTTP_PROVIDERS,
+                provide(TranslateConfig, {useValue: new TranslateConfig()}),
                 TranslateService
             ]);
             translate = injector.get(TranslateService);
@@ -25,6 +27,6 @@ export function main() {
             expect(TranslateService).toBeDefined();
             expect(translate).toBeDefined();
             expect(translate instanceof TranslateService).toBeTruthy();
-        })
+        });
     });
 }
