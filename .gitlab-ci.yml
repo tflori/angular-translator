@@ -1,4 +1,4 @@
-image: "iras/npmtest:1.0"
+image: "iras/npmtest:1.1"
 
 variables:
   GIT_SSL_NO_VERIFY: "true"
