@@ -15,7 +15,7 @@
   "author": "Thomas Flori",
   "license": "MIT",
   "bugs": {
-    "url": "https://config.w00tserver.org:4443/gitlab/tflori/angular2-translator/issues"
+    "url": "https://gitlab.w00tserver.org:617/tflori/angular2-translator/issues"
   },
   "main": "angular2-translator.js",
   "typings": "./angular2-translator.d.ts",

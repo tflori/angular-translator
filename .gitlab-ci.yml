@@ -1,7 +1,8 @@
-image: "iras/npmtest:1.4"
+image: "iras/npmtest:1.1"
 
 variables:
   GIT_SSL_NO_VERIFY: "true"
+  DISPLAY: ":23"
 
 before_script:
   - npm -v
