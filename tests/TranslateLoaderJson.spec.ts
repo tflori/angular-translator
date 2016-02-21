@@ -1,6 +1,8 @@
 import {Injector, NoProviderError, Key, provide} from "angular2/core";
-import {HTTP_PROVIDERS} from "angular2/http";
+import {RequestMethod, RequestOptions, Request, ResponseOptions, Response, HTTP_PROVIDERS, Connection, Http} from "angular2/http";
+import {MockBackend, MockConnection} from "angular2/http/testing";
 import {TranslateLoaderJsonConfig, TranslateLoaderJson} from "../src/TranslateLoaderJson";
+import {XHRBackend} from "angular2/http";
 
 export function main() {
     describe('TranslateLoaderJsonConfig', function () {
@@ -28,32 +30,42 @@ export function main() {
     });
 
     describe('TranslateLoaderJson', function () {
+        it('is defined', function () {
+            expect(TranslateLoaderJson).toBeDefined();
+        });
+
         describe('constructor', function () {
             it('requires a config', function () {
-                var injector      = Injector.resolveAndCreate([
+                var injector = Injector.resolveAndCreate([
                     HTTP_PROVIDERS,
                     TranslateLoaderJson
                 ]);
+
+                var action = function () {
+                    injector.get(TranslateLoaderJson);
+                };
+
                 var providerError = new NoProviderError(injector, Key.get(TranslateLoaderJsonConfig));
                 providerError.addKey(injector, Key.get(TranslateLoaderJson));
-
-                expect(function () {
-                    injector.get(TranslateLoaderJson);
-                }).toThrow(providerError);
+                expect(action).toThrow(providerError);
             });
         });
 
         describe('load', function () {
             var loader:TranslateLoaderJson;
+            var backend:MockBackend;
+            var connection:MockConnection;
 
             beforeEach(function () {
                 var injector:Injector = Injector.resolveAndCreate([
                     HTTP_PROVIDERS,
+                    provide(XHRBackend, {useClass: MockBackend}),
                     provide(TranslateLoaderJsonConfig, {useValue: new TranslateLoaderJsonConfig()}),
                     TranslateLoaderJson
                 ]);
-
-                loader = injector.get(TranslateLoaderJson);
+                backend               = injector.get(XHRBackend);
+                loader                = injector.get(TranslateLoaderJson);
+                backend.connections.subscribe((c:MockConnection) => connection = c);
             });
 
             it('is defined', function () {
@@ -65,6 +77,17 @@ export function main() {
                 var promise = loader.load('en');
 
                 expect(promise instanceof Promise).toBeTruthy();
+            });
+
+            it('loads a language file', function () {
+                spyOn(backend, 'createConnection').and.callThrough();
+
+                loader.load('en');
+
+                expect(backend.createConnection).toHaveBeenCalled();
+                var request = backend.createConnection["calls"].mostRecent().args[0]; // requires implicitAny :(
+                expect(request.url).toBe('i18n/en.json');
+                expect(request.method).toBe(RequestMethod.Get);
             });
         })
     });

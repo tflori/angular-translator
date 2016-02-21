@@ -4,8 +4,7 @@
   "scripts": {
     "test": "typings install && tsc && karma start",
     "test-watch": "typings install && tsc && karma start --no-single-run --auto-watch",
-    "prepublish": "typings install && tsc && node make.js",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+    "prepublish": "typings install && tsc && node make.js"
   },
   "keywords": [
     "angular2",
@@ -41,7 +40,6 @@
     "karma-typescript-preprocessor": "0.0.21",
     "reflect-metadata": "0.1.2",
     "rxjs": "5.0.0-beta.2",
-    "semantic-release": "~4.3.5",
     "systemjs": "~0.19.20",
     "systemjs-builder": "^0.15.6",
     "tsd": "^0.6.5",
