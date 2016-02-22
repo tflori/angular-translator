@@ -36,7 +36,7 @@ export function main() {
         });
 
         describe('constructor', function () {
-            it('requires a config', function () {
+            it('requires a TranslateLoaderJsonConfig', function () {
                 var injector = Injector.resolveAndCreate([
                     HTTP_PROVIDERS,
                     TranslateLoaderJson
