@@ -136,7 +136,13 @@ System.registerDynamic("src/TranslateLoaderJson", ["angular2/core", "angular2/ht
       var _this = this;
       return new Promise(function(resolve, reject) {
         var file = _this._config.path + lang + _this._config.extension;
-        _this._http.get(file);
+        _this._http.get(file).subscribe(function(response) {
+          if (response.status === 200) {
+            resolve(response.json());
+          } else {
+            reject('Language file could not be loaded (StatusCode: ' + response.status + ')');
+          }
+        });
       });
     };
     TranslateLoaderJson = __decorate([core_1.Injectable(), __param(0, core_1.Inject(http_1.Http)), __param(1, core_1.Inject(TranslateLoaderJsonConfig)), __metadata('design:paramtypes', [http_1.Http, TranslateLoaderJsonConfig])], TranslateLoaderJson);
