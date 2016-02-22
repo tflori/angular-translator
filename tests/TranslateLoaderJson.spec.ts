@@ -1,6 +1,7 @@
 import {Injector, NoProviderError, Key, provide} from "angular2/core";
 import {RequestMethod, RequestOptions, Request, ResponseOptions, Response, HTTP_PROVIDERS, Connection, Http} from "angular2/http";
 import {MockBackend, MockConnection} from "angular2/http/testing";
+import {PromiseMatcher} from "./helper/promise-matcher";
 import {TranslateLoaderJsonConfig, TranslateLoaderJson} from "../src/TranslateLoaderJson";
 import {XHRBackend} from "angular2/http";
 
@@ -57,6 +58,8 @@ export function main() {
             var connection:MockConnection;
 
             beforeEach(function () {
+                PromiseMatcher.install();
+
                 var injector:Injector = Injector.resolveAndCreate([
                     HTTP_PROVIDERS,
                     provide(XHRBackend, {useClass: MockBackend}),
@@ -67,6 +70,8 @@ export function main() {
                 loader                = injector.get(TranslateLoaderJson);
                 backend.connections.subscribe((c:MockConnection) => connection = c);
             });
+
+            afterEach(PromiseMatcher.uninstall);
 
             it('is defined', function () {
                 expect(loader.load).toBeDefined();
@@ -89,6 +94,45 @@ export function main() {
                 expect(request.url).toBe('i18n/en.json');
                 expect(request.method).toBe(RequestMethod.Get);
             });
-        })
+
+            it('resolves when connection responds', function() {
+                var promise = loader.load('en');
+
+                connection.mockRespond(new Response(new ResponseOptions({
+                    status: 200,
+                    body: JSON.stringify({
+                        "TEXT": "This is a text"
+                    }),
+                })));
+
+                expect(promise).toBeResolved();
+            });
+
+            it('transforms result to object', function() {
+                var promise = loader.load('en');
+
+                connection.mockRespond(new Response(new ResponseOptions({
+                    status: 200,
+                    body: JSON.stringify({
+                        "TEXT": "This is a text"
+                    })
+                })));
+
+                expect(promise).toBeResolvedWith({
+                    "TEXT": "This is a text"
+                });
+            });
+
+            it('rejectes when connection fails', function() {
+                var promise = loader.load('en');
+
+                connection.mockRespond(new Response(new ResponseOptions({
+                    status: 500,
+                    statusText: 'Internal Server Error'
+                })));
+
+                expect(promise).toBeRejected();
+            });
+        });
     });
 }

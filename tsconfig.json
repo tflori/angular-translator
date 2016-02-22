@@ -14,7 +14,9 @@
     "typings/main.d.ts",
     "angular2-translator.ts",
     "./src/TranslateService.ts",
-    "./src/TranslateConfig.ts"
+    "./src/TranslateConfig.ts",
+    "./src/TranslateLoader.ts",
+    "./src/TranslateLoaderJson.ts"
   ],
   "exclude": [
     "node_modules"

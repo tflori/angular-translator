@@ -32,12 +32,16 @@ export class TranslateLoaderJson extends TranslateLoader {
         return new Promise((resolve, reject) => {
             var file = this._config.path + lang + this._config.extension;
             //console.log('loading language ' + lang + ' with TranslateLoaderJson from file ' + file);
-            this._http.get(file);
-                //.map(res => res.json())
-                //.subscribe(
-                //    (translations) => resolve(translations),
-                //    (response)  => reject('Language file could not be loaded (StatusCode: ' + response.status + ')')
-                //);
+            this._http.get(file)
+                .subscribe(
+                    (response) => {
+                        if (response.status === 200) {
+                            resolve(response.json())
+                        } else {
+                            reject('Language file could not be loaded (StatusCode: ' + response.status + ')');
+                        }
+                    }
+                );
         });
     }
 }
