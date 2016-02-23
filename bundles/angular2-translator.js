@@ -68,7 +68,6 @@ System.registerDynamic("src/TranslateService", ["angular2/core", "angular2/http"
     };
     TranslateService.prototype.useLang = function(lang) {
       var providedLang = this._config.langProvided(lang, true);
-      console.log(providedLang);
       if (typeof providedLang === 'string') {
         this._lang = providedLang;
         return true;

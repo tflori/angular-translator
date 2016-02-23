@@ -66,7 +66,6 @@ export class TranslateService {
     public useLang(lang:string):boolean {
         var providedLang = this._config.langProvided(lang, true);
 
-        console.log(providedLang);
         if (typeof providedLang === 'string') {
             this._lang = providedLang;
             return true;
