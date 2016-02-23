@@ -6,6 +6,7 @@ export class TranslateLoaderJsonConfig {
     public path:string      = 'i18n/';
     public extension:string = '.json';
 
+    // @todo maybe we will change it to a destructed parameter like we did for TranslateConfig
     constructor(path?:string, extension?:string) {
         if (path) {
             this.path = path.replace(/\/+$/, '') + '/';

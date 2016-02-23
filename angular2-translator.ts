@@ -10,7 +10,7 @@ export * from './src/TranslateLoader';
 export * from './src/TranslateLoaderJson';
 
 export const TRANSLATE_PROVIDERS: any[] = [
-    new Provider(TranslateConfig, {useValue: new TranslateConfig()}),
+    new Provider(TranslateConfig, {useValue: new TranslateConfig({})}),
     new Provider(TranslateLoaderJsonConfig, {useValue: new TranslateLoaderJsonConfig()}),
     new Provider(TranslateLoader, {useClass: TranslateLoaderJson}),
     TranslateService

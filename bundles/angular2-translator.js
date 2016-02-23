@@ -1,4 +1,4 @@
-System.registerDynamic("src/TranslateService", ["angular2/core", "angular2/http", "./TranslateConfig"], true, function($__require, exports, module) {
+System.registerDynamic("src/TranslateService", ["angular2/core", "angular2/http", "./TranslateConfig", "./TranslateLoader"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -27,12 +27,55 @@ System.registerDynamic("src/TranslateService", ["angular2/core", "angular2/http"
   var core_1 = $__require('angular2/core');
   var http_1 = $__require('angular2/http');
   var TranslateConfig_1 = $__require('./TranslateConfig');
+  var TranslateLoader_1 = $__require('./TranslateLoader');
   var TranslateService = (function() {
-    function TranslateService(http, config) {
+    function TranslateService(http, config, loader) {
       this._http = http;
       this._config = config;
+      this._loader = loader;
+      this._lang = this._config.defaultLang;
     }
-    TranslateService = __decorate([core_1.Injectable(), __param(0, core_1.Inject(http_1.Http)), __param(1, core_1.Inject(TranslateConfig_1.TranslateConfig)), __metadata('design:paramtypes', [http_1.Http, TranslateConfig_1.TranslateConfig])], TranslateService);
+    TranslateService.prototype.currentLang = function() {
+      return this._lang;
+    };
+    TranslateService.prototype.detectLang = function(navigator) {
+      var detected = false,
+          navLangs,
+          i;
+      if (navigator) {
+        if (navigator.languages) {
+          navLangs = Array.isArray(navigator.languages) ? navigator.languages : [navigator.languages];
+          for (i = 0; i < navLangs.length; i++) {
+            detected = this._config.langProvided(navLangs[i], true);
+            if (detected) {
+              break;
+            }
+          }
+          if (!detected) {
+            for (i = 0; i < navLangs.length; i++) {
+              detected = this._config.langProvided(navLangs[i]);
+              if (detected) {
+                break;
+              }
+            }
+          }
+        }
+        if (!detected && navigator.language) {
+          detected = this._config.langProvided(navigator.language);
+        }
+      }
+      return detected;
+    };
+    TranslateService.prototype.useLang = function(lang) {
+      var providedLang = this._config.langProvided(lang, true);
+      console.log(providedLang);
+      if (typeof providedLang === 'string') {
+        this._lang = providedLang;
+        return true;
+      }
+      return false;
+    };
+    TranslateService = __decorate([core_1.Injectable(), __param(0, core_1.Inject(http_1.Http)), __param(1, core_1.Inject(TranslateConfig_1.TranslateConfig)), __param(2, core_1.Inject(TranslateLoader_1.TranslateLoader)), __metadata('design:paramtypes', [http_1.Http, TranslateConfig_1.TranslateConfig, TranslateLoader_1.TranslateLoader])], TranslateService);
     return TranslateService;
   })();
   exports.TranslateService = TranslateService;
@@ -46,12 +89,54 @@ System.registerDynamic("src/TranslateConfig", [], true, function($__require, exp
       __define = global.define;
   global.define = undefined;
   var TranslateConfig = (function() {
-    function TranslateConfig(defaultLang) {
-      this.defaultLang = 'en';
-      if (defaultLang) {
-        this.defaultLang = defaultLang;
-      }
+    function TranslateConfig(_a) {
+      var _b = _a.defaultLang,
+          defaultLang = _b === void 0 ? 'en' : _b,
+          _c = _a.providedLangs,
+          providedLangs = _c === void 0 ? ['en'] : _c;
+      this.defaultLang = providedLangs.indexOf(defaultLang) > -1 ? defaultLang : providedLangs[0];
+      this.providedLangs = providedLangs;
     }
+    TranslateConfig.prototype.langProvided = function(lang, strict) {
+      if (strict === void 0) {
+        strict = false;
+      }
+      var provided = false,
+          p;
+      var normalizeLang = function(lang) {
+        return lang.replace(/^([A-Za-z]{2})([\.\-_\/]?([A-Za-z]{2}))?/, function(substring, lang, v, country) {
+          if (v === void 0) {
+            v = '';
+          }
+          if (country === void 0) {
+            country = '';
+          }
+          lang = lang.toLowerCase();
+          country = country.toUpperCase();
+          return country ? lang + '-' + country : lang;
+        });
+      };
+      var providedLangsNormalized = this.providedLangs.map(normalizeLang);
+      lang = normalizeLang(lang);
+      p = providedLangsNormalized.indexOf(lang);
+      if (p > -1) {
+        provided = this.providedLangs[p];
+      } else if (!strict) {
+        lang = lang.substr(0, 2);
+        p = providedLangsNormalized.indexOf(lang);
+        if (p > -1) {
+          provided = this.providedLangs[p];
+        } else {
+          p = providedLangsNormalized.map(function(lang) {
+            return lang.substr(0, 2);
+          }).indexOf(lang);
+          if (p > -1) {
+            provided = this.providedLangs[p];
+          }
+        }
+      }
+      return provided;
+    };
     return TranslateConfig;
   })();
   exports.TranslateConfig = TranslateConfig;
@@ -172,7 +257,7 @@ System.registerDynamic("angular2-translator", ["./src/TranslateService", "./src/
   __export($__require('./src/TranslateConfig'));
   __export($__require('./src/TranslateLoader'));
   __export($__require('./src/TranslateLoaderJson'));
-  exports.TRANSLATE_PROVIDER = [new core_1.Provider(TranslateConfig_1.TranslateConfig, {useValue: new TranslateConfig_1.TranslateConfig()}), new core_1.Provider(TranslateLoaderJson_1.TranslateLoaderJsonConfig, {useValue: new TranslateLoaderJson_1.TranslateLoaderJsonConfig()}), new core_1.Provider(TranslateLoader_1.TranslateLoader, {useClass: TranslateLoaderJson_1.TranslateLoaderJson}), TranslateService_1.TranslateService];
+  exports.TRANSLATE_PROVIDERS = [new core_1.Provider(TranslateConfig_1.TranslateConfig, {useValue: new TranslateConfig_1.TranslateConfig({})}), new core_1.Provider(TranslateLoaderJson_1.TranslateLoaderJsonConfig, {useValue: new TranslateLoaderJson_1.TranslateLoaderJsonConfig()}), new core_1.Provider(TranslateLoader_1.TranslateLoader, {useClass: TranslateLoaderJson_1.TranslateLoaderJson}), TranslateService_1.TranslateService];
   global.define = __define;
   return module.exports;
 });
