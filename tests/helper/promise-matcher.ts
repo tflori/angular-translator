@@ -1,3 +1,4 @@
+import Jasmine = jasmine.Jasmine;
 export class PromiseMatcher {
     private static _instance:PromiseMatcher;
 
@@ -29,36 +30,30 @@ export class PromiseMatcher {
             return;
         }
         JasminePromise.NativePromise = this._originalPromise;
+        JasminePromise.initialize();
         this._global.Promise = JasminePromise;
 
+        var createCompareFn = function(util, customs, state:string, withArgs:boolean = false) {
+            return function(promise, ...args) {
+                if (!(promise instanceof JasminePromise)) {
+                    throw new Error('Promse is not a JasminePromise - did you run PromiseMatcher.install()?');
+                }
+                return promise.verify(util, customs, state, withArgs ? args : null);
+            };
+        };
+
         jasmine.addMatchers({
-            toBeRejected: function(util, customEqualityTesters) {
-                return {
-                    compare: function(promise) {
-                        return verifyPromise(util, customEqualityTesters, promise, 'rejected');
-                    }
-                }
+            toBeRejected: function(util, customs) {
+                return { compare: createCompareFn(util, customs, 'rejected') };
             },
-            toBeRejectedWith: function(util, customEqualityTesters) {
-                return {
-                    compare: function(promise, ...args) {
-                        return verifyPromise(util, customEqualityTesters, promise, 'rejected', args);
-                    }
-                }
+            toBeRejectedWith: function(util, customs) {
+                return { compare: createCompareFn(util, customs, 'rejected', true) };
             },
-            toBeResolved: function(util, customEqualityTesters) {
-                return {
-                    compare: function(promise) {
-                        return verifyPromise(util, customEqualityTesters, promise, 'resolved');
-                    }
-                }
+            toBeResolved: function(util, customs) {
+                return { compare: createCompareFn(util, customs, 'resolved') };
             },
-            toBeResolvedWith: function(util, customEqualityTesters) {
-                return {
-                    compare: function(promise, ...args) {
-                        return verifyPromise(util, customEqualityTesters, promise, 'resolved', args);
-                    }
-                }
+            toBeResolvedWith: function(util, customs) {
+                return { compare: createCompareFn(util, customs, 'resolved', true) };
             },
         });
     }
@@ -98,6 +93,7 @@ function verifyPromise(util:any, customEqualityTesters:any, promise:any, state:s
 }
 
 class JasminePromise {
+    private static _flush:Function = () => {};
     public static NativePromise:any;
 
     private _nativePromise:Promise<any>;
@@ -134,5 +130,43 @@ class JasminePromise {
 
     public catch(...args:any[]) {
         this._nativePromise.catch.apply(this._nativePromise, args);
+    }
+
+    public static initialize() {
+        JasminePromise.NativePromise._setScheduler(function(flush) {
+            JasminePromise._flush = flush;
+        });
+    }
+
+    public static flush() {
+        JasminePromise._flush();
+    }
+
+    public verify(util:any, customEqualityTesters:any, state:string, args?:any[]) {
+        JasminePromise.flush();
+
+        var result:{pass:boolean, message:string} = {
+            pass: false,
+            message: ''
+        };
+
+        result.pass = this.state === state;
+
+        if (result.pass) {
+            if (args) {
+                result.pass = util.equals(this.args, args, customEqualityTesters);
+                if (result.pass) {
+                    result.message = 'Expected promise not to be ' + state + ' with ' + JSON.stringify(args) + ' but it was';
+                } else {
+                    result.message = 'Expected promise to be ' + state + ' with ' + JSON.stringify(args) + ' but it was ' + state + ' with ' + JSON.stringify(this.args);
+                }
+            } else {
+                result.message = 'Expected promise not to be ' + state + ' but it was';
+            }
+        } else {
+            result.message = 'Expected promise to be ' + state + ' but it is ' + this.state;
+        }
+
+        return result;
     }
 }

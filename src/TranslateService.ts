@@ -21,10 +21,24 @@ export class TranslateService {
         this._lang = this._config.defaultLang;
     }
 
+    /**
+     * Getter for current language.
+     *
+     * @returns {string}
+     */
     public currentLang():string {
         return this._lang;
     }
 
+    /**
+     * Detects the preferred language by navigator.
+     *
+     * Returns false if the user prefers a language that is not provided or
+     * the provided language.
+     *
+     * @param navigator
+     * @returns {string|boolean}
+     */
     public detectLang(navigator:any):string|boolean {
         var detected:string|boolean = false, navLangs:string[], i:number;
 
@@ -72,5 +86,18 @@ export class TranslateService {
         }
 
         return false;
+    }
+
+    /**
+     * Waits for the current language to be loaded.
+     *
+     * @returns {Promise<void>|Promise}
+     */
+    public waitForTranslation():Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            this._loader.load(this._lang).then((translations) => {
+                resolve();
+            }, (reason) => reject(reason));
+        });
     }
 }

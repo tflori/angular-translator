@@ -1,5 +1,7 @@
 import {provide, NoProviderError, Key, Injector} from "angular2/core";
-import {HTTP_PROVIDERS} from "angular2/http";
+import {HTTP_PROVIDERS, XHRBackend} from "angular2/http";
+import {MockBackend} from "angular2/src/http/backends/mock_backend";
+import {PromiseMatcher} from "./helper/promise-matcher";
 import {TranslateService} from '../src/TranslateService';
 import {TranslateConfig} from "../src/TranslateConfig";
 import {TranslateLoader} from "../src/TranslateLoader";
@@ -73,6 +75,7 @@ export function main() {
         describe('instance', function () {
             var translateConfig:TranslateConfig;
             var translate:TranslateService;
+            var loader:TranslateLoader;
 
             beforeEach(function () {
                 translateConfig       = new TranslateConfig({});
@@ -82,6 +85,13 @@ export function main() {
                     provide(TranslateConfig, {useValue: translateConfig})
                 ]);
                 translate             = injector.get(TranslateService);
+                loader                = injector.get(TranslateLoader);
+                PromiseMatcher.install();
+            });
+
+            afterEach(function() {
+                //jasmine.clock().uninstall();
+                PromiseMatcher.uninstall();
             });
 
             describe('detect language', function () {
@@ -110,7 +120,7 @@ export function main() {
                 });
 
                 it('using config.langProvided for checking', function () {
-                    mockNavigator.language        = 'bm';
+                    mockNavigator.language = 'bm';
                     spyOn(translateConfig, 'langProvided');
 
                     var detectedLang = translate.detectLang(mockNavigator);
@@ -129,8 +139,8 @@ export function main() {
                 });
             });
 
-            describe('use language', function() {
-                it('checks that language is provided using strict checking', function() {
+            describe('use language', function () {
+                it('checks that language is provided using strict checking', function () {
                     spyOn(translateConfig, 'langProvided');
 
                     translate.useLang('en');
@@ -138,7 +148,7 @@ export function main() {
                     expect(translateConfig.langProvided).toHaveBeenCalledWith('en', true);
                 });
 
-                it('sets current language to the provided language', function() {
+                it('sets current language to the provided language', function () {
                     translateConfig.providedLangs = ['de/de'];
 
                     translate.useLang('de-DE');
@@ -146,12 +156,52 @@ export function main() {
                     expect(translate.currentLang()).toBe('de/de');
                 });
 
-                it('returns false if language is not provided', function() {
+                it('returns false if language is not provided', function () {
                     translateConfig.providedLangs = ['de/de'];
 
                     var result = translate.useLang('de');
 
                     expect(result).toBeFalsy();
+                });
+            });
+
+            describe('waiting for translation', function () {
+                var loaderPromiseResolve:Function;
+                var loaderPromiseReject:Function;
+
+                beforeEach(function() {
+                    spyOn(loader, 'load').and.returnValue(new Promise<Object>((resolve, reject) => {
+                        loaderPromiseResolve = resolve;
+                        loaderPromiseReject = reject;
+                    }));
+                });
+
+                it('returns a promise', function () {
+                    var promise = translate.waitForTranslation();
+
+                    expect(promise instanceof Promise).toBeTruthy();
+                });
+
+                it('starts loading the current language', function () {
+                    translate.waitForTranslation();
+
+                    expect(loader.load).toHaveBeenCalledWith('en');
+                });
+
+                it('resolves when loader resolves', function() {
+                    var promise = translate.waitForTranslation();
+
+                    loaderPromiseResolve({"TEXT":"This is a text"});
+
+                    expect(promise).toBeResolved();
+                });
+
+                it('rejects when loader rejects', function() {
+                   var promise = translate.waitForTranslation();
+
+                    loaderPromiseReject();
+
+                    expect(promise).toBeRejected();
                 });
             });
         });
