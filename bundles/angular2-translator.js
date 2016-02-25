@@ -30,6 +30,7 @@ System.registerDynamic("src/TranslateService", ["angular2/core", "angular2/http"
   var TranslateLoader_1 = $__require('./TranslateLoader');
   var TranslateService = (function() {
     function TranslateService(http, config, loader) {
+      this._loadedLangs = {};
       this._http = http;
       this._config = config;
       this._loader = loader;
@@ -73,6 +74,44 @@ System.registerDynamic("src/TranslateService", ["angular2/core", "angular2/http"
         return true;
       }
       return false;
+    };
+    TranslateService.prototype.waitForTranslation = function(lang) {
+      if (lang === void 0) {
+        lang = this._lang;
+      }
+      var l = this._config.langProvided(lang, true);
+      if (typeof l === 'boolean' && !l) {
+        return Promise.reject('Language not provided');
+      } else if (typeof l === 'string') {
+        lang = l;
+      }
+      return this._loadLang(lang);
+    };
+    TranslateService.prototype._loadLang = function(lang) {
+      var _this = this;
+      if (!this._loadedLangs[lang]) {
+        this._loadedLangs[lang] = new Promise(function(resolve, reject) {
+          _this._loader.load(lang).then(function() {
+            return resolve();
+          }, reject);
+        });
+      }
+      return this._loadedLangs[lang];
+    };
+    TranslateService.prototype.translate = function(keys, params, lang) {
+      var _this = this;
+      if (params === void 0) {
+        params = {};
+      }
+      if (lang === void 0) {
+        lang = this._lang;
+      }
+      if (lang != this._lang) {
+        lang = String(this._config.langProvided(lang, true) || this._lang);
+      }
+      return new Promise(function() {
+        _this._loadLang(lang);
+      });
     };
     TranslateService = __decorate([core_1.Injectable(), __param(0, core_1.Inject(http_1.Http)), __param(1, core_1.Inject(TranslateConfig_1.TranslateConfig)), __param(2, core_1.Inject(TranslateLoader_1.TranslateLoader)), __metadata('design:paramtypes', [http_1.Http, TranslateConfig_1.TranslateConfig, TranslateLoader_1.TranslateLoader])], TranslateService);
     return TranslateService;

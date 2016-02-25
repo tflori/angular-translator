@@ -6,8 +6,13 @@ import {TranslateService} from '../src/TranslateService';
 import {TranslateConfig} from "../src/TranslateConfig";
 import {TranslateLoader} from "../src/TranslateLoader";
 import {TRANSLATE_PROVIDERS} from "../angular2-translator";
+import {first} from "rxjs/operator/first";
 
 export function main() {
+    function calls(spy:any):jasmine.Calls {
+        return spy.calls;
+    }
+
     describe('TranslateService', function () {
         it('is defined', function () {
             expect(TranslateService).toBeDefined();
@@ -73,12 +78,13 @@ export function main() {
         });
 
         describe('instance', function () {
-            var translateConfig:TranslateConfig;
+            var translateConfig:TranslateConfig = new TranslateConfig({});
             var translate:TranslateService;
             var loader:TranslateLoader;
 
             beforeEach(function () {
-                translateConfig       = new TranslateConfig({});
+                translateConfig.providedLangs = ['en'];
+                translateConfig.defaultLang = 'en';
                 var injector:Injector = Injector.resolveAndCreate([
                     HTTP_PROVIDERS,
                     TRANSLATE_PROVIDERS,
@@ -202,6 +208,95 @@ export function main() {
                     loaderPromiseReject();
 
                     expect(promise).toBeRejected();
+                });
+
+                it('loads a language only once', function() {
+                    translate.waitForTranslation();
+                    translate.waitForTranslation();
+
+                    expect(calls(loader.load).count()).toBe(1);
+                });
+
+                it('returns the already resolved promise', function() {
+                    var firstPromise = translate.waitForTranslation();
+                    loaderPromiseResolve({"TEXT":"This is a text"});
+
+                    var secondPromise = translate.waitForTranslation();
+
+                    expect(secondPromise).toBeResolved();
+                    expect(secondPromise).toBe(firstPromise);
+                });
+
+                it('loads given language', function() {
+                    translateConfig.providedLangs = ['en', 'de'];
+
+                    translate.waitForTranslation('de');
+
+                    expect(loader.load).toHaveBeenCalledWith('de');
+                });
+
+                it('checks if the language is provided', function() {
+                    spyOn(translateConfig, 'langProvided');
+
+                    translate.waitForTranslation('de');
+
+                    expect(translateConfig.langProvided).toHaveBeenCalledWith('de', true);
+                });
+
+                it('rejects if the language is not provided', function() {
+                    var promise = translate.waitForTranslation('de');
+
+                    expect(promise).toBeRejectedWith('Language not provided');
+                });
+            });
+
+            describe('translate', function() {
+                var loaderPromiseResolve:Function;
+                var loaderPromiseReject:Function;
+
+                beforeEach(function() {
+                    spyOn(loader, 'load').and.returnValue(new Promise<Object>((resolve, reject) => {
+                        loaderPromiseResolve = resolve;
+                        loaderPromiseReject = reject;
+                    }));
+                });
+
+                it('loads the current language', function() {
+                    translate.translate('TEXT');
+
+                    expect(loader.load).toHaveBeenCalledWith('en');
+                });
+
+                it('loads the given language', function() {
+                    translateConfig.providedLangs = ['en', 'de'];
+
+                    translate.translate('TEXT', {}, 'de');
+
+                    expect(loader.load).toHaveBeenCalledWith('de');
+                });
+
+                it('checks if the language is provided', function() {
+                    spyOn(translateConfig, 'langProvided');
+
+                    translate.translate('TEXT', {}, 'de');
+
+                    expect(translateConfig.langProvided).toHaveBeenCalledWith('de', true);
+                });
+
+                // current language got checked before
+                it('does not check current language', function() {
+                    spyOn(translateConfig, 'langProvided');
+
+                    translate.translate('TEXT');
+
+                    expect(translateConfig.langProvided).not.toHaveBeenCalled();
+                });
+
+                it('loads a language only once', function() {
+                    translate.translate('TEXT');
+                    translate.translate('OTHER_TEXT');
+
+                    expect(calls(loader.load).count()).toBe(1);
                 });
             });
         });

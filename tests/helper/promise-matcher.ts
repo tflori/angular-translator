@@ -1,4 +1,5 @@
 import Jasmine = jasmine.Jasmine;
+
 export class PromiseMatcher {
     private static _instance:PromiseMatcher;
 
@@ -63,36 +64,7 @@ export class PromiseMatcher {
     }
 }
 
-function verifyPromise(util:any, customEqualityTesters:any, promise:any, state:string, args?:any[]) {
-    var result:{pass:boolean, message:string} = {
-        pass: false,
-        message: ''
-    };
-    if (!(promise instanceof JasminePromise)) {
-        throw new Error('Promse is not a JasminePromise - did you run PromiseMatcher.install()?');
-    }
-
-    result.pass = promise.state === state;
-
-    if (result.pass) {
-        if (args) {
-            result.pass = util.equals(promise.args, args, customEqualityTesters);
-            if (result.pass) {
-                result.message = 'Expected promise not to be ' + state + ' with ' + JSON.stringify(args) + ' but it was';
-            } else {
-                result.message = 'Expected promise to be ' + state + ' with ' + JSON.stringify(args) + ' but it was ' + state + ' with ' + JSON.stringify(promise.args);
-            }
-        } else {
-            result.message = 'Expected promise not to be ' + state + ' but it was';
-        }
-    } else {
-        result.message = 'Expected promise to be ' + state + ' but it is ' + promise.state;
-    }
-
-    return result;
-}
-
-class JasminePromise {
+export class JasminePromise {
     private static _flush:Function = () => {};
     public static NativePromise:any;
 
@@ -100,10 +72,14 @@ class JasminePromise {
 
     public state:string = 'pending';
     public args:any[];
-    public reason:string;
 
     constructor(resolver:any) {
         var resolve, reject;
+        this._nativePromise = new JasminePromise.NativePromise((_resolve, _reject) => {
+            resolve = _resolve;
+            reject = _reject;
+        });
+
         resolver(
             (...args: any[]) => {
                 if (this.state !== 'pending') { return; }
@@ -111,17 +87,13 @@ class JasminePromise {
                 this.args = args;
                 resolve.apply(null, args);
             },
-            (reason) => {
+            (...args: any[]) => {
                 if (this.state !== 'pending') { return; }
                 this.state = 'rejected';
-                this.reason = reason;
-                reject.apply(null, [reason]);
+                this.args = args;
+                reject.apply(null, args);
             }
         );
-        this._nativePromise = new JasminePromise.NativePromise((_resolve, _reject) => {
-            resolve = _resolve;
-            reject = _reject;
-        });
     }
 
     public then(...args:any[]) {
@@ -130,6 +102,14 @@ class JasminePromise {
 
     public catch(...args:any[]) {
         this._nativePromise.catch.apply(this._nativePromise, args);
+    }
+
+    public static reject(reason) {
+        return new JasminePromise((resolve, reject) => reject(reason));
+    }
+
+    public static resolve(...args) {
+        return new JasminePromise((resolve) => resolve.apply(null, args));
     }
 
     public static initialize() {

@@ -10,6 +10,7 @@ export class TranslateService {
     private _loader:TranslateLoader;
 
     private _lang:string;
+    private _loadedLangs:Object = {};
 
     constructor(@Inject(Http) http:Http,
                 @Inject(TranslateConfig) config:TranslateConfig,
@@ -36,7 +37,7 @@ export class TranslateService {
      * Returns false if the user prefers a language that is not provided or
      * the provided language.
      *
-     * @param navigator
+     * @param {any} navigator
      * @returns {string|boolean}
      */
     public detectLang(navigator:any):string|boolean {
@@ -70,7 +71,7 @@ export class TranslateService {
     }
 
     /**
-     * Set translator to use language "lang".
+     * Set translator to use language (lang).
      *
      * Returns true on success, false on failure
      *
@@ -91,13 +92,52 @@ export class TranslateService {
     /**
      * Waits for the current language to be loaded.
      *
+     * @param {string?} lang
      * @returns {Promise<void>|Promise}
      */
-    public waitForTranslation():Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            this._loader.load(this._lang).then((translations) => {
-                resolve();
-            }, (reason) => reject(reason));
+    public waitForTranslation(lang:string = this._lang):Promise<void> {
+        var l = this._config.langProvided(lang, true);
+        if (typeof l === 'boolean' && !l) {
+            return Promise.reject('Language not provided');
+        } else if (typeof l === 'string') {
+            lang = l;
+        }
+        return this._loadLang(lang);
+    }
+
+    /**
+     * Load a language.
+     *
+     * @param {string} lang
+     * @returns {Promise<void>|Promise}
+     * @private
+     */
+    private _loadLang(lang:string):Promise<void> {
+        if (!this._loadedLangs[lang]) {
+            this._loadedLangs[lang] = new Promise<void>((resolve, reject) => {
+                this._loader.load(lang).then(() => resolve(), reject);
+            });
+        }
+        return this._loadedLangs[lang];
+    }
+
+    /**
+     * Translate keys for current language or given language (lang).
+     *
+     * Optionally you can pass params for translation to be interpolated.
+     *
+     * @param {string|string[]} keys
+     * @param {any?} params
+     * @param {string?} lang
+     * @returns {Promise<string>|Promise}
+     */
+    public translate(keys:string|string[], params:any = {}, lang:string = this._lang):Promise<string> {
+        if (lang != this._lang) {
+            lang = String(this._config.langProvided(lang, true) || this._lang);
+        }
+
+        return new Promise<string>(() => {
+            this._loadLang(lang);
         });
     }
 }
