@@ -11,6 +11,7 @@ export class TranslateService {
 
     private _lang:string;
     private _loadedLangs:Object = {};
+    private _translations:Object = {};
 
     constructor(@Inject(Http) http:Http,
                 @Inject(TranslateConfig) config:TranslateConfig,
@@ -97,10 +98,10 @@ export class TranslateService {
      */
     public waitForTranslation(lang:string = this._lang):Promise<void> {
         var l = this._config.langProvided(lang, true);
-        if (typeof l === 'boolean' && !l) {
+        if (!l) {
             return Promise.reject('Language not provided');
-        } else if (typeof l === 'string') {
-            lang = l;
+        } else {
+            lang = String(l);
         }
         return this._loadLang(lang);
     }
@@ -115,29 +116,69 @@ export class TranslateService {
     private _loadLang(lang:string):Promise<void> {
         if (!this._loadedLangs[lang]) {
             this._loadedLangs[lang] = new Promise<void>((resolve, reject) => {
-                this._loader.load(lang).then(() => resolve(), reject);
+                this._loader.load(lang).then((translations) => {
+                    this._translations[lang] = translations;
+                    resolve();
+                }, reject);
             });
         }
         return this._loadedLangs[lang];
     }
 
     /**
-     * Translate keys for current language or given language (lang).
+     * Translate keys for current language or given language (lang) asynchronously.
      *
      * Optionally you can pass params for translation to be interpolated.
      *
      * @param {string|string[]} keys
      * @param {any?} params
      * @param {string?} lang
-     * @returns {Promise<string>|Promise}
+     * @returns {Promise<string|string[]>|Promise}
      */
-    public translate(keys:string|string[], params:any = {}, lang:string = this._lang):Promise<string> {
-        if (lang != this._lang) {
-            lang = String(this._config.langProvided(lang, true) || this._lang);
+    public translate(keys:string|string[], params:any = {}, lang:string = this._lang):Promise<string|string[]> {
+        return new Promise<string|string[]>((resolve, reject) => {
+            if (lang != this._lang) {
+                var l = this._config.langProvided(lang, true);
+                if (!l) {
+                    resolve(keys);
+                    return;
+                } else {
+                    lang = String(l);
+                }
+            }
+
+            this._loadLang(lang).then(() => {
+            }, () => {
+                resolve(keys);
+            });
+        });
+    }
+
+    /**
+     * Translate keys for current language or given language (lang) synchronously.
+     *
+     * Optionally you can pass params for translation to be interpolated.
+     *
+     * @param {string|string[]} keys
+     * @param {any?} params
+     * @param {string?} lang
+     * @returns {string|string[]}
+     */
+    public instant(keys:string|string[], params:any = {}, lang:string = this._lang):string|string[] {
+        if (!Array.isArray(keys)) {
+            return this.instant([keys], params, lang)[0];
         }
 
-        return new Promise<string>(() => {
-            this._loadLang(lang);
-        });
+        var result = [], i = keys.length, t:string;
+        while (i--) {
+            if (!this._translations[this._lang] || !this._translations[this._lang][keys[i]]) {
+                // missing translation
+                result.unshift(keys[i]);
+                continue;
+            }
+            result.unshift(this._translations[this._lang][keys[i]]);
+        }
+
+        return result;
     }
 }

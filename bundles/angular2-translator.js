@@ -31,6 +31,7 @@ System.registerDynamic("src/TranslateService", ["angular2/core", "angular2/http"
   var TranslateService = (function() {
     function TranslateService(http, config, loader) {
       this._loadedLangs = {};
+      this._translations = {};
       this._http = http;
       this._config = config;
       this._loader = loader;
@@ -80,10 +81,10 @@ System.registerDynamic("src/TranslateService", ["angular2/core", "angular2/http"
         lang = this._lang;
       }
       var l = this._config.langProvided(lang, true);
-      if (typeof l === 'boolean' && !l) {
+      if (!l) {
         return Promise.reject('Language not provided');
-      } else if (typeof l === 'string') {
-        lang = l;
+      } else {
+        lang = String(l);
       }
       return this._loadLang(lang);
     };
@@ -91,8 +92,9 @@ System.registerDynamic("src/TranslateService", ["angular2/core", "angular2/http"
       var _this = this;
       if (!this._loadedLangs[lang]) {
         this._loadedLangs[lang] = new Promise(function(resolve, reject) {
-          _this._loader.load(lang).then(function() {
-            return resolve();
+          _this._loader.load(lang).then(function(translations) {
+            _this._translations[lang] = translations;
+            resolve();
           }, reject);
         });
       }
@@ -106,12 +108,42 @@ System.registerDynamic("src/TranslateService", ["angular2/core", "angular2/http"
       if (lang === void 0) {
         lang = this._lang;
       }
-      if (lang != this._lang) {
-        lang = String(this._config.langProvided(lang, true) || this._lang);
-      }
-      return new Promise(function() {
-        _this._loadLang(lang);
+      return new Promise(function(resolve, reject) {
+        if (lang != _this._lang) {
+          var l = _this._config.langProvided(lang, true);
+          if (!l) {
+            resolve(keys);
+            return;
+          } else {
+            lang = String(l);
+          }
+        }
+        _this._loadLang(lang).then(function() {}, function() {
+          resolve(keys);
+        });
       });
+    };
+    TranslateService.prototype.instant = function(keys, params, lang) {
+      if (params === void 0) {
+        params = {};
+      }
+      if (lang === void 0) {
+        lang = this._lang;
+      }
+      if (!Array.isArray(keys)) {
+        return this.instant([keys], params, lang)[0];
+      }
+      var result = [],
+          i = keys.length,
+          t;
+      while (i--) {
+        if (!this._translations[this._lang] || !this._translations[this._lang][keys[i]]) {
+          result.unshift(keys[i]);
+          continue;
+        }
+        result.unshift(this._translations[this._lang][keys[i]]);
+      }
+      return result;
     };
     TranslateService = __decorate([core_1.Injectable(), __param(0, core_1.Inject(http_1.Http)), __param(1, core_1.Inject(TranslateConfig_1.TranslateConfig)), __param(2, core_1.Inject(TranslateLoader_1.TranslateLoader)), __metadata('design:paramtypes', [http_1.Http, TranslateConfig_1.TranslateConfig, TranslateLoader_1.TranslateLoader])], TranslateService);
     return TranslateService;

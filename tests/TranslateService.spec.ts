@@ -1,7 +1,7 @@
 import {provide, NoProviderError, Key, Injector} from "angular2/core";
 import {HTTP_PROVIDERS, XHRBackend} from "angular2/http";
 import {MockBackend} from "angular2/src/http/backends/mock_backend";
-import {PromiseMatcher} from "./helper/promise-matcher";
+import {PromiseMatcher, JasminePromise} from "./helper/promise-matcher";
 import {TranslateService} from '../src/TranslateService';
 import {TranslateConfig} from "../src/TranslateConfig";
 import {TranslateLoader} from "../src/TranslateLoader";
@@ -297,6 +297,48 @@ export function main() {
                     translate.translate('OTHER_TEXT');
 
                     expect(calls(loader.load).count()).toBe(1);
+                });
+
+                it('resolves keys if language is not provided', function() {
+                    var promise = translate.translate('TEXT', {}, 'de');
+
+                    expect(promise).toBeResolvedWith('TEXT');
+                });
+
+                it('resolves keys if laguage could not be loaded', function() {
+                    var promise = translate.translate(['TEXT', 'OTHER_TEXT']);
+
+                    loaderPromiseReject();
+
+                    expect(promise).toBeResolvedWith(['TEXT', 'OTHER_TEXT']);
+                });
+            });
+
+            describe('instant', function() {
+                var loaderPromiseResolve:Function;
+                var loaderPromiseReject:Function;
+
+                beforeEach(function() {
+                    spyOn(loader, 'load').and.returnValue(new Promise<Object>((resolve, reject) => {
+                        loaderPromiseResolve = resolve;
+                        loaderPromiseReject = reject;
+                    }));
+                });
+
+                it('returns keys if language is not loaded', function() {
+                    var translation = translate.instant('TEXT');
+
+                    expect(translation).toBe('TEXT');
+                });
+
+                it('returns keys if translation not found', function() {
+                    translate.waitForTranslation();
+                    loaderPromiseResolve({'TEXT': 'This is a text'});
+                    JasminePromise.flush();
+
+                    var translations = translate.instant(['TEXT', 'OTHER_TEXT']);
+
+                    expect(translations).toEqual(['This is a text', 'OTHER_TEXT']);
                 });
             });
         });
