@@ -118,12 +118,15 @@ System.registerDynamic("src/TranslateService", ["angular2/core", "angular2/http"
             lang = String(l);
           }
         }
-        _this._loadLang(lang).then(function() {}, function() {
+        _this._loadLang(lang).then(function() {
+          resolve(_this.instant(keys, params, lang));
+        }, function() {
           resolve(keys);
         });
       });
     };
     TranslateService.prototype.instant = function(keys, params, lang) {
+      var _this = this;
       if (params === void 0) {
         params = {};
       }
@@ -133,15 +136,41 @@ System.registerDynamic("src/TranslateService", ["angular2/core", "angular2/http"
       if (!Array.isArray(keys)) {
         return this.instant([keys], params, lang)[0];
       }
+      if (lang != this._lang) {
+        var l = this._config.langProvided(lang, true);
+        if (l) {
+          lang = String(l);
+        }
+      }
       var result = [],
           i = keys.length,
           t;
       while (i--) {
-        if (!this._translations[this._lang] || !this._translations[this._lang][keys[i]]) {
+        if (!this._translations[lang] || !this._translations[lang][keys[i]]) {
           result.unshift(keys[i]);
           continue;
         }
-        result.unshift(this._translations[this._lang][keys[i]]);
+        t = this._translations[lang][keys[i]];
+        t = t.replace(/\[\[\s*([A-Za-z0-9_\.-]+):?([A-Za-z0-9,_]+)?\s*\]\]/g, function(sub, key, vars) {
+          if (vars === void 0) {
+            vars = '';
+          }
+          var translationParams = {};
+          vars.split(',').map(function(key) {
+            if (Object.prototype.hasOwnProperty.call(params, key)) {
+              translationParams[key] = params[key];
+            }
+          });
+          return String(_this.instant(key, translationParams, lang));
+        });
+        t = t.replace(/{{\s*(.*?)\s*}}/g, function(sub, expression) {
+          try {
+            return __parse(expression, params);
+          } catch (e) {
+            return '';
+          }
+        });
+        result.unshift(t);
       }
       return result;
     };
@@ -149,6 +178,9 @@ System.registerDynamic("src/TranslateService", ["angular2/core", "angular2/http"
     return TranslateService;
   })();
   exports.TranslateService = TranslateService;
+  function __parse(expression, params) {
+    return eval('with(params) { (' + expression + ') }');
+  }
   global.define = __define;
   return module.exports;
 });

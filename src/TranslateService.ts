@@ -148,6 +148,7 @@ export class TranslateService {
             }
 
             this._loadLang(lang).then(() => {
+                resolve(this.instant(keys, params, lang));
             }, () => {
                 resolve(keys);
             });
@@ -169,16 +170,50 @@ export class TranslateService {
             return this.instant([keys], params, lang)[0];
         }
 
+        if (lang != this._lang) {
+            var l = this._config.langProvided(lang, true);
+            if (l) {
+                lang = String(l);
+            }
+        }
+
         var result = [], i = keys.length, t:string;
         while (i--) {
-            if (!this._translations[this._lang] || !this._translations[this._lang][keys[i]]) {
+            if (!this._translations[lang] || !this._translations[lang][keys[i]]) {
                 // missing translation
                 result.unshift(keys[i]);
                 continue;
             }
-            result.unshift(this._translations[this._lang][keys[i]]);
+            t = this._translations[lang][keys[i]];
+
+            // translate related
+            t = t.replace(/\[\[\s*([A-Za-z0-9_\.-]+):?([A-Za-z0-9,_]+)?\s*\]\]/g, (sub:string, key:string, vars:string = ''):string => {
+                var translationParams = {};
+                vars.split(',').map((key) => {
+                    if (Object.prototype.hasOwnProperty.call(params, key)) {
+                        translationParams[key] = params[key];
+                    }
+                });
+                return String(this.instant(key, translationParams, lang));
+            });
+
+            // simple interpolation
+            t = t.replace(/{{\s*(.*?)\s*}}/g, function(sub:string, expression:string) {
+                try {
+                    return __parse(expression, params);
+                } catch(e) {
+                    // parse error
+                    return '';
+                }
+            });
+
+            result.unshift(t);
         }
 
         return result;
     }
+}
+
+function __parse(expression:string, params:any) {
+    return eval('with(params) { (' + expression + ') }');
 }

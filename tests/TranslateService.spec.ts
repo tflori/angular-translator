@@ -312,33 +312,110 @@ export function main() {
 
                     expect(promise).toBeResolvedWith(['TEXT', 'OTHER_TEXT']);
                 });
+
+                it('uses instant to translate after loader resolves', function() {
+                    spyOn(translate, 'instant');
+                    translate.translate('TEXT');
+
+                    loaderPromiseResolve({'TEXT': 'This is a text'});
+                    JasminePromise.flush();
+
+                    expect(translate.instant).toHaveBeenCalledWith('TEXT', {}, translate.currentLang());
+                });
+
+                it('resolves with the return value from instant', function() {
+                    spyOn(translate, 'instant').and.returnValue('This is a text');
+                    var promise = translate.translate('TEXT');
+
+                    loaderPromiseResolve({'TEXT': 'This is a text'});
+
+                    expect(promise).toBeResolvedWith('This is a text');
+                });
             });
 
             describe('instant', function() {
-                var loaderPromiseResolve:Function;
-                var loaderPromiseReject:Function;
 
                 beforeEach(function() {
+                    var loaderPromiseResolve:Function = (t:Object) => {};
                     spyOn(loader, 'load').and.returnValue(new Promise<Object>((resolve, reject) => {
                         loaderPromiseResolve = resolve;
-                        loaderPromiseReject = reject;
                     }));
+
+                    translate.waitForTranslation();
+                    loaderPromiseResolve({
+                        TEXT: 'This is a text',
+                        INTERPOLATION: 'The sum from 1+2 is {{1+2}}',
+                        VARIABLES_TEST: 'This {{count > 5 ? "is interesting" : "is boring"}}',
+                        VARIABLES_OUT: 'Hello {{name.first}} {{name.title ? name.title + " " : ""}}{{name.last}}',
+                        BROKEN: 'This "{{notExisting.func()}}" is empty string',
+                        SALUTATION: '{{name.title ? name.title + " " : (name.gender === "w" ? "Ms." : "Mr.")}}{{name.first}} {{name.last}}',
+                        WELCOME: 'Welcome{{lastLogin ? " back" : ""}} [[SALUTATION:name]]!{{lastLogin ? " Your last login was on " + lastLogin : ""}}',
+                        HACK: '{{privateVar}}{{givenVar}}',
+                        CALL: 'You don\'t know {{privateVar}} but [[HACK:givenVar]]'
+                    });
+
+                    JasminePromise.flush();
                 });
 
                 it('returns keys if language is not loaded', function() {
-                    var translation = translate.instant('TEXT');
+                    var translation = translate.instant('TEXT', {}, 'de');
 
                     expect(translation).toBe('TEXT');
                 });
 
                 it('returns keys if translation not found', function() {
-                    translate.waitForTranslation();
-                    loaderPromiseResolve({'TEXT': 'This is a text'});
-                    JasminePromise.flush();
+                    var translations = translate.instant(['SOME_TEXT', 'OTHER_TEXT']);
 
-                    var translations = translate.instant(['TEXT', 'OTHER_TEXT']);
+                    expect(translations).toEqual(['SOME_TEXT', 'OTHER_TEXT']);
+                });
 
-                    expect(translations).toEqual(['This is a text', 'OTHER_TEXT']);
+                it('returns interpolated text', function() {
+                    var translations = translate.instant([
+                        'INTERPOLATION',
+                        'VARIABLES_TEST',
+                        'VARIABLES_OUT'
+                    ], {
+                        count: 6,
+                        name: {
+                            first: 'John',
+                            last: 'Doe'
+                        }
+                    });
+
+                    expect(translations).toEqual([
+                        'The sum from 1+2 is 3',
+                        'This is interesting',
+                        'Hello John Doe'
+                    ]);
+                });
+
+                it('catches parse errors in translations', function() {
+                    var translation = translate.instant('BROKEN');
+
+                    expect(translation).toBe('This "" is empty string');
+                });
+
+                it('translates values in brackets', function() {
+                    var translation = translate.instant('WELCOME', {
+                        lastLogin: '24th of February, 2016',
+                        name: {
+                            gender: 'w',
+                            first: 'Jane',
+                            title: 'Dr.',
+                            last: 'Doe'
+                        }
+                    });
+
+                    expect(translation).toBe('Welcome back Dr. Jane Doe! Your last login was on 24th of February, 2016');
+                });
+
+                it('transports only variables defined to subtranslations', function() {
+                    var translation = translate.instant('CALL', {
+                        privateVar: 'private',
+                        givenVar: 'given'
+                    });
+
+                    expect(translation).toBe('You don\'t know private but given');
                 });
             });
         });
