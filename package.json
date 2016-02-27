@@ -1,10 +1,11 @@
 {
   "name": "angular2-translator",
+  "version": "1.0.0alpha2",
   "description": "A translate-service, translate-pipe and translate-component for angular2",
   "scripts": {
     "test": "typings install && tsc && karma start",
     "test-watch": "typings install && tsc && karma start --no-single-run --auto-watch",
-    "prepublish": "typings install && tsc && node make.js"
+    "prepublish": "typings install && tsc && node bundle.js"
   },
   "keywords": [
     "angular2",

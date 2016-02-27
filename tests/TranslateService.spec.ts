@@ -2,10 +2,10 @@ import {provide, NoProviderError, Key, Injector} from "angular2/core";
 import {HTTP_PROVIDERS, XHRBackend} from "angular2/http";
 import {MockBackend} from "angular2/src/http/backends/mock_backend";
 import {PromiseMatcher, JasminePromise} from "./helper/promise-matcher";
-import {TranslateService} from '../src/TranslateService';
-import {TranslateConfig} from "../src/TranslateConfig";
-import {TranslateLoader} from "../src/TranslateLoader";
-import {TRANSLATE_PROVIDERS} from "../angular2-translator";
+import {TranslateService} from '../angular2-translator/src/TranslateService';
+import {TranslateConfig} from "../angular2-translator/src/TranslateConfig";
+import {TranslateLoader} from "../angular2-translator/src/TranslateLoader";
+import {TRANSLATE_PROVIDERS} from "../angular2-translator/translator";
 import {first} from "rxjs/operator/first";
 
 export function main() {

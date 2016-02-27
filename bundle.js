@@ -3,8 +3,7 @@ var path    = require('path');
 var Builder = require('systemjs-builder');
 var name    = pkg.name;
 
-var builder = new Builder();
-var config = {
+var builder = new Builder({
     baseURL: '.',
     transpiler: 'typescript',
     typescriptOptions: {
@@ -21,13 +20,11 @@ var config = {
     meta: {
         'node_modules/angular2/*': { build: false },
         'node_modules/rxjs/*': { build: false }
-    },
-};
-
-builder.config(config);
+    }
+});
 
 builder
-    .bundle(name, path.resolve(__dirname, 'bundles/', name + '.js'))
+    .bundle('angular2-translator/translator', path.resolve(__dirname, 'bundles/', name + '.js'))
     .then(function() {
         console.log('Build complete.');
     })

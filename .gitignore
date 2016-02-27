@@ -1,9 +1,9 @@
 npm-debug.log
 node_modules
 *.js
-!karma-test-shim.js
-!karma.conf.js
 *.map
 *.d.ts
-!make.js
+!karma-test-shim.js
+!karma.conf.js
+!bundle.js
 !bundles/*.js

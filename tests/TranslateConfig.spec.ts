@@ -1,4 +1,4 @@
-import {TranslateConfig} from "../src/TranslateConfig";
+import {TranslateConfig} from "../angular2-translator/src/TranslateConfig";
 
 export function main() {
     describe('TranslateConfig', function() {

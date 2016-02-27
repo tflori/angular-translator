@@ -1,0 +1,10 @@
+.idea
+.gitignore
+.gitlab-ci.yml
+karma-test-shim.js
+karma.conf.js
+node_modules
+npm-debug.log
+typings
+tests
+bundle.js
