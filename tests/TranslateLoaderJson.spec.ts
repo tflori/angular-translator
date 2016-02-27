@@ -2,7 +2,7 @@ import {Injector, NoProviderError, Key, provide} from "angular2/core";
 import {RequestMethod, RequestOptions, Request, ResponseOptions, Response, HTTP_PROVIDERS, Connection, Http} from "angular2/http";
 import {MockBackend, MockConnection} from "angular2/http/testing";
 import {PromiseMatcher} from "./helper/promise-matcher";
-import {TranslateLoaderJsonConfig, TranslateLoaderJson} from "../angular2-translator/src/TranslateLoaderJson";
+import {TranslateLoaderJsonConfig, TranslateLoaderJson} from "../angular2-translator/TranslateLoaderJson";
 import {XHRBackend} from "angular2/http";
 
 export function main() {

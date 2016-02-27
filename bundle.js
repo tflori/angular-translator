@@ -24,7 +24,7 @@ var builder = new Builder({
 });
 
 builder
-    .bundle('angular2-translator/translator', path.resolve(__dirname, 'bundles/', name + '.js'))
+    .bundle('angular2-translator', path.resolve(__dirname, 'bundles/', name + '.js'))
     .then(function() {
         console.log('Build complete.');
     })

@@ -12,11 +12,11 @@
   },
   "files": [
     "typings/main.d.ts",
-    "angular2-translator/translator.ts",
-    "./angular2-translator/src/TranslateService.ts",
-    "./angular2-translator/src/TranslateConfig.ts",
-    "./angular2-translator/src/TranslateLoader.ts",
-    "./angular2-translator/src/TranslateLoaderJson.ts"
+    "angular2-translator.ts",
+    "./angular2-translator/TranslateService.ts",
+    "./angular2-translator/TranslateConfig.ts",
+    "./angular2-translator/TranslateLoader.ts",
+    "./angular2-translator/TranslateLoaderJson.ts"
   ],
   "exclude": [
     "node_modules"

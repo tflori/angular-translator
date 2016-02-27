@@ -1,4 +1,4 @@
-System.registerDynamic("angular2-translator/src/TranslateService", ["angular2/core", "angular2/http", "./TranslateConfig", "./TranslateLoader"], true, function($__require, exports, module) {
+System.registerDynamic("angular2-translator/TranslateService", ["angular2/core", "angular2/http", "./TranslateConfig", "./TranslateLoader"], true, function($__require, exports, module) {
   ;
   var define;
   var global = this;
@@ -184,7 +184,7 @@ System.registerDynamic("angular2-translator/src/TranslateService", ["angular2/co
   return module.exports;
 });
 
-System.registerDynamic("angular2-translator/src/TranslateConfig", [], true, function($__require, exports, module) {
+System.registerDynamic("angular2-translator/TranslateConfig", [], true, function($__require, exports, module) {
   ;
   var define;
   var global = this;
@@ -244,7 +244,7 @@ System.registerDynamic("angular2-translator/src/TranslateConfig", [], true, func
   return module.exports;
 });
 
-System.registerDynamic("angular2-translator/src/TranslateLoader", [], true, function($__require, exports, module) {
+System.registerDynamic("angular2-translator/TranslateLoader", [], true, function($__require, exports, module) {
   ;
   var define;
   var global = this;
@@ -257,7 +257,7 @@ System.registerDynamic("angular2-translator/src/TranslateLoader", [], true, func
   return module.exports;
 });
 
-System.registerDynamic("angular2-translator/src/TranslateLoaderJson", ["angular2/core", "angular2/http", "./TranslateLoader"], true, function($__require, exports, module) {
+System.registerDynamic("angular2-translator/TranslateLoaderJson", ["angular2/core", "angular2/http", "./TranslateLoader"], true, function($__require, exports, module) {
   ;
   var define;
   var global = this;
@@ -336,7 +336,7 @@ System.registerDynamic("angular2-translator/src/TranslateLoaderJson", ["angular2
   return module.exports;
 });
 
-System.registerDynamic("angular2-translator/translator", ["./src/TranslateService", "./src/TranslateConfig", "./src/TranslateLoader", "./src/TranslateLoaderJson", "angular2/core"], true, function($__require, exports, module) {
+System.registerDynamic("angular2-translator", ["./angular2-translator/TranslateService", "./angular2-translator/TranslateConfig", "./angular2-translator/TranslateLoader", "./angular2-translator/TranslateLoaderJson", "angular2/core"], true, function($__require, exports, module) {
   ;
   var define;
   var global = this;
@@ -346,15 +346,15 @@ System.registerDynamic("angular2-translator/translator", ["./src/TranslateServic
       if (!exports.hasOwnProperty(p))
         exports[p] = m[p];
   }
-  var TranslateService_1 = $__require('./src/TranslateService');
-  var TranslateConfig_1 = $__require('./src/TranslateConfig');
-  var TranslateLoader_1 = $__require('./src/TranslateLoader');
-  var TranslateLoaderJson_1 = $__require('./src/TranslateLoaderJson');
+  var TranslateService_1 = $__require('./angular2-translator/TranslateService');
+  var TranslateConfig_1 = $__require('./angular2-translator/TranslateConfig');
+  var TranslateLoader_1 = $__require('./angular2-translator/TranslateLoader');
+  var TranslateLoaderJson_1 = $__require('./angular2-translator/TranslateLoaderJson');
   var core_1 = $__require('angular2/core');
-  __export($__require('./src/TranslateService'));
-  __export($__require('./src/TranslateConfig'));
-  __export($__require('./src/TranslateLoader'));
-  __export($__require('./src/TranslateLoaderJson'));
+  __export($__require('./angular2-translator/TranslateService'));
+  __export($__require('./angular2-translator/TranslateConfig'));
+  __export($__require('./angular2-translator/TranslateLoader'));
+  __export($__require('./angular2-translator/TranslateLoaderJson'));
   exports.TRANSLATE_PROVIDERS = [new core_1.Provider(TranslateConfig_1.TranslateConfig, {useValue: new TranslateConfig_1.TranslateConfig({})}), new core_1.Provider(TranslateLoaderJson_1.TranslateLoaderJsonConfig, {useValue: new TranslateLoaderJson_1.TranslateLoaderJsonConfig()}), new core_1.Provider(TranslateLoader_1.TranslateLoader, {useClass: TranslateLoaderJson_1.TranslateLoaderJson}), TranslateService_1.TranslateService];
   return module.exports;
 });
