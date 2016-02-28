@@ -2,17 +2,13 @@ import {provide, NoProviderError, Key, Injector} from "angular2/core";
 import {HTTP_PROVIDERS, XHRBackend} from "angular2/http";
 import {MockBackend} from "angular2/src/http/backends/mock_backend";
 import {PromiseMatcher, JasminePromise} from "./helper/promise-matcher";
+import {JasmineHelper} from "./helper/JasmineHelper";
 import {TranslateService} from '../angular2-translator/TranslateService';
 import {TranslateConfig} from "../angular2-translator/TranslateConfig";
 import {TranslateLoader} from "../angular2-translator/TranslateLoader";
 import {TRANSLATE_PROVIDERS} from "../angular2-translator";
-import {first} from "rxjs/operator/first";
 
 export function main() {
-    function calls(spy:any):jasmine.Calls {
-        return spy.calls;
-    }
-
     describe('TranslateService', function () {
         it('is defined', function () {
             expect(TranslateService).toBeDefined();
@@ -214,7 +210,7 @@ export function main() {
                     translate.waitForTranslation();
                     translate.waitForTranslation();
 
-                    expect(calls(loader.load).count()).toBe(1);
+                    expect(JasmineHelper.calls(loader.load).count()).toBe(1);
                 });
 
                 it('returns the already resolved promise', function() {
@@ -296,7 +292,7 @@ export function main() {
                     translate.translate('TEXT');
                     translate.translate('OTHER_TEXT');
 
-                    expect(calls(loader.load).count()).toBe(1);
+                    expect(JasmineHelper.calls(loader.load).count()).toBe(1);
                 });
 
                 it('resolves keys if language is not provided', function() {

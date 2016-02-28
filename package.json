@@ -1,6 +1,6 @@
 {
   "name": "angular2-translator",
-  "version": "1.0.0-alpha3",
+  "version": "1.0.0-alpha4",
   "description": "A translate-service, translate-pipe and translate-component for angular2",
   "scripts": {
     "test": "typings install && tsc && karma start",
@@ -19,7 +19,7 @@
   },
   "main": "./angular2-translator.js",
   "typings": "./angular2-translator.d.ts",
-  "homepage": "https://config.w00tserver.org:4443/gitlab/tflori/angular2-translator",
+  "homepage": "https://gitlab.w00tserver.org:617/tflori/angular2-translator",
   "peerDependencies": {
     "angular2": "~2.0.0-beta.6",
     "es6-promise": "~3.0.2",

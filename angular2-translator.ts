@@ -5,6 +5,7 @@ import {TranslateLoaderJson, TranslateLoaderJsonConfig} from './angular2-transla
 import {Provider} from "angular2/core";
 
 export * from './angular2-translator/TranslateService';
+export * from './angular2-translator/TranslatePipe';
 export * from './angular2-translator/TranslateConfig';
 export * from './angular2-translator/TranslateLoader';
 export * from './angular2-translator/TranslateLoaderJson';
