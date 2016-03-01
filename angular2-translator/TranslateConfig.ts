@@ -1,16 +1,36 @@
 export class TranslateConfig {
+    public static navigator:any = window && window.navigator ? window.navigator : {};
+
     public defaultLang:string;
     public providedLangs:string[];
+    public detectLanguageOnStart:boolean;
+    public navigatorLanguages:string[];
 
     constructor({
         defaultLang = 'en',
-        providedLangs = ['en']
+        providedLangs = ['en'],
+        detectLanguageOnStart = true
         }:{
         defaultLang?:string,
         providedLangs?:string[]
+        detectLanguageOnStart?:boolean
     }) {
         this.defaultLang   = providedLangs.indexOf(defaultLang) > -1 ? defaultLang : providedLangs[0];
         this.providedLangs = providedLangs;
+        this.detectLanguageOnStart = detectLanguageOnStart;
+        this.navigatorLanguages = (():string[] => {
+            var navigator:any = TranslateConfig.navigator;
+
+            if (navigator.languages instanceof Array) {
+                return Array.prototype.slice.call(navigator.languages);
+            } else if (typeof navigator.languages === 'string') {
+                return [String(navigator.languages)];
+            } else if (typeof navigator.language === 'string') {
+                return [navigator.language];
+            } else {
+                return [];
+            }
+        })();
     }
 
     /**

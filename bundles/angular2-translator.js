@@ -87,9 +87,24 @@ System.registerDynamic("angular2-translator/TranslateConfig", [], true, function
       var _b = _a.defaultLang,
           defaultLang = _b === void 0 ? 'en' : _b,
           _c = _a.providedLangs,
-          providedLangs = _c === void 0 ? ['en'] : _c;
+          providedLangs = _c === void 0 ? ['en'] : _c,
+          _d = _a.detectLanguageOnStart,
+          detectLanguageOnStart = _d === void 0 ? true : _d;
       this.defaultLang = providedLangs.indexOf(defaultLang) > -1 ? defaultLang : providedLangs[0];
       this.providedLangs = providedLangs;
+      this.detectLanguageOnStart = detectLanguageOnStart;
+      this.navigatorLanguages = (function() {
+        var navigator = TranslateConfig.navigator;
+        if (navigator.languages instanceof Array) {
+          return Array.prototype.slice.call(navigator.languages);
+        } else if (typeof navigator.languages === 'string') {
+          return [String(navigator.languages)];
+        } else if (typeof navigator.language === 'string') {
+          return [navigator.language];
+        } else {
+          return [];
+        }
+      })();
     }
     TranslateConfig.prototype.langProvided = function(lang, strict) {
       if (strict === void 0) {
@@ -131,6 +146,7 @@ System.registerDynamic("angular2-translator/TranslateConfig", [], true, function
       }
       return provided;
     };
+    TranslateConfig.navigator = window && window.navigator ? window.navigator : {};
     return TranslateConfig;
   })();
   exports.TranslateConfig = TranslateConfig;
@@ -186,34 +202,31 @@ System.registerDynamic("angular2-translator/TranslateService", ["angular2/core",
       this._config = config;
       this._loader = loader;
       this._lang = this._config.defaultLang;
+      if (config.detectLanguageOnStart) {
+        var lang = this.detectLang(config.navigatorLanguages);
+        if (lang) {
+          this._lang = String(lang);
+        }
+      }
     }
     TranslateService.prototype.currentLang = function() {
       return this._lang;
     };
-    TranslateService.prototype.detectLang = function(navigator) {
+    TranslateService.prototype.detectLang = function(navLangs) {
       var detected = false,
-          navLangs,
           i;
-      if (navigator) {
-        if (navigator.languages) {
-          navLangs = Array.isArray(navigator.languages) ? navigator.languages : [navigator.languages];
-          for (i = 0; i < navLangs.length; i++) {
-            detected = this._config.langProvided(navLangs[i], true);
-            if (detected) {
-              break;
-            }
-          }
-          if (!detected) {
-            for (i = 0; i < navLangs.length; i++) {
-              detected = this._config.langProvided(navLangs[i]);
-              if (detected) {
-                break;
-              }
-            }
-          }
+      for (i = 0; i < navLangs.length; i++) {
+        detected = this._config.langProvided(navLangs[i], true);
+        if (detected) {
+          break;
         }
-        if (!detected && navigator.language) {
-          detected = this._config.langProvided(navigator.language);
+      }
+      if (!detected) {
+        for (i = 0; i < navLangs.length; i++) {
+          detected = this._config.langProvided(navLangs[i]);
+          if (detected) {
+            break;
+          }
         }
       }
       return detected;

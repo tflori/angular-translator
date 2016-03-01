@@ -42,6 +42,38 @@ export function main() {
             expect(translateConfig.defaultLang).toBe('cn');
         });
 
+        describe('navigatorLanguages', function() {
+            it('is always an array', function() {
+                var translateConfig = new TranslateConfig({});
+
+                expect(translateConfig.navigatorLanguages instanceof Array).toBe(true);
+            });
+
+            it('uses navigator.languages when given', function() {
+                TranslateConfig.navigator = {languages: ['bm', 'de', 'fr', 'en']};
+
+                var translateConfig = new TranslateConfig({});
+
+                expect(translateConfig.navigatorLanguages).toEqual(['bm', 'de', 'fr', 'en']);
+            });
+
+            it('transforms navigator.languages to Array if it is String', function() {
+                TranslateConfig.navigator = {languages: 'bm'};
+
+                var translateConfig = new TranslateConfig({});
+
+                expect(translateConfig.navigatorLanguages).toEqual(['bm']);
+            });
+
+            it('falls back to navigator.language', function() {
+                TranslateConfig.navigator = {language: 'fr'};
+
+                var translateConfig = new TranslateConfig({});
+
+                expect(translateConfig.navigatorLanguages).toEqual(['fr']);
+            });
+        });
+
         describe('langProvided', function() {
             var translateConfig:TranslateConfig;
 

@@ -71,6 +71,23 @@ export function main() {
 
                 expect(translate.currentLang()).toBe('en');
             });
+
+            it('detects language automatically on start', function() {
+                var translateConfig = new TranslateConfig({
+                    providedLangs: ['en','de']
+                });
+                translateConfig.navigatorLanguages = ['de-DE', 'de', 'en-US', 'en'];
+
+                var injector = Injector.resolveAndCreate([
+                    HTTP_PROVIDERS,
+                    TRANSLATE_PROVIDERS,
+                    provide(TranslateConfig, {useValue: translateConfig}),
+                ]);
+
+                var translate:TranslateService = injector.get(TranslateService);
+
+                expect(translate.currentLang()).toBe('de');
+            });
         });
 
         describe('instance', function () {
@@ -103,39 +120,34 @@ export function main() {
                     mockNavigator = {};
                 });
 
-                it('detects language by navigator.language', function () {
+                it('detects language', function () {
                     translateConfig.providedLangs = ['bm', 'en'];
-                    mockNavigator.language        = 'bm';
 
-                    var detectedLang = translate.detectLang(mockNavigator);
+                    var detectedLang = translate.detectLang(['bm']);
 
                     expect(detectedLang).toBe('bm');
                 });
 
                 it('detects only languages that are provided', function () {
                     translateConfig.providedLangs = ['en'];
-                    mockNavigator.language        = 'bm';
 
-                    var detectedLang = translate.detectLang(mockNavigator);
+                    var detectedLang = translate.detectLang(['bm']);
 
                     expect(detectedLang).toBeFalsy();
                 });
 
                 it('using config.langProvided for checking', function () {
-                    mockNavigator.language = 'bm';
                     spyOn(translateConfig, 'langProvided');
 
-                    var detectedLang = translate.detectLang(mockNavigator);
+                    translate.detectLang(['bm']);
 
                     expect(translateConfig.langProvided).toHaveBeenCalledWith('bm');
                 });
 
-                it('rather checks navigator.languages', function () {
+                it('rather takes direct matches', function () {
                     translateConfig.providedLangs = ['de-DE', 'de-AT'];
-                    mockNavigator.language        = 'de-CH';
-                    mockNavigator.languages       = ['de-CH', 'de-AT'];
 
-                    var detectedLang = translate.detectLang(mockNavigator);
+                    var detectedLang = translate.detectLang(['de-CH', 'de-AT']);
 
                     expect(detectedLang).toBe('de-AT');
                 });

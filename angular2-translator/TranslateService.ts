@@ -17,6 +17,13 @@ export class TranslateService {
         this._loader = loader;
 
         this._lang = this._config.defaultLang;
+
+        if (config.detectLanguageOnStart) {
+            var lang = this.detectLang(config.navigatorLanguages);
+            if (lang) {
+                this._lang = String(lang);
+            }
+        }
     }
 
     /**
@@ -29,38 +36,29 @@ export class TranslateService {
     }
 
     /**
-     * Detects the preferred language by navigator.
+     * Detects the preferred language by navLangs.
      *
      * Returns false if the user prefers a language that is not provided or
      * the provided language.
      *
-     * @param {any} navigator
+     * @param {string[]} navLangs (usually navigator.languages)
      * @returns {string|boolean}
      */
-    public detectLang(navigator:any):string|boolean {
-        var detected:string|boolean = false, navLangs:string[], i:number;
+    public detectLang(navLangs:string[]):string|boolean {
+        var detected:string|boolean = false, i:number;
 
-        if (navigator) {
-            if (navigator.languages) {
-                navLangs = Array.isArray(navigator.languages) ?
-                    navigator.languages : [navigator.languages];
-                for (i = 0; i < navLangs.length; i++) {
-                    detected = this._config.langProvided(navLangs[i], true);
-                    if (detected) {
-                        break;
-                    }
-                }
-                if (!detected) {
-                    for (i = 0; i < navLangs.length; i++) {
-                        detected = this._config.langProvided(navLangs[i]);
-                        if (detected) {
-                            break;
-                        }
-                    }
-                }
+        for (i = 0; i < navLangs.length; i++) {
+            detected = this._config.langProvided(navLangs[i], true);
+            if (detected) {
+                break;
             }
-            if (!detected && navigator.language) {
-                detected = this._config.langProvided(navigator.language);
+        }
+        if (!detected) {
+            for (i = 0; i < navLangs.length; i++) {
+                detected = this._config.langProvided(navLangs[i]);
+                if (detected) {
+                    break;
+                }
             }
         }
 
