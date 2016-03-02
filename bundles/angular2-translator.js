@@ -166,7 +166,7 @@ System.registerDynamic("angular2-translator/TranslateLoader", [], true, function
   return module.exports;
 });
 
-System.registerDynamic("angular2-translator/TranslateService", ["angular2/core", "./TranslateConfig", "./TranslateLoader"], true, function($__require, exports, module) {
+System.registerDynamic("angular2-translator/TranslateService", ["angular2/core", "rxjs/Observable", "rxjs/add/operator/share", "./TranslateConfig", "./TranslateLoader"], true, function($__require, exports, module) {
   ;
   var define;
   var global = this;
@@ -193,10 +193,13 @@ System.registerDynamic("angular2-translator/TranslateService", ["angular2/core",
     };
   };
   var core_1 = $__require('angular2/core');
+  var Observable_1 = $__require('rxjs/Observable');
+  $__require('rxjs/add/operator/share');
   var TranslateConfig_1 = $__require('./TranslateConfig');
   var TranslateLoader_1 = $__require('./TranslateLoader');
   var TranslateService = (function() {
     function TranslateService(config, loader) {
+      var _this = this;
       this._loadedLangs = {};
       this._translations = {};
       this._config = config;
@@ -208,6 +211,9 @@ System.registerDynamic("angular2-translator/TranslateService", ["angular2/core",
           this._lang = String(lang);
         }
       }
+      this.languageChanged = new Observable_1.Observable(function(observer) {
+        return _this._languageChangedObserver = observer;
+      }).share();
     }
     TranslateService.prototype.currentLang = function() {
       return this._lang;
@@ -235,6 +241,9 @@ System.registerDynamic("angular2-translator/TranslateService", ["angular2/core",
       var providedLang = this._config.langProvided(lang, true);
       if (typeof providedLang === 'string') {
         this._lang = providedLang;
+        if (this._languageChangedObserver) {
+          this._languageChangedObserver.next(this._lang);
+        }
         return true;
       }
       return false;

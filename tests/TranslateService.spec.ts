@@ -1,5 +1,6 @@
 import {provide, NoProviderError, Key, Injector} from "angular2/core";
 import {HTTP_PROVIDERS, XHRBackend} from "angular2/http";
+import {Observable} from "rxjs/Observable";
 import {MockBackend} from "angular2/src/http/backends/mock_backend";
 import {PromiseMatcher, JasminePromise} from "./helper/promise-matcher";
 import {JasmineHelper} from "./helper/JasmineHelper";
@@ -176,6 +177,22 @@ export function main() {
                     var result = translate.useLang('de');
 
                     expect(result).toBeFalsy();
+                });
+
+                it('has an observable', function() {
+                    expect(translate.languageChanged instanceof Observable).toBe(true);
+                });
+
+                it('gives the next value to the observable', function() {
+                    translateConfig.providedLangs = ['en', 'de'];
+                    var newLang;
+                    translate.languageChanged.subscribe(function(nextLang) {
+                        newLang = nextLang;
+                    });
+
+                    translate.useLang('de');
+
+                    expect(newLang).toBe('de');
                 });
             });
 

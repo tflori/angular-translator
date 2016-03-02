@@ -1,4 +1,7 @@
 import {Injectable, Inject} from "angular2/core";
+import {Observable} from "rxjs/Observable";
+import {Observer} from "rxjs/Observer";
+import 'rxjs/add/operator/share';
 import {TranslateConfig} from './TranslateConfig';
 import {TranslateLoader} from "./TranslateLoader";
 
@@ -10,6 +13,9 @@ export class TranslateService {
     private _lang:string;
     private _loadedLangs:Object = {};
     private _translations:Object = {};
+    private _languageChangedObserver:Observer<string>;
+
+    public languageChanged:Observable<string>;
 
     constructor(@Inject(TranslateConfig) config:TranslateConfig,
                 @Inject(TranslateLoader) loader:TranslateLoader) {
@@ -24,6 +30,10 @@ export class TranslateService {
                 this._lang = String(lang);
             }
         }
+
+        this.languageChanged = new Observable<string>(
+            observer => this._languageChangedObserver = observer
+        ).share();
     }
 
     /**
@@ -78,6 +88,9 @@ export class TranslateService {
 
         if (typeof providedLang === 'string') {
             this._lang = providedLang;
+            if (this._languageChangedObserver) {
+                this._languageChangedObserver.next(this._lang);
+            }
             return true;
         }
 
