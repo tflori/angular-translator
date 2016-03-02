@@ -6,6 +6,7 @@ import {TranslatePipe} from "../angular2-translator/TranslatePipe";
 import {TranslateService} from "../angular2-translator/TranslateService";
 import {TranslateLoader} from "../angular2-translator/TranslateLoader";
 import {TranslateLoaderMock} from "./helper/TranslateLoaderMock";
+import {TranslateConfig} from "../angular2-translator/TranslateConfig";
 
 export function main() {
     describe('TranslatePipe', function() {
@@ -37,7 +38,10 @@ export function main() {
                 PromiseMatcher.install();
                 var injector = Injector.resolveAndCreate([
                     TRANSLATE_PROVIDERS,
-                    provide(TranslateLoader, {useValue: new TranslateLoaderMock()})
+                    provide(TranslateLoader, {useValue: new TranslateLoaderMock()}),
+                    provide(TranslateConfig, {useValue: new TranslateConfig({
+                        providedLangs: ['en', 'de']
+                    })})
                 ]);
 
                 translate = injector.get(TranslateService);
@@ -108,6 +112,14 @@ export function main() {
 
                 expect(translate.translate).toHaveBeenCalledWith('TEXT', {some:'value'});
                 expect(translate.translate).toHaveBeenCalledWith('TEXT', {some:'otherValue'});
+                expect(JasmineHelper.calls(translate.translate).count()).toBe(2);
+            });
+
+            it('calls translate again when language got changed', function() {
+                translatePipe.transform('TEXT');
+
+                translate.useLang('de');
+
                 expect(JasmineHelper.calls(translate.translate).count()).toBe(2);
             });
         });

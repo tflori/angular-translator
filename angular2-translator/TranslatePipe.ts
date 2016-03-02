@@ -9,10 +9,14 @@ export class TranslatePipe implements PipeTransform {
     private _translate:TranslateService;
     private _promise:Promise<string|string[]>;
     private _translation:string = '';
-    private _translated:{key:string,params:string};
+    private _translated:{key:string,params:any};
 
     constructor(@Inject(TranslateService) translate: TranslateService) {
         this._translate = translate;
+
+        translate.languageChanged.subscribe(() => {
+            this._startTranslation();
+        });
     }
 
     /**
@@ -35,7 +39,9 @@ export class TranslatePipe implements PipeTransform {
         }
 
         if (this._translated && this._promise &&
-            (this._translated.key !== key || this._translated.params !== JSON.stringify(params))
+            ( this._translated.key !== key ||
+              JSON.stringify(this._translated.params) !== JSON.stringify(params)
+            )
         ) {
             this._promise = null;
         }
@@ -43,15 +49,20 @@ export class TranslatePipe implements PipeTransform {
         if (!this._promise) {
             this._translated = {
                 key: key,
-                params: JSON.stringify(params)
+                params: params
             };
-            this._promise = this._translate.translate(key, params);
-            this._promise.then(
-                (translation) => this._translation = String(translation)
-            );
+            this._startTranslation();
         }
 
         return this._translation;
+    }
+
+    private _startTranslation() {
+        if (!this._translated || !this._translated.key) {
+            return;
+        }
+        this._promise = this._translate.translate(this._translated.key, this._translated.params);
+        this._promise.then((translation) => this._translation = String(translation));
     }
 }
 

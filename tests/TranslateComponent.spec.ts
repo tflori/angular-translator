@@ -7,6 +7,7 @@ import {TranslateComponent} from "../angular2-translator/TranslateComponent";
 import {TranslateService} from "../angular2-translator/TranslateService";
 import {TranslateLoader} from "../angular2-translator/TranslateLoader";
 import {JasminePromise} from "./helper/promise-matcher";
+import {TranslateConfig} from "../angular2-translator/TranslateConfig";
 
 export function main() {
     describe('TranslateComponent', function() {
@@ -34,7 +35,10 @@ export function main() {
                 PromiseMatcher.install();
                 var injector = Injector.resolveAndCreate([
                     TRANSLATE_PROVIDERS,
-                    provide(TranslateLoader, {useValue: new TranslateLoaderMock()})
+                    provide(TranslateLoader, {useValue: new TranslateLoaderMock()}),
+                    provide(TranslateConfig, {useValue: new TranslateConfig({
+                        providedLangs: ['en', 'de']
+                    })})
                 ]);
 
                 translate = injector.get(TranslateService);
@@ -90,6 +94,15 @@ export function main() {
                 JasminePromise.flush();
 
                 expect(translateComponent.translation).toBe('This is a text');
+            });
+
+            it('restarts translation when language got changed', function() {
+                translateComponent.key = 'TEXT';
+                JasmineHelper.calls(translate.translate).reset();
+
+                translate.useLang('de');
+
+                expect(translate.translate).toHaveBeenCalledWith('TEXT', {});
             });
         });
     });

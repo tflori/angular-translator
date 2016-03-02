@@ -386,11 +386,14 @@ System.registerDynamic("angular2-translator/TranslatePipe", ["angular2/core", ".
   var TranslateService_1 = $__require('./TranslateService');
   var TranslatePipe = (function() {
     function TranslatePipe(translate) {
+      var _this = this;
       this._translation = '';
       this._translate = translate;
+      translate.languageChanged.subscribe(function() {
+        _this._startTranslation();
+      });
     }
     TranslatePipe.prototype.transform = function(key, args) {
-      var _this = this;
       if (args === void 0) {
         args = [];
       }
@@ -402,20 +405,27 @@ System.registerDynamic("angular2-translator/TranslatePipe", ["angular2/core", ".
           params = args[0];
         }
       }
-      if (this._translated && this._promise && (this._translated.key !== key || this._translated.params !== JSON.stringify(params))) {
+      if (this._translated && this._promise && (this._translated.key !== key || JSON.stringify(this._translated.params) !== JSON.stringify(params))) {
         this._promise = null;
       }
       if (!this._promise) {
         this._translated = {
           key: key,
-          params: JSON.stringify(params)
+          params: params
         };
-        this._promise = this._translate.translate(key, params);
-        this._promise.then(function(translation) {
-          return _this._translation = String(translation);
-        });
+        this._startTranslation();
       }
       return this._translation;
+    };
+    TranslatePipe.prototype._startTranslation = function() {
+      var _this = this;
+      if (!this._translated || !this._translated.key) {
+        return;
+      }
+      this._promise = this._translate.translate(this._translated.key, this._translated.params);
+      this._promise.then(function(translation) {
+        return _this._translation = String(translation);
+      });
     };
     TranslatePipe = __decorate([core_1.Pipe({
       name: 'translate',

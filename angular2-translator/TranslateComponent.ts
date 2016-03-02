@@ -18,11 +18,15 @@ export class TranslateComponent {
 
     constructor(@Inject(TranslateService) translate:TranslateService) {
         this._translate = translate;
+
+        translate.languageChanged.subscribe(() => {
+            this._startTranslation();
+        })
     }
 
     @Input('translate') set key(key:string) {
         this._key = key;
-        this._start();
+        this._startTranslation();
     }
 
     @Input('translateParams') set params(params:any) {
@@ -31,10 +35,10 @@ export class TranslateComponent {
         }
 
         this._params = params;
-        this._start();
+        this._startTranslation();
     }
 
-    private _start() {
+    private _startTranslation() {
         if (!this._key) {
             return;
         }
