@@ -7,6 +7,7 @@ import {TranslateService} from "../angular2-translator/TranslateService";
 import {TranslateLoader} from "../angular2-translator/TranslateLoader";
 import {TranslateLoaderMock} from "./helper/TranslateLoaderMock";
 import {TranslateConfig} from "../angular2-translator/TranslateConfig";
+import {TranslateLogHandler} from "../angular2-translator/TranslateService";
 
 export function main() {
     describe('TranslatePipe', function() {
@@ -121,6 +122,14 @@ export function main() {
                 translate.useLang('de');
 
                 expect(JasmineHelper.calls(translate.translate).count()).toBe(2);
+            });
+
+            it('shows error if params could not be parsed', function() {
+                spyOn(TranslateLogHandler, 'error');
+
+                translatePipe.transform('TEXT', ['{baefa}']);
+
+                expect(TranslateLogHandler.error).toHaveBeenCalledWith('\'{baefa}\' could not be parsed to object');
             });
         });
     });

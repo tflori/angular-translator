@@ -4,13 +4,18 @@ import {Observable} from "rxjs/Observable";
 import {MockBackend} from "angular2/src/http/backends/mock_backend";
 import {PromiseMatcher, JasminePromise} from "./helper/promise-matcher";
 import {JasmineHelper} from "./helper/JasmineHelper";
-import {TranslateService} from '../angular2-translator/TranslateService';
+import {TranslateLoaderMock} from "./helper/TranslateLoaderMock";
+import {TranslateService, TranslateLogHandler} from '../angular2-translator/TranslateService';
 import {TranslateConfig} from "../angular2-translator/TranslateConfig";
 import {TranslateLoader} from "../angular2-translator/TranslateLoader";
 import {TRANSLATE_PROVIDERS} from "../angular2-translator";
 
 export function main() {
     describe('TranslateService', function () {
+        beforeEach(function() {
+            TranslateLogHandler.error = () => {};
+        });
+
         it('is defined', function () {
             expect(TranslateService).toBeDefined();
         });
@@ -18,7 +23,6 @@ export function main() {
         describe('constructor', function () {
             it('requires a TranslateConfig', function () {
                 var injector = Injector.resolveAndCreate([
-                    HTTP_PROVIDERS,
                     TranslateService
                 ]);
 
@@ -33,7 +37,6 @@ export function main() {
 
             it('requires a TranslateLoader', function () {
                 var injector = Injector.resolveAndCreate([
-                    HTTP_PROVIDERS,
                     TranslateService,
                     provide(TranslateConfig, {useValue: new TranslateConfig({})})
                 ]);
@@ -43,6 +46,22 @@ export function main() {
                 };
 
                 var providerError = new NoProviderError(injector, Key.get(TranslateLoader));
+                providerError.addKey(injector, Key.get(TranslateService));
+                expect(action).toThrow(providerError);
+            });
+
+            it('requires an TranslateLogHandler', function() {
+                var injector = Injector.resolveAndCreate([
+                    TranslateService,
+                    provide(TranslateConfig, {useValue: new TranslateConfig({})}),
+                    provide(TranslateLoader, {useValue: new TranslateLoaderMock()})
+                ]);
+
+                var action = function () {
+                    injector.get(TranslateService);
+                };
+
+                var providerError = new NoProviderError(injector, Key.get(TranslateLogHandler));
                 providerError.addKey(injector, Key.get(TranslateService));
                 expect(action).toThrow(providerError);
             });
@@ -88,6 +107,24 @@ export function main() {
                 var translate:TranslateService = injector.get(TranslateService);
 
                 expect(translate.currentLang()).toBe('de');
+            });
+
+            it('informs about detected language', function() {
+                var translateConfig = new TranslateConfig({
+                    providedLangs: ['en','de']
+                });
+                translateConfig.navigatorLanguages = ['de-DE', 'de', 'en-US', 'en'];
+                spyOn(TranslateLogHandler, 'info');
+
+                var injector = Injector.resolveAndCreate([
+                    HTTP_PROVIDERS,
+                    TRANSLATE_PROVIDERS,
+                    provide(TranslateConfig, {useValue: translateConfig}),
+                ]);
+
+                var translate:TranslateService = injector.get(TranslateService);
+
+                expect(TranslateLogHandler.info).toHaveBeenCalledWith('Language de got detected');
             });
         });
 
@@ -194,6 +231,15 @@ export function main() {
 
                     expect(newLang).toBe('de');
                 });
+
+                it('informs about language change', function() {
+                    spyOn(TranslateLogHandler, 'info');
+                    translateConfig.providedLangs = ['de/de'];
+
+                    translate.useLang('de-DE');
+
+                    expect(TranslateLogHandler.info).toHaveBeenCalledWith('Language changed to de/de');
+                });
             });
 
             describe('waiting for translation', function () {
@@ -272,6 +318,26 @@ export function main() {
                     var promise = translate.waitForTranslation('de');
 
                     expect(promise).toBeRejectedWith('Language not provided');
+                });
+
+                it('informs about loaded language', function() {
+                    spyOn(TranslateLogHandler, 'info');
+
+                    translate.waitForTranslation();
+                    loaderPromiseResolve();
+                    JasminePromise.flush();
+
+                    expect(TranslateLogHandler.info).toHaveBeenCalledWith('Language en got loaded');
+                });
+
+                it('shows error when language could not be loaded', function() {
+                    spyOn(TranslateLogHandler, 'error');
+
+                    translate.waitForTranslation();
+                    loaderPromiseReject('File not found');
+                    JasminePromise.flush();
+
+                    expect(TranslateLogHandler.error).toHaveBeenCalledWith('Language en could not be loaded (File not found)');
                 });
             });
 
@@ -441,6 +507,22 @@ export function main() {
                     });
 
                     expect(translation).toBe('You don\'t know private but given');
+                });
+
+                it('informs about missing translation', function() {
+                    spyOn(TranslateLogHandler, 'info');
+
+                    translate.instant('UNDEFINED');
+
+                    expect(TranslateLogHandler.info).toHaveBeenCalledWith('Translation for \'UNDEFINED\' in language en not found');
+                });
+
+                it('shows error when parsing throws error', function() {
+                    spyOn(TranslateLogHandler, 'error');
+
+                    translate.instant('BROKEN');
+
+                    expect(TranslateLogHandler.error).toHaveBeenCalledWith('Parsing error for expression \'notExisting.func()\'');
                 });
             });
         });

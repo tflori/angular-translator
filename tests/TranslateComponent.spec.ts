@@ -8,9 +8,14 @@ import {TranslateService} from "../angular2-translator/TranslateService";
 import {TranslateLoader} from "../angular2-translator/TranslateLoader";
 import {JasminePromise} from "./helper/promise-matcher";
 import {TranslateConfig} from "../angular2-translator/TranslateConfig";
+import {TranslateLogHandler} from "../angular2-translator/TranslateService";
 
 export function main() {
     describe('TranslateComponent', function() {
+        beforeEach(function() {
+            TranslateLogHandler.error = () => {}
+        });
+
         describe('constructor', function() {
             it('requires a TranslateService', function () {
                 var injector = Injector.resolveAndCreate([
@@ -103,6 +108,14 @@ export function main() {
                 translate.useLang('de');
 
                 expect(translate.translate).toHaveBeenCalledWith('TEXT', {});
+            });
+
+            it('shows error if params are not object', function() {
+                spyOn(TranslateLogHandler, 'error');
+
+                translateComponent.params = 'foo';
+
+                expect(TranslateLogHandler.error).toHaveBeenCalledWith('Params have to be an object');
             });
         });
     });

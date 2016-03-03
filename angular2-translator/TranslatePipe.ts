@@ -33,6 +33,9 @@ export class TranslatePipe implements PipeTransform {
         if (args[0]) {
             if (typeof args[0] === 'string') {
                 params = __parseParams(args[0]);
+                if (!Object.keys(params).length) {
+                    this._translate.logHandler.error('\'' + args[0] + '\' could not be parsed to object');
+                }
             } else if (typeof args[0] === 'object') {
                 params = args[0];
             }

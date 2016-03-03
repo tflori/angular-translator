@@ -197,18 +197,27 @@ System.registerDynamic("angular2-translator/TranslateService", ["angular2/core",
   $__require('rxjs/add/operator/share');
   var TranslateConfig_1 = $__require('./TranslateConfig');
   var TranslateLoader_1 = $__require('./TranslateLoader');
+  exports.TranslateLogHandler = {
+    error: function(message) {
+      return console && console.error && console.error(message);
+    },
+    info: function() {},
+    debug: function() {}
+  };
   var TranslateService = (function() {
-    function TranslateService(config, loader) {
+    function TranslateService(config, loader, logHandler) {
       var _this = this;
       this._loadedLangs = {};
       this._translations = {};
       this._config = config;
       this._loader = loader;
-      this._lang = this._config.defaultLang;
+      this.logHandler = logHandler;
+      this._lang = config.defaultLang;
       if (config.detectLanguageOnStart) {
         var lang = this.detectLang(config.navigatorLanguages);
         if (lang) {
           this._lang = String(lang);
+          logHandler.info('Language de got detected');
         }
       }
       this.languageChanged = new Observable_1.Observable(function(observer) {
@@ -241,6 +250,7 @@ System.registerDynamic("angular2-translator/TranslateService", ["angular2/core",
       var providedLang = this._config.langProvided(lang, true);
       if (typeof providedLang === 'string') {
         this._lang = providedLang;
+        this.logHandler.info('Language changed to ' + providedLang);
         if (this._languageChangedObserver) {
           this._languageChangedObserver.next(this._lang);
         }
@@ -266,8 +276,12 @@ System.registerDynamic("angular2-translator/TranslateService", ["angular2/core",
         this._loadedLangs[lang] = new Promise(function(resolve, reject) {
           _this._loader.load(lang).then(function(translations) {
             _this._translations[lang] = translations;
+            _this.logHandler.info('Language ' + lang + ' got loaded');
             resolve();
-          }, reject);
+          }, function(reason) {
+            _this.logHandler.error('Language ' + lang + ' could not be loaded (' + reason + ')');
+            reject(reason);
+          });
         });
       }
       return this._loadedLangs[lang];
@@ -319,6 +333,7 @@ System.registerDynamic("angular2-translator/TranslateService", ["angular2/core",
           t;
       while (i--) {
         if (!this._translations[lang] || !this._translations[lang][keys[i]]) {
+          this.logHandler.info('Translation for \'' + keys[i] + '\' in language ' + lang + ' not found');
           result.unshift(keys[i]);
           continue;
         }
@@ -339,6 +354,7 @@ System.registerDynamic("angular2-translator/TranslateService", ["angular2/core",
           try {
             return __parse(expression, params);
           } catch (e) {
+            _this.logHandler.error('Parsing error for expression \'' + expression + '\'');
             return '';
           }
         });
@@ -346,7 +362,7 @@ System.registerDynamic("angular2-translator/TranslateService", ["angular2/core",
       }
       return result;
     };
-    TranslateService = __decorate([core_1.Injectable(), __param(0, core_1.Inject(TranslateConfig_1.TranslateConfig)), __param(1, core_1.Inject(TranslateLoader_1.TranslateLoader)), __metadata('design:paramtypes', [TranslateConfig_1.TranslateConfig, TranslateLoader_1.TranslateLoader])], TranslateService);
+    TranslateService = __decorate([core_1.Injectable(), __param(0, core_1.Inject(TranslateConfig_1.TranslateConfig)), __param(1, core_1.Inject(TranslateLoader_1.TranslateLoader)), __param(2, core_1.Inject(exports.TranslateLogHandler)), __metadata('design:paramtypes', [TranslateConfig_1.TranslateConfig, TranslateLoader_1.TranslateLoader, Object])], TranslateService);
     return TranslateService;
   })();
   exports.TranslateService = TranslateService;
@@ -401,6 +417,9 @@ System.registerDynamic("angular2-translator/TranslatePipe", ["angular2/core", ".
       if (args[0]) {
         if (typeof args[0] === 'string') {
           params = __parseParams(args[0]);
+          if (!Object.keys(params).length) {
+            this._translate.logHandler.error('\'' + args[0] + '\' could not be parsed to object');
+          }
         } else if (typeof args[0] === 'object') {
           params = args[0];
         }
@@ -466,6 +485,6 @@ System.registerDynamic("angular2-translator", ["./angular2-translator/TranslateS
   __export($__require('./angular2-translator/TranslateConfig'));
   __export($__require('./angular2-translator/TranslateLoader'));
   __export($__require('./angular2-translator/TranslateLoaderJson'));
-  exports.TRANSLATE_PROVIDERS = [new core_1.Provider(TranslateConfig_1.TranslateConfig, {useValue: new TranslateConfig_1.TranslateConfig({})}), new core_1.Provider(TranslateLoaderJson_1.TranslateLoaderJsonConfig, {useValue: new TranslateLoaderJson_1.TranslateLoaderJsonConfig()}), new core_1.Provider(TranslateLoader_1.TranslateLoader, {useClass: TranslateLoaderJson_1.TranslateLoaderJson}), TranslateService_1.TranslateService];
+  exports.TRANSLATE_PROVIDERS = [new core_1.Provider(TranslateConfig_1.TranslateConfig, {useValue: new TranslateConfig_1.TranslateConfig({})}), new core_1.Provider(TranslateLoaderJson_1.TranslateLoaderJsonConfig, {useValue: new TranslateLoaderJson_1.TranslateLoaderJsonConfig()}), new core_1.Provider(TranslateLoader_1.TranslateLoader, {useClass: TranslateLoaderJson_1.TranslateLoaderJson}), new core_1.Provider(TranslateService_1.TranslateLogHandler, {useValue: TranslateService_1.TranslateLogHandler}), TranslateService_1.TranslateService];
   return module.exports;
 });

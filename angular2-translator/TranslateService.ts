@@ -1,9 +1,20 @@
-import {Injectable, Inject} from "angular2/core";
+import {Injectable, Inject, OpaqueToken} from "angular2/core";
 import {Observable} from "rxjs/Observable";
 import {Observer} from "rxjs/Observer";
 import 'rxjs/add/operator/share';
 import {TranslateConfig} from './TranslateConfig';
 import {TranslateLoader} from "./TranslateLoader";
+
+export interface TranslateLogHandler {
+    error(message:string):void;
+    info(message:string):void;
+    debug(message:string):void;
+}
+export const TranslateLogHandler = <TranslateLogHandler>{
+    error: (message) => console && console.error && console.error(message),
+    info: () => {},
+    debug: () => {}
+};
 
 @Injectable()
 export class TranslateService {
@@ -16,18 +27,22 @@ export class TranslateService {
     private _languageChangedObserver:Observer<string>;
 
     public languageChanged:Observable<string>;
+    public logHandler:TranslateLogHandler;
 
     constructor(@Inject(TranslateConfig) config:TranslateConfig,
-                @Inject(TranslateLoader) loader:TranslateLoader) {
+                @Inject(TranslateLoader) loader:TranslateLoader,
+                @Inject(TranslateLogHandler) logHandler:TranslateLogHandler) {
         this._config = config;
         this._loader = loader;
+        this.logHandler = logHandler;
 
-        this._lang = this._config.defaultLang;
+        this._lang = config.defaultLang;
 
         if (config.detectLanguageOnStart) {
             var lang = this.detectLang(config.navigatorLanguages);
             if (lang) {
                 this._lang = String(lang);
+                logHandler.info('Language de got detected');
             }
         }
 
@@ -88,6 +103,7 @@ export class TranslateService {
 
         if (typeof providedLang === 'string') {
             this._lang = providedLang;
+            this.logHandler.info('Language changed to ' + providedLang);
             if (this._languageChangedObserver) {
                 this._languageChangedObserver.next(this._lang);
             }
@@ -125,8 +141,12 @@ export class TranslateService {
             this._loadedLangs[lang] = new Promise<void>((resolve, reject) => {
                 this._loader.load(lang).then((translations) => {
                     this._translations[lang] = translations;
+                    this.logHandler.info('Language ' + lang + ' got loaded');
                     resolve();
-                }, reject);
+                }, (reason) => {
+                    this.logHandler.error('Language ' + lang + ' could not be loaded (' + reason + ')');
+                    reject(reason);
+                });
             });
         }
         return this._loadedLangs[lang];
@@ -187,7 +207,7 @@ export class TranslateService {
         var result = [], i = keys.length, t:string;
         while (i--) {
             if (!this._translations[lang] || !this._translations[lang][keys[i]]) {
-                // missing translation
+                this.logHandler.info('Translation for \'' + keys[i] + '\' in language ' + lang + ' not found');
                 result.unshift(keys[i]);
                 continue;
             }
@@ -205,11 +225,11 @@ export class TranslateService {
             });
 
             // simple interpolation
-            t = t.replace(/{{\s*(.*?)\s*}}/g, function(sub:string, expression:string) {
+            t = t.replace(/{{\s*(.*?)\s*}}/g, (sub:string, expression:string) => {
                 try {
                     return __parse(expression, params);
                 } catch(e) {
-                    // parse error
+                    this.logHandler.error('Parsing error for expression \'' + expression + '\'');
                     return '';
                 }
             });
