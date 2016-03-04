@@ -30,19 +30,20 @@ You also can clone the repository and symlink the project folder or what ever:
 git clone https://gitlab.w00tserver.org:617/tflori/angular2-translator
 ln -s angular2-translator MyApp/libs/angular2-translator
 ```
-<sup><sub>You should know what you do and don't follow this guide for installation.</sub><sup>
+> You should know what you do and don't follow this guide for installation.
 
 ## How to use
 
 Simple basic usage:
 ```javascript
 import {Component} from 'angular2/core';
-import {TranslateService, TranslatePipe} from 'angular2-translator';
+import {TranslateService, TranslatePipe, TranslateComponent} from 'angular2-translator';
 
 @Component({
     selector: 'my-app',
-    template: '{TEXT|translate}',
-    pipes: [TranslatePipe]
+    template: '{TEXT|translate} is the same as <span translate="TEXT"></span>',
+    pipes: [TranslatePipe],
+    directives: [TranslateComponent]
 })
 export class AppComponent {
     constructor(translate: TranslateService) {
@@ -53,7 +54,7 @@ export class AppComponent {
 }
 ```
 
-<sup><sub>we need more documentation...</sub><sup>
+To learn more how to use visit [the wiki pages](https://gitlab.w00tserver.org:617/tflori/angular2-translator/wikis/home)
 
 ## Features
 ### Different loaders
