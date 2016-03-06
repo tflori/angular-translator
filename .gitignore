@@ -7,3 +7,4 @@ node_modules
 !karma.conf.js
 !bundle.js
 !bundles/*.js
+.editorconfig

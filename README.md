@@ -54,7 +54,7 @@ export class AppComponent {
 }
 ```
 
-To learn more how to use visit [the wiki pages](https://gitlab.w00tserver.org:617/tflori/angular2-translator/wikis/home)
+To learn more have a look at [the docs](docs/index.md)
 
 ## Features
 ### Different loaders
