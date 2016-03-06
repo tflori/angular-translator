@@ -224,9 +224,25 @@ System.registerDynamic("angular2-translator/TranslateService", ["angular2/core",
         return _this._languageChangedObserver = observer;
       }).share();
     }
-    TranslateService.prototype.currentLang = function() {
-      return this._lang;
-    };
+    Object.defineProperty(TranslateService.prototype, "lang", {
+      get: function() {
+        return this._lang;
+      },
+      set: function(lang) {
+        var providedLang = this._config.langProvided(lang, true);
+        if (typeof providedLang === 'string') {
+          this._lang = providedLang;
+          this.logHandler.info('Language changed to ' + providedLang);
+          if (this._languageChangedObserver) {
+            this._languageChangedObserver.next(this._lang);
+          }
+          return;
+        }
+        throw new Error('Language not provided');
+      },
+      enumerable: true,
+      configurable: true
+    });
     TranslateService.prototype.detectLang = function(navLangs) {
       var detected = false,
           i;
@@ -245,18 +261,6 @@ System.registerDynamic("angular2-translator/TranslateService", ["angular2/core",
         }
       }
       return detected;
-    };
-    TranslateService.prototype.useLang = function(lang) {
-      var providedLang = this._config.langProvided(lang, true);
-      if (typeof providedLang === 'string') {
-        this._lang = providedLang;
-        this.logHandler.info('Language changed to ' + providedLang);
-        if (this._languageChangedObserver) {
-          this._languageChangedObserver.next(this._lang);
-        }
-        return true;
-      }
-      return false;
     };
     TranslateService.prototype.waitForTranslation = function(lang) {
       if (lang === void 0) {
