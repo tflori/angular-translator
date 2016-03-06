@@ -51,13 +51,24 @@ export class TranslateService {
         ).share();
     }
 
-    /**
-     * Getter for current language.
-     *
-     * @returns {string}
-     */
-    public currentLang():string {
+    get lang():string {
         return this._lang;
+    }
+
+    set lang(lang:string) {
+        var providedLang = this._config.langProvided(lang, true);
+
+        if (typeof providedLang === 'string') {
+            this._lang = providedLang;
+            this.logHandler.info('Language changed to ' + providedLang);
+            if (this._languageChangedObserver) {
+                this._languageChangedObserver.next(this._lang);
+            }
+
+            return;
+        }
+
+        throw new Error('Language not provided');
     }
 
     /**
@@ -88,29 +99,6 @@ export class TranslateService {
         }
 
         return detected;
-    }
-
-    /**
-     * Set translator to use language (lang).
-     *
-     * Returns true on success, false on failure
-     *
-     * @param lang
-     * @return {boolean}
-     */
-    public useLang(lang:string):boolean {
-        var providedLang = this._config.langProvided(lang, true);
-
-        if (typeof providedLang === 'string') {
-            this._lang = providedLang;
-            this.logHandler.info('Language changed to ' + providedLang);
-            if (this._languageChangedObserver) {
-                this._languageChangedObserver.next(this._lang);
-            }
-            return true;
-        }
-
-        return false;
     }
 
     /**

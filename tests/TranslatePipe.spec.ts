@@ -119,7 +119,7 @@ export function main() {
             it('calls translate again when language got changed', function() {
                 translatePipe.transform('TEXT');
 
-                translate.useLang('de');
+                translate.lang = 'de';
 
                 expect(JasmineHelper.calls(translate.translate).count()).toBe(2);
             });

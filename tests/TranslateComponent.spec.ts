@@ -105,7 +105,7 @@ export function main() {
                 translateComponent.key = 'TEXT';
                 JasmineHelper.calls(translate.translate).reset();
 
-                translate.useLang('de');
+                translate.lang = 'de';
 
                 expect(translate.translate).toHaveBeenCalledWith('TEXT', {});
             });

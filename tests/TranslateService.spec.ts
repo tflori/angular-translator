@@ -89,7 +89,7 @@ export function main() {
 
                 var translate:TranslateService = injector.get(TranslateService);
 
-                expect(translate.currentLang()).toBe('en');
+                expect(translate.lang).toBe('en');
             });
 
             it('detects language automatically on start', function() {
@@ -106,7 +106,7 @@ export function main() {
 
                 var translate:TranslateService = injector.get(TranslateService);
 
-                expect(translate.currentLang()).toBe('de');
+                expect(translate.lang).toBe('de');
             });
 
             it('informs about detected language', function() {
@@ -191,11 +191,11 @@ export function main() {
                 });
             });
 
-            describe('use language', function () {
+            describe('change language', function () {
                 it('checks that language is provided using strict checking', function () {
-                    spyOn(translateConfig, 'langProvided');
+                    spyOn(translateConfig, 'langProvided').and.callThrough();
 
-                    translate.useLang('en');
+                    translate.lang = 'en' ;
 
                     expect(translateConfig.langProvided).toHaveBeenCalledWith('en', true);
                 });
@@ -203,17 +203,19 @@ export function main() {
                 it('sets current language to the provided language', function () {
                     translateConfig.providedLangs = ['de/de'];
 
-                    translate.useLang('de-DE');
+                    translate.lang = 'de-DE';
 
-                    expect(translate.currentLang()).toBe('de/de');
+                    expect(translate.lang).toBe('de/de');
                 });
 
-                it('returns false if language is not provided', function () {
+                it('throws error if language is not provided', function () {
                     translateConfig.providedLangs = ['de/de'];
 
-                    var result = translate.useLang('de');
+                    var action = function() {
+                        translate.lang = 'de';
+                    };
 
-                    expect(result).toBeFalsy();
+                    expect(action).toThrow(new Error('Language not provided'));
                 });
 
                 it('has an observable', function() {
@@ -227,7 +229,7 @@ export function main() {
                         newLang = nextLang;
                     });
 
-                    translate.useLang('de');
+                    translate.lang = 'de';
 
                     expect(newLang).toBe('de');
                 });
@@ -236,7 +238,7 @@ export function main() {
                     spyOn(TranslateLogHandler, 'info');
                     translateConfig.providedLangs = ['de/de'];
 
-                    translate.useLang('de-DE');
+                    translate.lang = 'de-DE';
 
                     expect(TranslateLogHandler.info).toHaveBeenCalledWith('Language changed to de/de');
                 });
@@ -411,7 +413,7 @@ export function main() {
                     loaderPromiseResolve({'TEXT': 'This is a text'});
                     JasminePromise.flush();
 
-                    expect(translate.instant).toHaveBeenCalledWith('TEXT', {}, translate.currentLang());
+                    expect(translate.instant).toHaveBeenCalledWith('TEXT', {}, translate.lang);
                 });
 
                 it('resolves with the return value from instant', function() {
