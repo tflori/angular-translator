@@ -15,6 +15,8 @@ class TranslateLoaderJsonConfig {
 }
 ```
 
+Default values are `path = 'i18n'` and `extension = '.json'` .
+
 ### Example:
 Directory structure:
 ```
