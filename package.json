@@ -1,6 +1,6 @@
 {
   "name": "angular2-translator",
-  "version": "1.0.0-rc2",
+  "version": "1.0.0-rc3",
   "description": "A translate-service, translate-pipe and translate-component for angular2",
   "scripts": {
     "test": "typings install && tsc && karma start",
