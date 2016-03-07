@@ -202,7 +202,7 @@ export class TranslateService {
             t = this._translations[lang][keys[i]];
 
             // translate related
-            t = t.replace(/\[\[\s*([A-Za-z0-9_\.-]+):?([A-Za-z0-9,_]+)?\s*\]\]/g, (sub:string, key:string, vars:string = ''):string => {
+            t = t.replace(/\[\[\s*([A-Za-z0-9_\.-]+)\s*:?\s*([A-Za-z0-9,_]+)?\s*\]\]/g, (sub:string, key:string, vars:string = ''):string => {
                 var translationParams = {};
                 vars.split(',').map((key) => {
                     if (Object.prototype.hasOwnProperty.call(params, key)) {

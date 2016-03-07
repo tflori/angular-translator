@@ -10,7 +10,7 @@ new TranslateConfig({
   defaultLang: 'de'
 });
 ```
-## The properties:
+## The Properties
 
 | Name                  | Type     | Default  | Description |
 |-----------------------|----------|----------|-------------|
@@ -19,7 +19,7 @@ new TranslateConfig({
 | detectLanguageOnStart | string   | `true`   | Defines whether the language should be detected by navigator.language(s) when TranslateService got initialized or not. |
 | navigatorLanguages    | string[] | -        | Holds an array of languages the browser accepts. Mostly it is exactly `navigator.languages` but for browsers that only define `navigator.language` it is `[navigator.language]`. If nothing is defined by the browser it is simply an empty array. |
 
-## The methods:
+## The Methods
 
 ### langProvided(lang:string, strict:boolean):string
 Tries to find matching provided language and returns the provided language. The provided

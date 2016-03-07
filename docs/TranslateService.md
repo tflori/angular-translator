@@ -3,7 +3,7 @@
 The TranslateService holds the core functionality for this module. It is not only for translation also
 it provides functions for control structures.
 
-## The properties
+## The Properties
 
 | Name            | Type                | Default              | Description |
 |-----------------|---------------------|----------------------|-------------|
@@ -11,7 +11,7 @@ it provides functions for control structures.
 | languageChanged | Observable<string>  | -                    | The observer fires next when a new language get changed. If you use translate service maybe you want to update your translations on this event. |
 | logHandler      | TranslateLogHandler | -                    | Holds the logHandler for other control structures. This is more or less internal - you should not use it. |
 
-## The methods
+## The Methods
 
 ### detectLang(navLangs:string[]):string|boolean  
 Detects the preferred language by navLangs. It is an array of strings - you can give any array

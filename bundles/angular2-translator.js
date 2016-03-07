@@ -342,7 +342,7 @@ System.registerDynamic("angular2-translator/TranslateService", ["angular2/core",
           continue;
         }
         t = this._translations[lang][keys[i]];
-        t = t.replace(/\[\[\s*([A-Za-z0-9_\.-]+):?([A-Za-z0-9,_]+)?\s*\]\]/g, function(sub, key, vars) {
+        t = t.replace(/\[\[\s*([A-Za-z0-9_\.-]+)\s*:?\s*([A-Za-z0-9,_]+)?\s*\]\]/g, function(sub, key, vars) {
           if (vars === void 0) {
             vars = '';
           }

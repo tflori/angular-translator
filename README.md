@@ -1,4 +1,4 @@
-# angular2-translator
+# Angular2 Translator
 
 ## How to install
 
