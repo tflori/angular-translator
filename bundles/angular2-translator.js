@@ -310,7 +310,7 @@ System.registerDynamic("angular2-translator/TranslateService", ["angular2/core",
         var lang = this.detectLang(config.navigatorLanguages);
         if (lang) {
           this._lang = String(lang);
-          logHandler.info('Language de got detected');
+          logHandler.info('Language ' + lang + ' got detected');
         }
       }
       this.languageChanged = new Observable_1.Observable(function(observer) {

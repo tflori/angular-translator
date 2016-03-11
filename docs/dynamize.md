@@ -52,7 +52,7 @@ Other translations are loaded before the content of double braces got parsed.
 In general we can not recommend to use logic inside translations. But we know that sometimes it is much easier and of
 course language related.
 
-We suggest that you only use logic for language related stuff like pluralization like we did in the example.
+> We suggest that you only use logic for language related stuff like pluralization like we did in the example.
 
 ## Provide parameters
 
@@ -76,8 +76,31 @@ It begins to get really bad for pipes - that is the drawback why we suggest to u
 Because pipes only accept predefined objects or string parameters we parse this parameter if it is string. That costs
 and is not readable. It also looks like logic in your view.
 
+Another - some bit more realistic - example for usage of pipes:
+```html
+<p>{{'USER_LOGGED_IN'|translate:user}}</p>
+```
+
+This works only if you define lastLogin in user as string, or use a method of moment in you translation.
+ 
+Define as string:
+```js
+this.user = {name:'Thomas', lastLogin: moment('2016-03-06 22:13.31').format('LLL')}
+```
+
+Use method for formatting in translation:
+```json
+{
+  "USER_LOGGED_IN": "[[GREET:name]], your last login was on {{lastLogin.format('LLL')}}"
+}
+```
+
+## Performance
+
 Both examples in the view have by logic a higher cpu usage:
 1. The object needs to be generated
 2. The object has to be checked if it has changed
 
-To have it under your control we suggest to use TranslateService::translate.
+To have it under your control we suggest to use TranslateService::translate. You can then subscribe to 
+`TranslateService.languageChanged` to change your translation when the language got changed. Also you will know
+when your values have changed.
