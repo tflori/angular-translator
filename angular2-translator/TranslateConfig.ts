@@ -49,9 +49,13 @@ export class TranslateConfig {
         var provided:string|boolean = false, p;
 
         var normalizeLang = function (lang) {
+            var regExp = /^([A-Za-z]{2})(?:[\.\-_\/]?([A-Za-z]{2}))?$/;
+            if (!lang.match(regExp)) {
+                return '';
+            }
             return lang.replace(
-                /^([A-Za-z]{2})([\.\-_\/]?([A-Za-z]{2}))?/,
-                function (substring, lang, v = '', country = '') {
+                regExp,
+                function (substring, lang, country = '') {
                     lang    = lang.toLowerCase();
                     country = country.toUpperCase();
                     return country ? lang + '-' + country : lang;
@@ -61,6 +65,10 @@ export class TranslateConfig {
 
         var providedLangsNormalized = this.providedLangs.map(normalizeLang);
         lang = normalizeLang(lang);
+
+        if (lang.length === 0) {
+            return provided;
+        }
 
         p = providedLangsNormalized.indexOf(lang);
         if (p > -1) {

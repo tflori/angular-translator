@@ -135,7 +135,15 @@ export function main() {
                 var providedLang = translateConfig.langProvided('de', true);
 
                 expect(providedLang).toBeFalsy();
-            })
+            });
+
+            it('only takes valid matches', function() {
+                translateConfig.providedLangs = ['br','en'];
+
+                var providedLang = translateConfig.langProvided('british');
+
+                expect(providedLang).toBeFalsy();
+            });
         });
     });
 }

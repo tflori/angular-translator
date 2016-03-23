@@ -24,7 +24,17 @@ new TranslateConfig({
 ### langProvided(lang:string, strict:boolean):string
 Tries to find matching provided language and returns the provided language. The provided
 language and the language that is searched are getting normalized for matching. That means
-that `'EN/usa'` is getting `'en-US'`. Example:
+that `'EN/usa'` is getting `'en-US'`.
+
+Only valid language/region combinations are allowed. This is necessary to exclude finding provided language Breton
+if the browser says `"british"`. Valid in this case means to use this format: 
+`<two letter language>[[divider]<two letter region>]`. Or - to be more precise - this regular expression: 
+`/^([A-Za-z]{2})(?:[\.\-_\/]?([A-Za-z]{2}))?$/`.
+
+Because the setter for TranslateServer.lang is checking if language is provided it is necessary that your provided
+languages matches against this regular expression too. Otherwise you will never be able to switch to this language.
+
+Example:
 ```js
 import {TranslateConfig} from 'angular2-translator';
 

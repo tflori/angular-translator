@@ -206,10 +206,11 @@ System.registerDynamic("angular2-translator/TranslateConfig", [], true, function
       var provided = false,
           p;
       var normalizeLang = function(lang) {
-        return lang.replace(/^([A-Za-z]{2})([\.\-_\/]?([A-Za-z]{2}))?/, function(substring, lang, v, country) {
-          if (v === void 0) {
-            v = '';
-          }
+        var regExp = /^([A-Za-z]{2})(?:[\.\-_\/]?([A-Za-z]{2}))?$/;
+        if (!lang.match(regExp)) {
+          return '';
+        }
+        return lang.replace(regExp, function(substring, lang, country) {
           if (country === void 0) {
             country = '';
           }
@@ -220,6 +221,9 @@ System.registerDynamic("angular2-translator/TranslateConfig", [], true, function
       };
       var providedLangsNormalized = this.providedLangs.map(normalizeLang);
       lang = normalizeLang(lang);
+      if (lang.length === 0) {
+        return provided;
+      }
       p = providedLangsNormalized.indexOf(lang);
       if (p > -1) {
         provided = this.providedLangs[p];
