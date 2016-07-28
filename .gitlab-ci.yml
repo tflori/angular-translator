@@ -1,4 +1,4 @@
-image: "iras/npmtest:1.1"
+image: "iras/npmtest:1.0"
 
 variables:
   DISPLAY: ":23"
@@ -13,4 +13,3 @@ test:
     - npm install
     - npm test
     - npm run prepublish
-  
