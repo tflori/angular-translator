@@ -1,25 +1,15 @@
 {
   "compilerOptions": {
-    "noImplicitAny": false,
-    "module": "commonjs",
     "target": "ES5",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "sourceMap": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "inlineSourceMap": true,
-    "inlineSources": true,
+    "removeComments": false,
     "declaration": true,
-    "moduleResolution": "node"
+    "noImplicitAny": false
   },
-  "files": [
-    "typings/main.d.ts",
-    "angular2-translator.ts",
-    "./angular2-translator/TranslateService.ts",
-    "./angular2-translator/TranslatePipe.ts",
-    "./angular2-translator/TranslateComponent.ts",
-    "./angular2-translator/TranslateConfig.ts",
-    "./angular2-translator/TranslateLoader.ts",
-    "./angular2-translator/TranslateLoaderJson.ts"
-  ],
   "exclude": [
     "node_modules"
   ]

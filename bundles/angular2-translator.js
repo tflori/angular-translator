@@ -1,8 +1,9 @@
-System.registerDynamic("angular2-translator/TranslateLoaderJson", ["angular2/core", "angular2/http", "./TranslateLoader"], true, function($__require, exports, module) {
+System.registerDynamic("angular2-translator/TranslateLoaderJson", ["@angular/core", "@angular/http", "./TranslateLoader"], true, function($__require, exports, module) {
+  "use strict";
   ;
-  var define;
-  var global = this;
-  var GLOBAL = this;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
   var __extends = (this && this.__extends) || function(d, b) {
     for (var p in b)
       if (b.hasOwnProperty(p))
@@ -33,8 +34,8 @@ System.registerDynamic("angular2-translator/TranslateLoaderJson", ["angular2/cor
       decorator(target, key, paramIndex);
     };
   };
-  var core_1 = $__require('angular2/core');
-  var http_1 = $__require('angular2/http');
+  var core_1 = $__require('@angular/core');
+  var http_1 = $__require('@angular/http');
   var TranslateLoader_1 = $__require('./TranslateLoader');
   var TranslateLoaderJsonConfig = (function() {
     function TranslateLoaderJsonConfig(path, extension) {
@@ -48,7 +49,7 @@ System.registerDynamic("angular2-translator/TranslateLoaderJson", ["angular2/cor
       }
     }
     return TranslateLoaderJsonConfig;
-  })();
+  }());
   exports.TranslateLoaderJsonConfig = TranslateLoaderJsonConfig;
   var TranslateLoaderJson = (function(_super) {
     __extends(TranslateLoaderJson, _super);
@@ -72,16 +73,18 @@ System.registerDynamic("angular2-translator/TranslateLoaderJson", ["angular2/cor
     };
     TranslateLoaderJson = __decorate([core_1.Injectable(), __param(0, core_1.Inject(http_1.Http)), __param(1, core_1.Inject(TranslateLoaderJsonConfig)), __metadata('design:paramtypes', [http_1.Http, TranslateLoaderJsonConfig])], TranslateLoaderJson);
     return TranslateLoaderJson;
-  })(TranslateLoader_1.TranslateLoader);
+  }(TranslateLoader_1.TranslateLoader));
   exports.TranslateLoaderJson = TranslateLoaderJson;
+  global.define = __define;
   return module.exports;
 });
 
-System.registerDynamic("angular2-translator/TranslatePipe", ["angular2/core", "./TranslateService"], true, function($__require, exports, module) {
+System.registerDynamic("angular2-translator/TranslatePipe", ["@angular/core", "./TranslateService"], true, function($__require, exports, module) {
+  "use strict";
   ;
-  var define;
-  var global = this;
-  var GLOBAL = this;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
   var __decorate = (this && this.__decorate) || function(decorators, target, key, desc) {
     var c = arguments.length,
         r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
@@ -103,7 +106,7 @@ System.registerDynamic("angular2-translator/TranslatePipe", ["angular2/core", ".
       decorator(target, key, paramIndex);
     };
   };
-  var core_1 = $__require('angular2/core');
+  var core_1 = $__require('@angular/core');
   var TranslateService_1 = $__require('./TranslateService');
   var TranslatePipe = (function() {
     function TranslatePipe(translate) {
@@ -156,7 +159,7 @@ System.registerDynamic("angular2-translator/TranslatePipe", ["angular2/core", ".
       pure: false
     }), __param(0, core_1.Inject(TranslateService_1.TranslateService)), __metadata('design:paramtypes', [TranslateService_1.TranslateService])], TranslatePipe);
     return TranslatePipe;
-  })();
+  }());
   exports.TranslatePipe = TranslatePipe;
   function __parseParams(arg) {
     try {
@@ -167,14 +170,16 @@ System.registerDynamic("angular2-translator/TranslatePipe", ["angular2/core", ".
     } catch (e) {}
     return {};
   }
+  global.define = __define;
   return module.exports;
 });
 
 System.registerDynamic("angular2-translator/TranslateConfig", [], true, function($__require, exports, module) {
+  "use strict";
   ;
-  var define;
-  var global = this;
-  var GLOBAL = this;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
   var TranslateConfig = (function() {
     function TranslateConfig(_a) {
       var _b = _a.defaultLang,
@@ -245,29 +250,33 @@ System.registerDynamic("angular2-translator/TranslateConfig", [], true, function
     };
     TranslateConfig.navigator = window && window.navigator ? window.navigator : {};
     return TranslateConfig;
-  })();
+  }());
   exports.TranslateConfig = TranslateConfig;
+  global.define = __define;
   return module.exports;
 });
 
 System.registerDynamic("angular2-translator/TranslateLoader", [], true, function($__require, exports, module) {
+  "use strict";
   ;
-  var define;
-  var global = this;
-  var GLOBAL = this;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
   var TranslateLoader = (function() {
     function TranslateLoader() {}
     return TranslateLoader;
-  })();
+  }());
   exports.TranslateLoader = TranslateLoader;
+  global.define = __define;
   return module.exports;
 });
 
-System.registerDynamic("angular2-translator/TranslateService", ["angular2/core", "rxjs/Observable", "rxjs/add/operator/share", "./TranslateConfig", "./TranslateLoader"], true, function($__require, exports, module) {
+System.registerDynamic("angular2-translator/TranslateService", ["@angular/core", "rxjs/Observable", "rxjs/add/operator/share", "./TranslateConfig", "./TranslateLoader"], true, function($__require, exports, module) {
+  "use strict";
   ;
-  var define;
-  var global = this;
-  var GLOBAL = this;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
   var __decorate = (this && this.__decorate) || function(decorators, target, key, desc) {
     var c = arguments.length,
         r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
@@ -289,7 +298,7 @@ System.registerDynamic("angular2-translator/TranslateService", ["angular2/core",
       decorator(target, key, paramIndex);
     };
   };
-  var core_1 = $__require('angular2/core');
+  var core_1 = $__require('@angular/core');
   var Observable_1 = $__require('rxjs/Observable');
   $__require('rxjs/add/operator/share');
   var TranslateConfig_1 = $__require('./TranslateConfig');
@@ -420,7 +429,7 @@ System.registerDynamic("angular2-translator/TranslateService", ["angular2/core",
       if (lang === void 0) {
         lang = this._lang;
       }
-      if (!Array.isArray(keys)) {
+      if (typeof keys === 'string') {
         return this.instant([keys], params, lang)[0];
       }
       if (lang != this._lang) {
@@ -453,7 +462,7 @@ System.registerDynamic("angular2-translator/TranslateService", ["angular2/core",
         });
         t = t.replace(/{{\s*(.*?)\s*}}/g, function(sub, expression) {
           try {
-            return __parse(expression, params);
+            return __parse.call(params, expression) || '';
           } catch (e) {
             _this.logHandler.error('Parsing error for expression \'' + expression + '\'');
             return '';
@@ -465,19 +474,21 @@ System.registerDynamic("angular2-translator/TranslateService", ["angular2/core",
     };
     TranslateService = __decorate([core_1.Injectable(), __param(0, core_1.Inject(TranslateConfig_1.TranslateConfig)), __param(1, core_1.Inject(TranslateLoader_1.TranslateLoader)), __param(2, core_1.Inject(exports.TranslateLogHandler)), __metadata('design:paramtypes', [TranslateConfig_1.TranslateConfig, TranslateLoader_1.TranslateLoader, Object])], TranslateService);
     return TranslateService;
-  })();
+  }());
   exports.TranslateService = TranslateService;
-  function __parse(expression, params) {
-    return eval('with(params) { (' + expression + ') }');
+  function __parse(expression) {
+    return eval('(' + expression + ')');
   }
+  global.define = __define;
   return module.exports;
 });
 
-System.registerDynamic("angular2-translator/TranslateComponent", ["angular2/core", "./TranslateService"], true, function($__require, exports, module) {
+System.registerDynamic("angular2-translator/TranslateComponent", ["@angular/core", "./TranslateService"], true, function($__require, exports, module) {
+  "use strict";
   ;
-  var define;
-  var global = this;
-  var GLOBAL = this;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
   var __decorate = (this && this.__decorate) || function(decorators, target, key, desc) {
     var c = arguments.length,
         r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
@@ -499,10 +510,10 @@ System.registerDynamic("angular2-translator/TranslateComponent", ["angular2/core
       decorator(target, key, paramIndex);
     };
   };
-  var core_1 = $__require('angular2/core');
+  var core_1 = $__require('@angular/core');
   var TranslateService_1 = $__require('./TranslateService');
-  var core_2 = $__require('angular2/core');
-  var core_3 = $__require('angular2/core');
+  var core_2 = $__require('@angular/core');
+  var core_3 = $__require('@angular/core');
   var TranslateComponent = (function() {
     function TranslateComponent(translate) {
       var _this = this;
@@ -550,16 +561,18 @@ System.registerDynamic("angular2-translator/TranslateComponent", ["angular2/core
       template: '{{translation}}'
     }), __param(0, core_2.Inject(TranslateService_1.TranslateService)), __metadata('design:paramtypes', [TranslateService_1.TranslateService])], TranslateComponent);
     return TranslateComponent;
-  })();
+  }());
   exports.TranslateComponent = TranslateComponent;
+  global.define = __define;
   return module.exports;
 });
 
-System.registerDynamic("angular2-translator", ["./angular2-translator/TranslateService", "./angular2-translator/TranslateConfig", "./angular2-translator/TranslateLoader", "./angular2-translator/TranslateLoaderJson", "angular2/core", "./angular2-translator/TranslatePipe", "./angular2-translator/TranslateComponent"], true, function($__require, exports, module) {
+System.registerDynamic("angular2-translator", ["./angular2-translator/TranslateService", "./angular2-translator/TranslateConfig", "./angular2-translator/TranslateLoader", "./angular2-translator/TranslateLoaderJson", "@angular/core", "./angular2-translator/TranslatePipe", "./angular2-translator/TranslateComponent"], true, function($__require, exports, module) {
+  "use strict";
   ;
-  var define;
-  var global = this;
-  var GLOBAL = this;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
   function __export(m) {
     for (var p in m)
       if (!exports.hasOwnProperty(p))
@@ -569,7 +582,7 @@ System.registerDynamic("angular2-translator", ["./angular2-translator/TranslateS
   var TranslateConfig_1 = $__require('./angular2-translator/TranslateConfig');
   var TranslateLoader_1 = $__require('./angular2-translator/TranslateLoader');
   var TranslateLoaderJson_1 = $__require('./angular2-translator/TranslateLoaderJson');
-  var core_1 = $__require('angular2/core');
+  var core_1 = $__require('@angular/core');
   __export($__require('./angular2-translator/TranslateService'));
   __export($__require('./angular2-translator/TranslatePipe'));
   __export($__require('./angular2-translator/TranslateComponent'));
@@ -577,5 +590,6 @@ System.registerDynamic("angular2-translator", ["./angular2-translator/TranslateS
   __export($__require('./angular2-translator/TranslateLoader'));
   __export($__require('./angular2-translator/TranslateLoaderJson'));
   exports.TRANSLATE_PROVIDERS = [new core_1.Provider(TranslateConfig_1.TranslateConfig, {useValue: new TranslateConfig_1.TranslateConfig({})}), new core_1.Provider(TranslateLoaderJson_1.TranslateLoaderJsonConfig, {useValue: new TranslateLoaderJson_1.TranslateLoaderJsonConfig()}), new core_1.Provider(TranslateLoader_1.TranslateLoader, {useClass: TranslateLoaderJson_1.TranslateLoaderJson}), new core_1.Provider(TranslateService_1.TranslateLogHandler, {useValue: TranslateService_1.TranslateLogHandler}), TranslateService_1.TranslateService];
+  global.define = __define;
   return module.exports;
 });

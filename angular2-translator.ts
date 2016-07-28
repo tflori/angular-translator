@@ -2,7 +2,7 @@ import {TranslateService, TranslateLogHandler} from './angular2-translator/Trans
 import {TranslateConfig} from './angular2-translator/TranslateConfig';
 import {TranslateLoader} from './angular2-translator/TranslateLoader';
 import {TranslateLoaderJson, TranslateLoaderJsonConfig} from './angular2-translator/TranslateLoaderJson';
-import {Provider} from "angular2/core";
+import {Provider} from "@angular/core";
 
 export * from './angular2-translator/TranslateService';
 export * from './angular2-translator/TranslatePipe';

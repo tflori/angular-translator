@@ -1,4 +1,4 @@
-import {Injectable, Inject, OpaqueToken} from "angular2/core";
+import {Injectable, Inject} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {Observer} from "rxjs/Observer";
 import 'rxjs/add/operator/share';
@@ -181,7 +181,7 @@ export class TranslateService {
      * @returns {string|string[]}
      */
     public instant(keys:string|string[], params:any = {}, lang:string = this._lang):string|string[] {
-        if (!Array.isArray(keys)) {
+        if (typeof keys === 'string') {
             return this.instant([keys], params, lang)[0];
         }
 
@@ -215,7 +215,7 @@ export class TranslateService {
             // simple interpolation
             t = t.replace(/{{\s*(.*?)\s*}}/g, (sub:string, expression:string) => {
                 try {
-                    return __parse(expression, params);
+                    return __parse.call(params, expression) || '';
                 } catch(e) {
                     this.logHandler.error('Parsing error for expression \'' + expression + '\'');
                     return '';
@@ -229,6 +229,6 @@ export class TranslateService {
     }
 }
 
-function __parse(expression:string, params:any) {
-    return eval('with(params) { (' + expression + ') }');
+function __parse(expression:string) {
+    return eval('(' + expression + ')');
 }

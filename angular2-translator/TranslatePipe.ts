@@ -1,4 +1,4 @@
-import {Pipe, PipeTransform, Inject} from "angular2/core";
+import {Pipe, PipeTransform, Inject} from "@angular/core";
 import {TranslateService} from "./TranslateService";
 
 @Pipe({

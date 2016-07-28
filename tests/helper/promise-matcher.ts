@@ -1,4 +1,5 @@
 import Jasmine = jasmine.Jasmine;
+import {flushMicrotasks} from "@angular/core/testing";
 
 export class PromiseMatcher {
     private static _instance:PromiseMatcher;
@@ -64,6 +65,7 @@ export class PromiseMatcher {
     }
 }
 
+var i = 0;
 export class JasminePromise {
     private static _flush:Function = () => {};
     public static NativePromise:any;
@@ -72,13 +74,16 @@ export class JasminePromise {
 
     public state:string = 'pending';
     public args:any[];
+    public id:number;
 
     constructor(resolver:any) {
+        this.id = i++;
         var resolve, reject;
         this._nativePromise = new JasminePromise.NativePromise((_resolve, _reject) => {
             resolve = _resolve;
             reject = _reject;
         });
+        this._nativePromise.catch(() => {});
 
         resolver(
             (...args: any[]) => {
@@ -112,14 +117,12 @@ export class JasminePromise {
         return new JasminePromise((resolve) => resolve.apply(null, args));
     }
 
-    public static initialize() {
-        JasminePromise.NativePromise._setScheduler(function(flush) {
-            JasminePromise._flush = flush;
-        });
-    }
+    public static initialize() {}
 
     public static flush() {
-        JasminePromise._flush();
+        try {
+            flushMicrotasks();
+        } catch(e) {}
     }
 
     public verify(util:any, customEqualityTesters:any, state:string, args?:any[]) {
