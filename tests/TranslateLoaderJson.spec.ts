@@ -1,138 +1,135 @@
-import {Injector, NoProviderError, Key, provide} from "angular2/core";
-import {RequestMethod, RequestOptions, Request, ResponseOptions, Response, HTTP_PROVIDERS, Connection, Http} from "angular2/http";
-import {MockBackend, MockConnection} from "angular2/http/testing";
+import {ReflectiveInjector, NoProviderError, ReflectiveKey, provide} from "@angular/core";
+import {RequestMethod, ResponseOptions, Response, HTTP_PROVIDERS, XHRBackend} from "@angular/http";
+import {MockBackend, MockConnection} from "@angular/http/testing";
 import {PromiseMatcher} from "./helper/promise-matcher";
 import {TranslateLoaderJsonConfig, TranslateLoaderJson} from "../angular2-translator/TranslateLoaderJson";
-import {XHRBackend} from "angular2/http";
 
-export function main() {
-    describe('TranslateLoaderJsonConfig', function () {
-        it('is defined', function () {
-            var config = new TranslateLoaderJsonConfig();
+describe('TranslateLoaderJsonConfig', function () {
+    it('is defined', function () {
+        var config = new TranslateLoaderJsonConfig();
 
-            expect(TranslateLoaderJsonConfig).toBeDefined();
-            expect(config).toBeDefined();
-            expect(config instanceof TranslateLoaderJsonConfig).toBeTruthy();
-        });
+        expect(TranslateLoaderJsonConfig).toBeDefined();
+        expect(config).toBeDefined();
+        expect(config instanceof TranslateLoaderJsonConfig).toBeTruthy();
+    });
 
-        it('defines default path and extension', function () {
-            var config = new TranslateLoaderJsonConfig();
+    it('defines default path and extension', function () {
+        var config = new TranslateLoaderJsonConfig();
 
-            expect(config.path).toBe('i18n/');
-            expect(config.extension).toBe('.json');
-        });
+        expect(config.path).toBe('i18n/');
+        expect(config.extension).toBe('.json');
+    });
 
-        it('overrides defaults by constructor', function () {
-            var config = new TranslateLoaderJsonConfig('localization', '-lang.json');
+    it('overrides defaults by constructor', function () {
+        var config = new TranslateLoaderJsonConfig('localization', '-lang.json');
 
-            expect(config.path).toBe('localization/');
-            expect(config.extension).toBe('-lang.json');
+        expect(config.path).toBe('localization/');
+        expect(config.extension).toBe('-lang.json');
+    });
+});
+
+describe('TranslateLoaderJson', function () {
+    it('is defined', function () {
+        expect(TranslateLoaderJson).toBeDefined();
+    });
+
+    describe('constructor', function () {
+        it('requires a TranslateLoaderJsonConfig', function () {
+            var injector = ReflectiveInjector.resolveAndCreate([
+                HTTP_PROVIDERS,
+                TranslateLoaderJson
+            ]);
+
+            var action = function () {
+                injector.get(TranslateLoaderJson);
+            };
+
+            var providerError = new NoProviderError(injector, ReflectiveKey.get(TranslateLoaderJsonConfig));
+            providerError.addKey(injector, ReflectiveKey.get(TranslateLoaderJson));
+            expect(action).toThrow(providerError);
         });
     });
 
-    describe('TranslateLoaderJson', function () {
+    describe('load', function () {
+        var loader:TranslateLoaderJson;
+        var backend:MockBackend;
+        var connection:MockConnection;
+
+        beforeEach(function () {
+            PromiseMatcher.install();
+
+            var injector:ReflectiveInjector = ReflectiveInjector.resolveAndCreate([
+                HTTP_PROVIDERS,
+                provide(XHRBackend, {useClass: MockBackend}),
+                provide(TranslateLoaderJsonConfig, {useValue: new TranslateLoaderJsonConfig()}),
+                TranslateLoaderJson
+            ]);
+            backend               = injector.get(XHRBackend);
+            loader                = injector.get(TranslateLoaderJson);
+            backend.connections.subscribe((c:MockConnection) => connection = c);
+        });
+
+        afterEach(PromiseMatcher.uninstall);
+
         it('is defined', function () {
-            expect(TranslateLoaderJson).toBeDefined();
+            expect(loader.load).toBeDefined();
+            expect(typeof loader.load).toBe('function');
         });
 
-        describe('constructor', function () {
-            it('requires a TranslateLoaderJsonConfig', function () {
-                var injector = Injector.resolveAndCreate([
-                    HTTP_PROVIDERS,
-                    TranslateLoaderJson
-                ]);
+        it('returns a promise', function () {
+            var promise = loader.load('en');
 
-                var action = function () {
-                    injector.get(TranslateLoaderJson);
-                };
-
-                var providerError = new NoProviderError(injector, Key.get(TranslateLoaderJsonConfig));
-                providerError.addKey(injector, Key.get(TranslateLoaderJson));
-                expect(action).toThrow(providerError);
-            });
+            expect(promise instanceof Promise).toBeTruthy();
         });
 
-        describe('load', function () {
-            var loader:TranslateLoaderJson;
-            var backend:MockBackend;
-            var connection:MockConnection;
+        it('loads a language file', function () {
+            spyOn(backend, 'createConnection').and.callThrough();
 
-            beforeEach(function () {
-                PromiseMatcher.install();
+            loader.load('en');
 
-                var injector:Injector = Injector.resolveAndCreate([
-                    HTTP_PROVIDERS,
-                    provide(XHRBackend, {useClass: MockBackend}),
-                    provide(TranslateLoaderJsonConfig, {useValue: new TranslateLoaderJsonConfig()}),
-                    TranslateLoaderJson
-                ]);
-                backend               = injector.get(XHRBackend);
-                loader                = injector.get(TranslateLoaderJson);
-                backend.connections.subscribe((c:MockConnection) => connection = c);
-            });
+            expect(backend.createConnection).toHaveBeenCalled();
+            var request = backend.createConnection["calls"].mostRecent().args[0]; // requires implicitAny :(
+            expect(request.url).toBe('i18n/en.json');
+            expect(request.method).toBe(RequestMethod.Get);
+        });
 
-            afterEach(PromiseMatcher.uninstall);
+        it('resolves when connection responds', function() {
+            var promise = loader.load('en');
 
-            it('is defined', function () {
-                expect(loader.load).toBeDefined();
-                expect(typeof loader.load).toBe('function');
-            });
-
-            it('returns a promise', function () {
-                var promise = loader.load('en');
-
-                expect(promise instanceof Promise).toBeTruthy();
-            });
-
-            it('loads a language file', function () {
-                spyOn(backend, 'createConnection').and.callThrough();
-
-                loader.load('en');
-
-                expect(backend.createConnection).toHaveBeenCalled();
-                var request = backend.createConnection["calls"].mostRecent().args[0]; // requires implicitAny :(
-                expect(request.url).toBe('i18n/en.json');
-                expect(request.method).toBe(RequestMethod.Get);
-            });
-
-            it('resolves when connection responds', function() {
-                var promise = loader.load('en');
-
-                connection.mockRespond(new Response(new ResponseOptions({
-                    status: 200,
-                    body: JSON.stringify({
-                        "TEXT": "This is a text"
-                    }),
-                })));
-
-                expect(promise).toBeResolved();
-            });
-
-            it('transforms result to object', function() {
-                var promise = loader.load('en');
-
-                connection.mockRespond(new Response(new ResponseOptions({
-                    status: 200,
-                    body: JSON.stringify({
-                        "TEXT": "This is a text"
-                    })
-                })));
-
-                expect(promise).toBeResolvedWith({
+            connection.mockRespond(new Response(new ResponseOptions({
+                status: 200,
+                body: JSON.stringify({
                     "TEXT": "This is a text"
-                });
-            });
+                }),
+            })));
 
-            it('rejectes when connection fails', function() {
-                var promise = loader.load('en');
+            expect(promise).toBeResolved();
+        });
 
-                connection.mockRespond(new Response(new ResponseOptions({
-                    status: 500,
-                    statusText: 'Internal Server Error'
-                })));
+        it('transforms result to object', function() {
+            var promise = loader.load('en');
 
-                expect(promise).toBeRejected();
+            connection.mockRespond(new Response(new ResponseOptions({
+                status: 200,
+                body: JSON.stringify({
+                    "TEXT": "This is a text"
+                })
+            })));
+
+            expect(promise).toBeResolvedWith({
+                "TEXT": "This is a text"
             });
         });
+
+        it('rejectes when connection fails', function() {
+            var promise = loader.load('en');
+
+            connection.mockRespond(new Response(new ResponseOptions({
+                status: 500,
+                statusText: 'Internal Server Error'
+            })));
+
+            expect(promise).toBeRejected();
+        });
     });
-}
+});

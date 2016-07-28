@@ -2,6 +2,10 @@
   "name": "angular2-translator",
   "version": "1.0.2",
   "description": "A translate-service, translate-pipe and translate-component for angular2",
+  "repository": {
+    "type": "git",
+    "url": "git://gitlab.w00tserver.org/tflori/angular2-translator.git"
+  },
   "scripts": {
     "test": "typings install && tsc && karma start",
     "test-watch": "typings install && tsc && karma start --no-single-run --auto-watch",
@@ -21,35 +25,37 @@
   "typings": "./angular2-translator.d.ts",
   "homepage": "https://gitlab.w00tserver.org:617/tflori/angular2-translator",
   "peerDependencies": {
-    "angular2": "^2.0.0-beta.6",
-    "es6-promise": "^3.0.2",
-    "es6-shim": "^0.33.3",
-    "reflect-metadata": "^0.1.2",
-    "rxjs": "^5.0.0-beta.2",
-    "zone.js": "^0.5.14"
+    "@angular/common": "2.0.0-rc.4",
+    "@angular/compiler": "2.0.0-rc.4",
+    "@angular/core": "2.0.0-rc.4",
+    "@angular/http": "2.0.0-rc.4",
+    "@angular/platform-browser": "2.0.0-rc.4",
+    "@angular/platform-browser-dynamic": "2.0.0-rc.4",
+    "@angular/router": "3.0.0-beta.2",
+    "rxjs": "5.0.0-beta.6",
+    "zone.js": "0.6.12"
   },
   "devDependencies": {
-    "angular2": "^2.0.0-beta.6",
-    "es6-promise": "~3.0.2",
-    "es6-shim": "~0.33.3",
-    "jasmine-core": "~2.3.4",
-    "karma": "~0.13.15",
-    "karma-chrome-launcher": "~0.2.2",
-    "karma-firefox-launcher": "~0.1.7",
-    "karma-jasmine": "~0.3.6",
-    "karma-spec-reporter": "0.0.24",
-    "karma-typescript-preprocessor": "0.0.21",
-    "reflect-metadata": "0.1.2",
-    "retyped-jasmine-es6-promise-matchers-tsd-ambient": "0.0.0-0",
-    "rxjs": "5.0.0-beta.2",
-    "systemjs": "~0.19.20",
-    "systemjs-builder": "^0.15.6",
-    "tsd": "^0.6.5",
-    "typescript": "~1.7.3",
-    "typings": "^0.6.8",
-    "zone.js": "0.5.14"
-  },
-  "czConfig": {
-    "path": "node_modules/cz-conventional-changelog"
+    "@angular/common": "2.0.0-rc.4",
+    "@angular/compiler": "2.0.0-rc.4",
+    "@angular/core": "2.0.0-rc.4",
+    "@angular/http": "2.0.0-rc.4",
+    "@angular/platform-browser": "2.0.0-rc.4",
+    "@angular/platform-browser-dynamic": "2.0.0-rc.4",
+    "@angular/router": "3.0.0-beta.2",
+    "rxjs": "5.0.0-beta.6",
+    "zone.js": "0.6.12",
+
+    "es6-shim": "0.35.1",
+    "reflect-metadata": "0.1.3",
+    "systemjs": "0.19.27",
+    "systemjs-builder": "0.15.6",
+    "jasmine-core": "2.4.1",
+    "karma": "1.1.2",
+    "karma-chrome-launcher": "1.0.1",
+    "karma-firefox-launcher": "1.0.0",
+    "karma-jasmine": "1.0.2",
+    "karma-spec-reporter": "0.0.26",
+    "typings": "1.0.4"
   }
 }

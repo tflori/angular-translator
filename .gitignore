@@ -1,10 +1,12 @@
 npm-debug.log
 node_modules
-*.js
 *.map
 *.d.ts
+!tests/helper/promise-matchers.d.ts
+*.js
 !karma-test-shim.js
 !karma.conf.js
 !bundle.js
 !bundles/*.js
 .editorconfig
+typings/**/typings.json

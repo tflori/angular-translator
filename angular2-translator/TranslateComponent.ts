@@ -1,7 +1,7 @@
-import {Component} from "angular2/core";
+import {Component} from "@angular/core";
 import {TranslateService} from "./TranslateService";
-import {Inject} from "angular2/core";
-import {Input} from "angular2/core";
+import {Inject} from "@angular/core";
+import {Input} from "@angular/core";
 
 @Component({
     selector: '[translate]',
