@@ -9,7 +9,7 @@ This is a simple example with a count to show how it works.
 
 Your translation file:
 ```json
-{ "NEW_MESSAGES": "You have {{count}} new message{{count == 1 ? '' : 's'}}" }
+{ "NEW_MESSAGES": "You have {{this.count}} new message{{this.count == 1 ? '' : 's'}}" }
 ```
 
 In your component you can use it like this:
@@ -42,8 +42,8 @@ Other translations are loaded before the content of double braces got parsed.
 ```json
 {
   "HELLO": "Hello",
-  "GREET": "[[ HELLO ]] {{name}}",
-  "USER_LOGGED_IN": "[[GREET:name]], your last login was on {{lastLogin}}"
+  "GREET": "[[ HELLO ]] {{this.name}}",
+  "USER_LOGGED_IN": "[[GREET:name]], your last login was on {{this.lastLogin}}"
 }
 ```
 
@@ -91,7 +91,7 @@ this.user = {name:'Thomas', lastLogin: moment('2016-03-06 22:13.31').format('LLL
 Use method for formatting in translation:
 ```json
 {
-  "USER_LOGGED_IN": "[[GREET:name]], your last login was on {{lastLogin.format('LLL')}}"
+  "USER_LOGGED_IN": "[[GREET:name]], your last login was on {{this.lastLogin.format('LLL')}}"
 }
 ```
 
