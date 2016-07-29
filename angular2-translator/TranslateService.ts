@@ -215,7 +215,7 @@ export class TranslateService {
             // simple interpolation
             t = t.replace(/{{\s*(.*?)\s*}}/g, (sub:string, expression:string) => {
                 try {
-                    return __parse.call(params, expression) || '';
+                    return TranslateService._parse.call(params, expression) || '';
                 } catch(e) {
                     this.logHandler.error('Parsing error for expression \'' + expression + '\'');
                     return '';
@@ -227,8 +227,8 @@ export class TranslateService {
 
         return result;
     }
-}
 
-function __parse(expression:string) {
-    return eval('(' + expression + ')');
+    private static _parse(expression:string) {
+        return eval('(' + expression + ')');
+    }
 }

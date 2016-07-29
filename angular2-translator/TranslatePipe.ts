@@ -32,7 +32,7 @@ export class TranslatePipe implements PipeTransform {
 
         if (args[0]) {
             if (typeof args[0] === 'string') {
-                params = __parseParams(args[0]);
+                params = TranslatePipe._parseParams(args[0]);;
                 if (!Object.keys(params).length) {
                     this._translate.logHandler.error('\'' + args[0] + '\' could not be parsed to object');
                 }
@@ -67,14 +67,14 @@ export class TranslatePipe implements PipeTransform {
         this._promise = this._translate.translate(this._translated.key, this._translated.params);
         this._promise.then((translation) => this._translation = String(translation));
     }
-}
 
-function __parseParams(arg:string):Object {
-    try {
-        var o = eval('(' + arg + ')');
-        if (typeof o === 'object') {
-            return o;
-        }
-    } catch(e) {}
-    return {};
+    private static _parseParams(arg:string):Object {
+        try {
+            var o = eval('(' + arg + ')');
+            if (typeof o === 'object') {
+                return o;
+            }
+        } catch(e) {}
+        return {};
+    }
 }

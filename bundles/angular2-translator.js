@@ -124,7 +124,8 @@ System.registerDynamic("angular2-translator/TranslatePipe", ["@angular/core", ".
       var params = {};
       if (args[0]) {
         if (typeof args[0] === 'string') {
-          params = __parseParams(args[0]);
+          params = TranslatePipe._parseParams(args[0]);
+          ;
           if (!Object.keys(params).length) {
             this._translate.logHandler.error('\'' + args[0] + '\' could not be parsed to object');
           }
@@ -154,6 +155,15 @@ System.registerDynamic("angular2-translator/TranslatePipe", ["@angular/core", ".
         return _this._translation = String(translation);
       });
     };
+    TranslatePipe._parseParams = function(arg) {
+      try {
+        var o = eval('(' + arg + ')');
+        if (typeof o === 'object') {
+          return o;
+        }
+      } catch (e) {}
+      return {};
+    };
     TranslatePipe = __decorate([core_1.Pipe({
       name: 'translate',
       pure: false
@@ -161,15 +171,6 @@ System.registerDynamic("angular2-translator/TranslatePipe", ["@angular/core", ".
     return TranslatePipe;
   }());
   exports.TranslatePipe = TranslatePipe;
-  function __parseParams(arg) {
-    try {
-      var o = eval('(' + arg + ')');
-      if (typeof o === 'object') {
-        return o;
-      }
-    } catch (e) {}
-    return {};
-  }
   global.define = __define;
   return module.exports;
 });
@@ -462,7 +463,7 @@ System.registerDynamic("angular2-translator/TranslateService", ["@angular/core",
         });
         t = t.replace(/{{\s*(.*?)\s*}}/g, function(sub, expression) {
           try {
-            return __parse.call(params, expression) || '';
+            return TranslateService._parse.call(params, expression) || '';
           } catch (e) {
             _this.logHandler.error('Parsing error for expression \'' + expression + '\'');
             return '';
@@ -472,13 +473,13 @@ System.registerDynamic("angular2-translator/TranslateService", ["@angular/core",
       }
       return result;
     };
+    TranslateService._parse = function(expression) {
+      return eval('(' + expression + ')');
+    };
     TranslateService = __decorate([core_1.Injectable(), __param(0, core_1.Inject(TranslateConfig_1.TranslateConfig)), __param(1, core_1.Inject(TranslateLoader_1.TranslateLoader)), __param(2, core_1.Inject(exports.TranslateLogHandler)), __metadata('design:paramtypes', [TranslateConfig_1.TranslateConfig, TranslateLoader_1.TranslateLoader, Object])], TranslateService);
     return TranslateService;
   }());
   exports.TranslateService = TranslateService;
-  function __parse(expression) {
-    return eval('(' + expression + ')');
-  }
   global.define = __define;
   return module.exports;
 });
