@@ -31,17 +31,17 @@ import {TranslateLoader} from "./TranslateLoader";
 @Injectable()
 export class TranslateLoaderStatic extends TranslateLoader {
     private translations:object = {
-        en => {
+        en: {
             "HELLO WORLD": "Hello World!"
         },
-        fr => {
+        fr: {
             "HELLO WORLD": "Bonjour le monde!"
         },
-        de => {
+        de: {
             "HELLO WORLD": "Hallo Welt!"
         },
-        ru => {
-            "HELLO WORLD:" "Привет мир!"
+        ru: {
+            "HELLO WORLD": "Привет мир!"
         }
     };
 
