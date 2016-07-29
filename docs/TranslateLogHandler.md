@@ -14,7 +14,7 @@ interface TranslateLogHandler {
 ```
 
 ## Error messages
-Actually there are just 4 error messages:
+Currently there are just 4 error messages:
 
 - In TranslateService
   - `"Language <lang> could not be loaded (<reason>)"` - When the TranslateLoader rejects his promise with <reason> for loading <lang>.
@@ -25,7 +25,7 @@ Actually there are just 4 error messages:
   - `"Params have to be an object"` - When you give anything else than an object to translateParams attribute.
     
 ## Info messages
-Actually there exists 4 info messages:
+Currently there exists 4 info messages:
 
 - In TranslateService
   - `"Language <lang> got detected"` - When language got detected on initialization.
@@ -34,4 +34,4 @@ Actually there exists 4 info messages:
   - `"Translation for \"<key>\" in language <lang> not found"` - When a translation is missing.
   
 ## Debug messages
-Actually there are not debug messages.
+Currently there are no debug messages.
