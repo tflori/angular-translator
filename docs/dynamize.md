@@ -9,7 +9,7 @@ This is a simple example with a count to show how it works.
 
 Your translation file:
 ```json
-{ "NEW_MESSAGES": "You have {{this.count}} new message{{this.count == 1 ? '' : 's'}}" }
+{ "NEW_MESSAGES": "You have {{count}} new message{{count == 1 ? '' : 's'}}" }
 ```
 
 In your component you can use it like this:
@@ -42,8 +42,8 @@ Other translations are loaded before the content of double braces got parsed.
 ```json
 {
   "HELLO": "Hello",
-  "GREET": "[[ HELLO ]] {{this.name}}",
-  "USER_LOGGED_IN": "[[GREET:name]], your last login was on {{this.lastLogin}}"
+  "GREET": "[[ HELLO ]] {{name}}",
+  "USER_LOGGED_IN": "[[GREET:name]], your last login was on {{lastLogin}}"
 }
 ```
 
@@ -91,7 +91,7 @@ this.user = {name:'Thomas', lastLogin: moment('2016-03-06 22:13.31').format('LLL
 Use method for formatting in translation:
 ```json
 {
-  "USER_LOGGED_IN": "[[GREET:name]], your last login was on {{this.lastLogin.format('LLL')}}"
+  "USER_LOGGED_IN": "[[GREET:name]], your last login was on {{lastLogin.format('LLL')}}"
 }
 ```
 
@@ -101,6 +101,6 @@ Both examples in the view have by logic a higher cpu usage:
 1. The object needs to be generated
 2. The object has to be checked if it has changed
 
-To have it under your control we suggest to use TranslateService::translate. You can then subscribe to 
-`TranslateService.languageChanged` to change your translation when the language got changed. Also you will know
-when your values have changed.
+To have it under your control we suggest to use `TranslateService.translate()` or `TranslateService.instant()`. You can
+then subscribe to `TranslateService.languageChanged` to change your translation when the language got changed. Also you
+will know when your values have changed.
