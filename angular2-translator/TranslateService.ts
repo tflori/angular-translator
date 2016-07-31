@@ -215,7 +215,7 @@ export class TranslateService {
             // simple interpolation
             t = t.replace(/{{\s*(.*?)\s*}}/g, (sub:string, expression:string) => {
                 try {
-                    return TranslateService._parse.call(params, expression) || '';
+                    return TranslateService._parse(expression, params) || '';
                 } catch(e) {
                     this.logHandler.error('Parsing error for expression \'' + expression + '\'');
                     return '';
@@ -228,7 +228,15 @@ export class TranslateService {
         return result;
     }
 
-    private static _parse(expression:string) {
-        return eval('(' + expression + ')');
+    private static _parse(expression:string, context:any) {
+        var func:string[] = [], varName;
+        func.push('(function() {');
+        for (varName in context) {
+            if (context.hasOwnProperty(varName)) {
+                func.push('var ' + varName + ' = params[\'' + varName + '\'];');
+            }
+        }
+        func.push('return (' + expression + '); })()');
+        return eval(func.join("\n"));
     }
 }

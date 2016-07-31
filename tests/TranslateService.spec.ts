@@ -441,13 +441,13 @@ describe('TranslateService', function () {
                 loaderPromiseResolve({
                     TEXT: 'This is a text',
                     INTERPOLATION: 'The sum from 1+2 is {{1+2}}',
-                    VARIABLES_TEST: 'This {{this.count > 5 ? "is interesting" : "is boring"}}',
-                    VARIABLES_OUT: 'Hello {{this.name.first}} {{this.name.title ? this.name.title + " " : ""}}{{this.name.last}}',
-                    BROKEN: 'This "{{this.notExisting.func()}}" is empty string',
-                    SALUTATION: '{{this.name.title ? this.name.title + " " : (this.name.gender === "w" ? "Ms." : "Mr.")}}{{this.name.first}} {{this.name.last}}',
-                    WELCOME: 'Welcome{{this.lastLogin ? " back" : ""}} [[SALUTATION:name]]!{{this.lastLogin ? " Your last login was on " + this.lastLogin : ""}}',
-                    HACK: '{{this.privateVar}}{{this.givenVar}}',
-                    CALL: 'You don\'t know {{this.privateVar}} but [[HACK:givenVar]]'
+                    VARIABLES_TEST: 'This {{count > 5 ? "is interesting" : "is boring"}}',
+                    VARIABLES_OUT: 'Hello {{name.first}} {{name.title ? name.title + " " : ""}}{{name.last}}',
+                    BROKEN: 'This "{{notExisting.func()}}" is empty string',
+                    SALUTATION: '{{name.title ? name.title + " " : (name.gender === "w" ? "Ms." : "Mr.")}}{{name.first}} {{name.last}}',
+                    WELCOME: 'Welcome{{lastLogin ? " back" : ""}} [[SALUTATION:name]]!{{lastLogin ? " Your last login was on " + lastLogin : ""}}',
+                    HACK: '{{privateVar}}{{givenVar}}',
+                    CALL: 'You don\'t know {{privateVar}} but [[HACK:givenVar]]'
                 });
 
                 JasminePromise.flush();
@@ -527,7 +527,7 @@ describe('TranslateService', function () {
 
                 translate.instant('BROKEN');
 
-                expect(TranslateLogHandler.error).toHaveBeenCalledWith('Parsing error for expression \'this.notExisting.func()\'');
+                expect(TranslateLogHandler.error).toHaveBeenCalledWith('Parsing error for expression \'notExisting.func()\'');
             });
         });
     });
