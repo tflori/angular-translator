@@ -233,7 +233,7 @@ export class TranslateService {
         func.push('(function() {');
         for (varName in context) {
             if (context.hasOwnProperty(varName)) {
-                func.push('var ' + varName + ' = params[\'' + varName + '\'];');
+                func.push('var ' + varName + ' = context[\'' + varName + '\'];');
             }
         }
         func.push('return (' + expression + '); })()');
