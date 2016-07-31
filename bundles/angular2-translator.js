@@ -463,7 +463,7 @@ System.registerDynamic("angular2-translator/TranslateService", ["@angular/core",
         });
         t = t.replace(/{{\s*(.*?)\s*}}/g, function(sub, expression) {
           try {
-            return TranslateService._parse.call(params, expression) || '';
+            return TranslateService._parse(expression, params) || '';
           } catch (e) {
             _this.logHandler.error('Parsing error for expression \'' + expression + '\'');
             return '';
@@ -473,8 +473,17 @@ System.registerDynamic("angular2-translator/TranslateService", ["@angular/core",
       }
       return result;
     };
-    TranslateService._parse = function(expression) {
-      return eval('(' + expression + ')');
+    TranslateService._parse = function(expression, context) {
+      var func = [],
+          varName;
+      func.push('(function() {');
+      for (varName in context) {
+        if (context.hasOwnProperty(varName)) {
+          func.push('var ' + varName + ' = context[\'' + varName + '\'];');
+        }
+      }
+      func.push('return (' + expression + '); })()');
+      return eval(func.join("\n"));
     };
     TranslateService = __decorate([core_1.Injectable(), __param(0, core_1.Inject(TranslateConfig_1.TranslateConfig)), __param(1, core_1.Inject(TranslateLoader_1.TranslateLoader)), __param(2, core_1.Inject(exports.TranslateLogHandler)), __metadata('design:paramtypes', [TranslateConfig_1.TranslateConfig, TranslateLoader_1.TranslateLoader, Object])], TranslateService);
     return TranslateService;
