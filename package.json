@@ -19,11 +19,11 @@
   "author": "Thomas Flori",
   "license": "MIT",
   "bugs": {
-    "url": "https://gitlab.w00tserver.org:617/tflori/angular2-translator/issues"
+    "url": "http://gitlab.w00tserver.org/tflori/angular2-translator/issues"
   },
   "main": "./angular2-translator.js",
   "typings": "./angular2-translator.d.ts",
-  "homepage": "https://gitlab.w00tserver.org:617/tflori/angular2-translator",
+  "homepage": "http://gitlab.w00tserver.org/tflori/angular2-translator",
   "peerDependencies": {
     "@angular/common": "2.0.0-rc.4",
     "@angular/compiler": "2.0.0-rc.4",
