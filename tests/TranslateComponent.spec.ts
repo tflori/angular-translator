@@ -10,6 +10,7 @@ import {JasminePromise} from "./helper/promise-matcher";
 import {TranslateConfig} from "../angular2-translator/TranslateConfig";
 import {TranslateLogHandler} from "../angular2-translator/TranslateService";
 import {fakeAsync} from "@angular/core/testing";
+import {COMPILER_PROVIDERS} from "@angular/compiler";
 
 describe('TranslateComponent', function() {
     beforeEach(function() {
@@ -39,6 +40,7 @@ describe('TranslateComponent', function() {
         beforeEach(function() {
             PromiseMatcher.install();
             var injector = ReflectiveInjector.resolveAndCreate([
+                COMPILER_PROVIDERS,
                 TRANSLATE_PROVIDERS,
                 provide(TranslateLoader, {useValue: new TranslateLoaderMock()}),
                 provide(TranslateConfig, {useValue: new TranslateConfig({

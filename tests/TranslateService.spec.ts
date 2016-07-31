@@ -9,6 +9,8 @@ import {TranslateConfig} from "../angular2-translator/TranslateConfig";
 import {TranslateLoader} from "../angular2-translator/TranslateLoader";
 import {TRANSLATE_PROVIDERS} from "../angular2-translator";
 import {fakeAsync} from "@angular/core/testing";
+import {Parser} from "@angular/compiler/src/expression_parser/parser";
+import {COMPILER_PROVIDERS} from "@angular/compiler";
 
 describe('TranslateService', function () {
     beforeEach(function() {
@@ -65,9 +67,27 @@ describe('TranslateService', function () {
             expect(action).toThrow(providerError);
         });
 
+        it('requires an Parser', function() {
+            var injector = ReflectiveInjector.resolveAndCreate([
+                TranslateService,
+                provide(TranslateConfig, {useValue: new TranslateConfig({})}),
+                provide(TranslateLoader, {useValue: new TranslateLoaderMock()}),
+                provide(TranslateLogHandler, {useValue: TranslateLogHandler})
+            ]);
+
+            var action = function () {
+                injector.get(TranslateService);
+            };
+
+            var providerError = new NoProviderError(injector, ReflectiveKey.get(Parser));
+            providerError.addKey(injector, ReflectiveKey.get(TranslateService));
+            expect(action).toThrow(providerError);
+        });
+
         it('predfines providers for default config', function () {
             var injector = ReflectiveInjector.resolveAndCreate([
                 HTTP_PROVIDERS,
+                COMPILER_PROVIDERS,
                 TRANSLATE_PROVIDERS
             ]);
             var translate:TranslateService;
@@ -83,6 +103,7 @@ describe('TranslateService', function () {
         it('sets current lang to default lang', function () {
             var injector = ReflectiveInjector.resolveAndCreate([
                 HTTP_PROVIDERS,
+                COMPILER_PROVIDERS,
                 TRANSLATE_PROVIDERS
             ]);
 
@@ -99,6 +120,7 @@ describe('TranslateService', function () {
 
             var injector = ReflectiveInjector.resolveAndCreate([
                 HTTP_PROVIDERS,
+                COMPILER_PROVIDERS,
                 TRANSLATE_PROVIDERS,
                 provide(TranslateConfig, {useValue: translateConfig}),
             ]);
@@ -117,6 +139,7 @@ describe('TranslateService', function () {
 
             var injector = ReflectiveInjector.resolveAndCreate([
                 HTTP_PROVIDERS,
+                COMPILER_PROVIDERS,
                 TRANSLATE_PROVIDERS,
                 provide(TranslateConfig, {useValue: translateConfig}),
             ]);
@@ -137,6 +160,7 @@ describe('TranslateService', function () {
             translateConfig.defaultLang = 'en';
             var injector:ReflectiveInjector = ReflectiveInjector.resolveAndCreate([
                 HTTP_PROVIDERS,
+                COMPILER_PROVIDERS,
                 TRANSLATE_PROVIDERS,
                 provide(TranslateConfig, {useValue: translateConfig})
             ]);

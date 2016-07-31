@@ -8,6 +8,7 @@ import {TranslateLoader} from "../angular2-translator/TranslateLoader";
 import {TranslateLoaderMock} from "./helper/TranslateLoaderMock";
 import {TranslateConfig} from "../angular2-translator/TranslateConfig";
 import {fakeAsync} from "@angular/core/testing";
+import {COMPILER_PROVIDERS} from "@angular/compiler";
 
 describe('TranslatePipe', function() {
     it('is defined', function () {
@@ -38,6 +39,7 @@ describe('TranslatePipe', function() {
             PromiseMatcher.install();
             TranslateLogHandler.error = () => {};
             var injector = ReflectiveInjector.resolveAndCreate([
+                COMPILER_PROVIDERS,
                 TRANSLATE_PROVIDERS,
                 provide(TranslateLoader, {useValue: new TranslateLoaderMock()}),
                 provide(TranslateConfig, {useValue: new TranslateConfig({

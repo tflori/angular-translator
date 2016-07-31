@@ -4,6 +4,9 @@ import {Observer} from "rxjs/Observer";
 import 'rxjs/add/operator/share';
 import {TranslateConfig} from './TranslateConfig';
 import {TranslateLoader} from "./TranslateLoader";
+import {Parser} from "@angular/compiler/src/expression_parser/parser";
+import {Interpolation} from "@angular/compiler/src/expression_parser/ast";
+import {PropertyRead, ImplicitReceiver} from "@angular/compiler/src/expression_parser/ast";
 
 export interface TranslateLogHandler {
     error(message:string):void;
@@ -20,6 +23,7 @@ export const TranslateLogHandler = <TranslateLogHandler>{
 export class TranslateService {
     private _config:TranslateConfig;
     private _loader:TranslateLoader;
+    private _parser:Parser;
 
     private _lang:string;
     private _loadedLangs:Object = {};
@@ -31,9 +35,11 @@ export class TranslateService {
 
     constructor(@Inject(TranslateConfig) config:TranslateConfig,
                 @Inject(TranslateLoader) loader:TranslateLoader,
-                @Inject(TranslateLogHandler) logHandler:TranslateLogHandler) {
+                @Inject(TranslateLogHandler) logHandler:TranslateLogHandler,
+                @Inject(Parser) parser:Parser) {
         this._config = config;
         this._loader = loader;
+        this._parser = parser;
         this.logHandler = logHandler;
 
         this._lang = config.defaultLang;
@@ -215,6 +221,10 @@ export class TranslateService {
             // simple interpolation
             t = t.replace(/{{\s*(.*?)\s*}}/g, (sub:string, expression:string) => {
                 try {
+                    var ast = this._parser.parseInterpolation(sub.split('this.').join(''), null);
+                    if (ast && typeof ast.ast == 'object' && ast.ast instanceof Interpolation) {
+                        return this.buildTextInterpolation(<Interpolation>ast.ast).interpolate(params);
+                    }
                     return TranslateService._parse.call(params, expression) || '';
                 } catch(e) {
                     this.logHandler.error('Parsing error for expression \'' + expression + '\'');
@@ -230,5 +240,76 @@ export class TranslateService {
 
     private static _parse(expression:string) {
         return eval('(' + expression + ')');
+    }
+
+    private buildTextInterpolation(interpolation: Interpolation): TextInterpolation {
+        let parts: ((ctx: any) => any)[] = [];
+
+        for (let i = 0; i < interpolation.strings.length; i++) {
+            let string = interpolation.strings[i];
+
+            if (string.length > 0) {
+                parts.push(ctx => string);
+            }
+
+            if (i < interpolation.expressions.length) {
+                let exp = interpolation.expressions[i];
+
+                if (exp instanceof PropertyRead) {
+                    var getter = this.buildPropertyGetter(exp);
+                    parts.push(this.addValueFormatter(getter));
+                } else {
+                    throw new Error(`Expression of type ${exp.constructor && exp.constructor.name1} is not supported.`);
+                }
+            }
+        }
+
+        return new TextInterpolation(parts);
+    };
+
+    private buildPropertyGetter(exp: PropertyRead): ((ctx: any) => any) {
+        var getter: ((ctx: any) => any);
+
+        if (exp.receiver instanceof PropertyRead) {
+            getter = this.buildPropertyGetter(<PropertyRead>exp.receiver);
+        } else if (!(exp.receiver instanceof ImplicitReceiver)) {
+            throw new Error(`Expression is not supported.`);
+        }
+
+        if (getter) {
+            let innerGetter = getter;
+            getter = ctx => {
+                ctx = innerGetter(ctx);
+                return ctx && exp.getter(ctx);
+            };
+        } else {
+            getter = <(ctx: any)=>any>exp.getter;
+        }
+
+        return ctx => ctx && getter(ctx);
+    }
+
+    private addValueFormatter(getter: ((ctx: any) => any)): ((ctx: any) => any) {
+        return ctx => {
+            var value = getter(ctx);
+
+            if (value === null || typeof value === "undefined") {
+                value = '';
+            }
+
+            return value;
+        }
+    }
+}
+
+class TextInterpolation {
+    private _interpolationFunctions: ((ctx: any)=>any)[];
+
+    constructor(parts: ((ctx: any) => any)[]) {
+        this._interpolationFunctions = parts;
+    }
+
+    public interpolate(ctx: any): string {
+        return this._interpolationFunctions.map(f => f(ctx)).join('');
     }
 }
