@@ -4,12 +4,14 @@ import {Observer} from "rxjs/Observer";
 import 'rxjs/add/operator/share';
 import {TranslateConfig} from './TranslateConfig';
 import {TranslateLoader} from "./TranslateLoader";
+import {isArray} from "util";
 
 export interface TranslateLogHandler {
     error(message:string):void;
     info(message:string):void;
     debug(message:string):void;
 }
+
 export const TranslateLogHandler = <TranslateLogHandler>{
     error: (message) => console && console.error && console.error(message),
     info: () => {},
@@ -215,7 +217,7 @@ export class TranslateService {
             // simple interpolation
             t = t.replace(/{{\s*(.*?)\s*}}/g, (sub:string, expression:string) => {
                 try {
-                    return TranslateService._parse(expression, params) || '';
+                    return this._parse(expression, params) || '';
                 } catch(e) {
                     this.logHandler.error('Parsing error for expression \'' + expression + '\'');
                     return '';
@@ -228,12 +230,20 @@ export class TranslateService {
         return result;
     }
 
-    private static _parse(expression:string, context:any) {
+    private _parse(expression:string, __context:any) {
         var func:string[] = [], varName;
         func.push('(function() {');
-        for (varName in context) {
-            if (context.hasOwnProperty(varName)) {
-                func.push('var ' + varName + ' = context[\'' + varName + '\'];');
+        if (Array.isArray(__context)) {
+            this.logHandler.error('Parameters can not be an array.');
+        } else {
+            for (varName in __context) {
+                if (varName === '__context' || !varName.match(/[a-zA-Z_][a-zA-Z0-9_]*/)) {
+                    this.logHandler.error('Parameter \''+varName+'\' is not allowed.');
+                    continue;
+                }
+                if (__context.hasOwnProperty(varName)) {
+                    func.push('try { var ' + varName + ' = __context[\'' + varName + '\']; } catch(e) {}');
+                }
             }
         }
         func.push('return (' + expression + '); })()');

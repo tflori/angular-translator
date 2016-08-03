@@ -11,10 +11,6 @@ import {TRANSLATE_PROVIDERS} from "../angular2-translator";
 import {fakeAsync} from "@angular/core/testing";
 
 describe('TranslateService', function () {
-    beforeEach(function() {
-        TranslateLogHandler.error = () => {};
-    });
-
     it('is defined', function () {
         expect(TranslateService).toBeDefined();
     });
@@ -141,6 +137,7 @@ describe('TranslateService', function () {
                 provide(TranslateConfig, {useValue: translateConfig})
             ]);
             translate             = injector.get(TranslateService);
+            translate.logHandler.error = (msg) => { console.error(msg); };
             loader                = injector.get(TranslateLoader);
             PromiseMatcher.install();
         });
@@ -276,7 +273,8 @@ describe('TranslateService', function () {
             }));
 
             it('rejects when loader rejects', fakeAsync(function() {
-               var promise = translate.waitForTranslation();
+                TranslateLogHandler.error = () => {};
+               var promise                 = translate.waitForTranslation();
 
                 loaderPromiseReject();
                 JasminePromise.flush();
@@ -335,7 +333,7 @@ describe('TranslateService', function () {
             }));
 
             it('shows error when language could not be loaded', fakeAsync(function() {
-                spyOn(TranslateLogHandler, 'error');
+                spyOn(TranslateLogHandler, 'error').and.callFake(() => {});
 
                 translate.waitForTranslation();
                 loaderPromiseReject('File not found');
@@ -401,7 +399,8 @@ describe('TranslateService', function () {
             });
 
             it('resolves keys if laguage could not be loaded', fakeAsync(function() {
-                var promise = translate.translate(['TEXT', 'OTHER_TEXT']);
+                TranslateLogHandler.error = () => {};
+                var promise                = translate.translate(['TEXT', 'OTHER_TEXT']);
 
                 loaderPromiseReject();
                 JasminePromise.flush();
@@ -447,7 +446,8 @@ describe('TranslateService', function () {
                     SALUTATION: '{{name.title ? name.title + " " : (name.gender === "w" ? "Ms." : "Mr.")}}{{name.first}} {{name.last}}',
                     WELCOME: 'Welcome{{lastLogin ? " back" : ""}} [[SALUTATION:name]]!{{lastLogin ? " Your last login was on " + lastLogin : ""}}',
                     HACK: '{{privateVar}}{{givenVar}}',
-                    CALL: 'You don\'t know {{privateVar}} but [[HACK:givenVar]]'
+                    CALL: 'You don\'t know {{privateVar}} but [[HACK:givenVar]]',
+                    HACKED: 'Context: {{context}}'
                 });
 
                 JasminePromise.flush();
@@ -486,6 +486,8 @@ describe('TranslateService', function () {
             });
 
             it('catches parse errors in translations', function() {
+                TranslateLogHandler.error = () => {};
+
                 var translation = translate.instant('BROKEN');
 
                 expect(translation).toBe('This "" is empty string');
@@ -506,6 +508,8 @@ describe('TranslateService', function () {
             });
 
             it('transports only variables defined to subtranslations', function() {
+                TranslateLogHandler.error = () => {};
+
                 var translation = translate.instant('CALL', {
                     privateVar: 'private',
                     givenVar: 'given'
@@ -523,11 +527,54 @@ describe('TranslateService', function () {
             });
 
             it('shows error when parsing throws error', function() {
-                spyOn(TranslateLogHandler, 'error');
+                spyOn(TranslateLogHandler, 'error').and.callFake(() => {});
 
                 translate.instant('BROKEN');
 
                 expect(TranslateLogHandler.error).toHaveBeenCalledWith('Parsing error for expression \'notExisting.func()\'');
+            });
+
+            it('can not get __context as parameter', function() {
+                spyOn(TranslateLogHandler, 'error').and.callFake(() => {});
+
+                translate.instant('INTERPOLATION', {__context: 'at work'});
+
+                expect(TranslateLogHandler.error).toHaveBeenCalledWith('Parameter \'__context\' is not allowed.');
+            });
+
+            it('can not get numeric keys in parameter', function() {
+                spyOn(TranslateLogHandler, 'error').and.callFake(() => {});
+
+                translate.instant('INTERPOLATION', {
+                    42: 'the answer'
+                });
+
+                expect(TranslateLogHandler.error).toHaveBeenCalledWith('Parameter \'42\' is not allowed.');
+            });
+
+            it('continues with other parameters after __context', function() {
+                TranslateLogHandler.error = () => {};
+
+                var translation = translate.instant('VARIABLES_TEST', {__context: 'at work', count: 6});
+
+                expect(translation).toBe('This is interesting');
+            });
+
+            it('continues with other parameters after numeric', function() {
+                TranslateLogHandler.error = () => {};
+
+                var translation = translate.instant('VARIABLES_TEST', {42: 'the answer', count: 6});
+
+                expect(translation).toBe('This is interesting');
+            });
+
+            it('ignores array as parameters', function() {
+                spyOn(TranslateLogHandler, 'error').and.callFake(() => {});
+
+                var translation = translate.instant('INTERPOLATION', [1, 2, 3]);
+
+                expect(translation).toBe('The sum from 1+2 is 3');
+                expect(TranslateLogHandler.error).toHaveBeenCalledWith('Parameters can not be an array.');
             });
         });
     });
