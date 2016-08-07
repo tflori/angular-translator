@@ -1,10 +1,10 @@
 export class TranslateConfig {
-    public static navigator:any = window && window.navigator ? window.navigator : {};
+    public static navigator: any = window && window.navigator ? window.navigator : {};
 
-    public defaultLang:string;
-    public providedLangs:string[];
-    public detectLanguageOnStart:boolean;
-    public navigatorLanguages:string[];
+    public defaultLang: string;
+    public providedLangs: string[];
+    public detectLanguageOnStart: boolean;
+    public navigatorLanguages: string[];
 
     constructor({
         defaultLang = 'en',
@@ -23,9 +23,9 @@ export class TranslateConfig {
 
             if (navigator.languages instanceof Array) {
                 return Array.prototype.slice.call(navigator.languages);
-            } else if (typeof navigator.languages === 'string') {
+            } else if (typeof navigator.languages === "string") {
                 return [String(navigator.languages)];
-            } else if (typeof navigator.language === 'string') {
+            } else if (typeof navigator.language === "string") {
                 return [navigator.language];
             } else {
                 return [];

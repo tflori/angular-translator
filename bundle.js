@@ -1,33 +1,36 @@
-var pkg     = require('./package.json');
-var path    = require('path');
+/*jslint node: true */
+"use strict";
+
+var pkg = require('./package.json');
+var path = require('path');
 var Builder = require('systemjs-builder');
-var name    = pkg.name;
+var name = pkg.name;
 
 var builder = new Builder({
-    baseURL: '.',
-    transpiler: 'typescript',
-    typescriptOptions: {
-        module: 'cjs'
-    },
-    map: {
-        typescript: './node_modules/typescript/lib/typescript.js',
-        '@angular': path.resolve('node_modules/@angular'),
-        rxjs: path.resolve('node_modules/rxjs')
-    },
-    paths: {
-        '*': '*.js'
-    },
-    meta: {
-        'node_modules/@angular/*': { build: false },
-        'node_modules/rxjs/*': { build: false }
-    }
+  baseURL: '.',
+  transpiler: 'typescript',
+  typescriptOptions: {
+    module: 'cjs'
+  },
+  map: {
+    typescript: './node_modules/typescript/lib/typescript.js',
+    '@angular': path.resolve('node_modules/@angular'),
+    rxjs: path.resolve('node_modules/rxjs')
+  },
+  paths: {
+    '*': '*.js'
+  },
+  meta: {
+    'node_modules/@angular/*': {build: false},
+    'node_modules/rxjs/*': {build: false}
+  }
 });
 
 builder
-    .bundle('angular2-translator', path.resolve(__dirname, 'bundles/', name + '.js'))
-    .then(function() {
-        console.log('Build complete.');
-    })
-    .catch(function(err) {
-        console.log('Error', err);
-    });
+  .bundle('angular2-translator', path.resolve(__dirname, 'bundles/', name + '.js'))
+  .then(function () {
+    console.log('Build complete.');
+  })
+  .catch(function (err) {
+    console.log('Error', err);
+  });
