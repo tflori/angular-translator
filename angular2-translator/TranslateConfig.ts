@@ -7,19 +7,19 @@ export class TranslateConfig {
     public navigatorLanguages: string[];
 
     constructor({
-        defaultLang = 'en',
-        providedLangs = ['en'],
-        detectLanguageOnStart = true
-        }:{
-        defaultLang?:string,
-        providedLangs?:string[]
-        detectLanguageOnStart?:boolean
+        defaultLang = "en",
+        providedLangs = ["en"],
+        detectLanguageOnStart = true,
+        }: {
+        defaultLang?: string,
+        providedLangs?: string[]
+        detectLanguageOnStart?: boolean
     }) {
         this.defaultLang   = providedLangs.indexOf(defaultLang) > -1 ? defaultLang : providedLangs[0];
         this.providedLangs = providedLangs;
         this.detectLanguageOnStart = detectLanguageOnStart;
-        this.navigatorLanguages = (():string[] => {
-            var navigator:any = TranslateConfig.navigator;
+        this.navigatorLanguages = ((): string[] => {
+            let navigator: any = TranslateConfig.navigator;
 
             if (navigator.languages instanceof Array) {
                 return Array.prototype.slice.call(navigator.languages);
@@ -45,25 +45,26 @@ export class TranslateConfig {
      * @param {boolean?} strict
      * @returns {string|boolean}
      */
-    public langProvided(lang:string, strict:boolean = false):string|boolean {
-        var provided:string|boolean = false, p;
+    public langProvided(lang: string, strict: boolean = false): string|boolean {
+        let provided: string|boolean = false;
+        let p;
 
-        var normalizeLang = function (lang) {
-            var regExp = /^([A-Za-z]{2})(?:[\.\-_\/]?([A-Za-z]{2}))?$/;
-            if (!lang.match(regExp)) {
-                return '';
+        let normalizeLang = function (languageString) {
+            let regExp = /^([A-Za-z]{2})(?:[\.\-_\/]?([A-Za-z]{2}))?$/;
+            if (!languageString.match(regExp)) {
+                return "";
             }
-            return lang.replace(
+            return languageString.replace(
                 regExp,
-                function (substring, lang, country = '') {
-                    lang    = lang.toLowerCase();
-                    country = country.toUpperCase();
-                    return country ? lang + '-' + country : lang;
+                function (substring, language, country = "") {
+                    language    = language.toLowerCase();
+                    country     = country.toUpperCase();
+                    return country ? language + "-" + country : language;
                 }
             );
         };
 
-        var providedLangsNormalized = this.providedLangs.map(normalizeLang);
+        let providedLangsNormalized = this.providedLangs.map(normalizeLang);
         lang = normalizeLang(lang);
 
         if (lang.length === 0) {
@@ -79,8 +80,8 @@ export class TranslateConfig {
             if (p > -1) {
                 provided = this.providedLangs[p];
             } else {
-                p = providedLangsNormalized.map(function (lang) {
-                    return lang.substr(0, 2);
+                p = providedLangsNormalized.map(function (language) {
+                    return language.substr(0, 2);
                 }).indexOf(lang);
                 if (p > -1) {
                     provided = this.providedLangs[p];

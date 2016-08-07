@@ -2,6 +2,7 @@
   "extends": "tslint:latest",
   "rules": {
     "no-empty": false,
+    "no-eval": false,
     "variable-name": "allow-leading-underscore"
   }
 }

@@ -446,7 +446,7 @@ describe("TranslateService", function () {
                 translate.waitForTranslation();
                 loaderPromiseResolve({
                     BROKEN: 'This "{{notExisting.func()}}" is empty string',
-                    CALL: "You don\'t know {{privatelet}} but [[HACK:givenlet]]",
+                    CALL: "You don\'t know {{privateVar}} but [[HACK:givenVar]]",
                     HACK: "{{privateVar}}{{givenVar}}",
                     HACKED: "Context: {{context}}",
                     INTERPOLATION: "The sum from 1+2 is {{1+2}}",
@@ -516,7 +516,7 @@ describe("TranslateService", function () {
                 expect(translation).toBe("Welcome back Dr. Jane Doe! Your last login was on 24th of February, 2016");
             });
 
-            it("transports only letiables defined to subtranslations", function() {
+            it("transports only variables defined to subtranslations", function() {
                 TranslateLogHandler.error = () => {};
 
                 let translation = translate.instant("CALL", {

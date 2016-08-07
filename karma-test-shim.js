@@ -1,4 +1,4 @@
-/*global jasmine, __karma__, System, window */
+/*global jasmine, __karma__, System, window, Promise */
 (function () {
   "use strict";
 

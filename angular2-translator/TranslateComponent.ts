@@ -1,37 +1,35 @@
-import {Component} from "@angular/core";
-import {TranslateService} from "./TranslateService";
-import {Inject} from "@angular/core";
-import {Input} from "@angular/core";
+import {TranslateService}         from "./TranslateService";
+
+import {Component, Inject, Input} from "@angular/core";
 
 @Component({
-    selector: '[translate]',
-    properties: ['translate', 'translateParams'],
-    template: '{{translation}}'
+    properties: [ "translate", "translateParams" ],
+    selector: "[translate]",
+    template: "{{translation}}",
 })
 export class TranslateComponent {
-    private _translate:TranslateService;
+    public translation: string = "";
 
-    private _key:string;
-    private _params:any = {};
+    private _translate: TranslateService;
+    private _key: string;
+    private _params: any = {};
 
-    public translation:string = '';
-
-    constructor(@Inject(TranslateService) translate:TranslateService) {
+    constructor(@Inject(TranslateService) translate: TranslateService) {
         this._translate = translate;
 
         translate.languageChanged.subscribe(() => {
             this._startTranslation();
-        })
+        });
     }
 
-    @Input('translate') set key(key:string) {
+    @Input("translate") set key(key: string) {
         this._key = key;
         this._startTranslation();
     }
 
-    @Input('translateParams') set params(params:any) {
-        if (typeof params !== 'object') {
-            this._translate.logHandler.error('Params have to be an object');
+    @Input("translateParams") set params(params: any) {
+        if (typeof params !== "object") {
+            this._translate.logHandler.error("Params have to be an object");
             return;
         }
 
