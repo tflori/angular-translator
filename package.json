@@ -8,6 +8,8 @@
   },
   "scripts": {
     "test": "typings install && tsc && karma start",
+    "tslint": "tslint -c tslint.json --exclude=\"**/*.d.ts\" --exclude=\"node_modules/**/*.ts\" \"**/*.ts\"",
+    "jslint": "jslint --nomen --indent 2 -- bundle.js karma.conf.js karma-test-shim.js",
     "test-watch": "typings install && tsc && karma start --no-single-run --auto-watch",
     "prepublish": "typings install && tsc && node bundle.js"
   },
@@ -22,6 +24,9 @@
     "url": "http://gitlab.w00tserver.org/tflori/angular2-translator/issues"
   },
   "main": "./angular2-translator.js",
+  "typescript": {
+    "main": "./angular2-translator.ts"
+  },
   "typings": "./angular2-translator.d.ts",
   "homepage": "http://gitlab.w00tserver.org/tflori/angular2-translator",
   "peerDependencies": {
@@ -43,19 +48,20 @@
     "@angular/platform-browser": "2.0.0-rc.4",
     "@angular/platform-browser-dynamic": "2.0.0-rc.4",
     "@angular/router": "3.0.0-beta.2",
-    "rxjs": "5.0.0-beta.6",
-    "zone.js": "0.6.12",
-
     "es6-shim": "0.35.1",
-    "reflect-metadata": "0.1.3",
-    "systemjs": "0.19.27",
-    "systemjs-builder": "0.15.6",
     "jasmine-core": "2.4.1",
+    "jslint": "^0.10.3",
     "karma": "1.1.2",
     "karma-chrome-launcher": "1.0.1",
     "karma-firefox-launcher": "1.0.0",
     "karma-jasmine": "1.0.2",
     "karma-spec-reporter": "0.0.26",
-    "typings": "1.0.4"
+    "reflect-metadata": "0.1.3",
+    "rxjs": "5.0.0-beta.6",
+    "systemjs": "0.19.27",
+    "systemjs-builder": "0.15.6",
+    "tslint": "^3.14.0",
+    "typings": "1.0.4",
+    "zone.js": "0.6.12"
   }
 }

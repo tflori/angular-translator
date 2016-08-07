@@ -1,30 +1,29 @@
-import Jasmine = jasmine.Jasmine;
 import {flushMicrotasks} from "@angular/core/testing";
 
 export class PromiseMatcher {
-    private static _instance:PromiseMatcher;
-
-    private _originalPromise:any;
-    private _global:any;
-
-    constructor() {
-        this._global = window || global;
-        this._originalPromise = this._global.Promise;
-    }
-
-    static getInstance() {
+    public static getInstance() {
         if (!this._instance) {
             this._instance = new PromiseMatcher();
         }
         return this._instance;
     }
 
-    static install() {
+    public static install() {
         PromiseMatcher.getInstance()._install();
     }
 
-    static uninstall() {
+    public static uninstall() {
         PromiseMatcher.getInstance()._uninstall();
+    }
+
+    private static _instance: PromiseMatcher;
+
+    private _originalPromise: any;
+    private _global: any;
+
+    constructor() {
+        this._global = window || global;
+        this._originalPromise = this._global.Promise;
     }
 
     private _install() {
@@ -35,10 +34,10 @@ export class PromiseMatcher {
         JasminePromise.initialize();
         this._global.Promise = JasminePromise;
 
-        var createCompareFn = function(util, customs, state:string, withArgs:boolean = false) {
+        let createCompareFn = function(util, customs, state: string, withArgs: boolean = false) {
             return function(promise, ...args) {
                 if (!(promise instanceof JasminePromise)) {
-                    throw new Error('Promse is not a JasminePromise - did you run PromiseMatcher.install()?');
+                    throw new Error("Promse is not a JasminePromise - did you run PromiseMatcher.install()?");
                 }
                 return promise.verify(util, customs, state, withArgs ? args : null);
             };
@@ -46,16 +45,16 @@ export class PromiseMatcher {
 
         jasmine.addMatchers({
             toBeRejected: function(util, customs) {
-                return { compare: createCompareFn(util, customs, 'rejected') };
+                return { compare: createCompareFn(util, customs, "rejected") };
             },
             toBeRejectedWith: function(util, customs) {
-                return { compare: createCompareFn(util, customs, 'rejected', true) };
+                return { compare: createCompareFn(util, customs, "rejected", true) };
             },
             toBeResolved: function(util, customs) {
-                return { compare: createCompareFn(util, customs, 'resolved') };
+                return { compare: createCompareFn(util, customs, "resolved") };
             },
             toBeResolvedWith: function(util, customs) {
-                return { compare: createCompareFn(util, customs, 'resolved', true) };
+                return { compare: createCompareFn(util, customs, "resolved", true) };
             },
         });
     }
@@ -65,49 +64,9 @@ export class PromiseMatcher {
     }
 }
 
-var i = 0;
+let i = 0;
 export class JasminePromise {
-    private static _flush:Function = () => {};
-    public static NativePromise:any;
-
-    private _nativePromise:Promise<any>;
-
-    public state:string = 'pending';
-    public args:any[];
-    public id:number;
-
-    constructor(resolver:any) {
-        this.id = i++;
-        var resolve, reject;
-        this._nativePromise = new JasminePromise.NativePromise((_resolve, _reject) => {
-            resolve = _resolve;
-            reject = _reject;
-        });
-        this._nativePromise.catch(() => {});
-
-        resolver(
-            (...args: any[]) => {
-                if (this.state !== 'pending') { return; }
-                this.state = 'resolved';
-                this.args = args;
-                resolve.apply(null, args);
-            },
-            (...args: any[]) => {
-                if (this.state !== 'pending') { return; }
-                this.state = 'rejected';
-                this.args = args;
-                reject.apply(null, args);
-            }
-        );
-    }
-
-    public then(...args:any[]) {
-        this._nativePromise.then.apply(this._nativePromise, args);
-    }
-
-    public catch(...args:any[]) {
-        this._nativePromise.catch.apply(this._nativePromise, args);
-    }
+    public static NativePromise: any;
 
     public static reject(reason) {
         return new JasminePromise((resolve, reject) => reject(reason));
@@ -122,15 +81,55 @@ export class JasminePromise {
     public static flush() {
         try {
             flushMicrotasks();
-        } catch(e) {}
+        } catch (e) {}
     }
 
-    public verify(util:any, customEqualityTesters:any, state:string, args?:any[]) {
+    public state: string = "pending";
+    public args: any[];
+    public id: number;
+
+    private _nativePromise: Promise<any>;
+
+    constructor(resolver: any) {
+        this.id = i++;
+        let resolve;
+        let reject;
+        this._nativePromise = new JasminePromise.NativePromise((_resolve, _reject) => {
+            resolve = _resolve;
+            reject = _reject;
+        });
+        this._nativePromise.catch(() => {});
+
+        resolver(
+            (...args: any[]) => {
+                if (this.state !== "pending") { return; }
+                this.state = "resolved";
+                this.args = args;
+                resolve.apply(null, args);
+            },
+            (...args: any[]) => {
+                if (this.state !== "pending") { return; }
+                this.state = "rejected";
+                this.args = args;
+                reject.apply(null, args);
+            }
+        );
+    }
+
+    public then(...args: any[]) {
+        this._nativePromise.then.apply(this._nativePromise, args);
+    }
+
+    public catch(...args: any[]) {
+        this._nativePromise.catch.apply(this._nativePromise, args);
+    }
+
+    public verify(util: any, customEqualityTesters: any, state: string, args?: any[]) {
         JasminePromise.flush();
 
-        var result:{pass:boolean, message:string} = {
+        let result: { pass: boolean, message: string } = {
+            message: "",
             pass: false,
-            message: ''
         };
 
         result.pass = this.state === state;
@@ -139,15 +138,19 @@ export class JasminePromise {
             if (args) {
                 result.pass = util.equals(this.args, args, customEqualityTesters);
                 if (result.pass) {
-                    result.message = 'Expected promise not to be ' + state + ' with ' + JSON.stringify(args) + ' but it was';
+                    result.message = "Expected promise not to be " +
+                        state + " with " +
+                        JSON.stringify(args) + " but it was";
                 } else {
-                    result.message = 'Expected promise to be ' + state + ' with ' + JSON.stringify(args) + ' but it was ' + state + ' with ' + JSON.stringify(this.args);
+                    result.message = "Expected promise to be " +
+                        state + " with " + JSON.stringify(args) +
+                        " but it was " + state + " with " + JSON.stringify(this.args);
                 }
             } else {
-                result.message = 'Expected promise not to be ' + state + ' but it was';
+                result.message = "Expected promise not to be " + state + " but it was";
             }
         } else {
-            result.message = 'Expected promise to be ' + state + ' but it is ' + this.state;
+            result.message = "Expected promise to be " + state + " but it is " + this.state;
         }
 
         return result;

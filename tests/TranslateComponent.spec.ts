@@ -1,121 +1,121 @@
-import {ReflectiveInjector, ReflectiveKey, NoProviderError, provide} from "@angular/core";
-import {JasmineHelper} from "./helper/JasmineHelper";
-import {PromiseMatcher} from "./helper/promise-matcher";
-import {TranslateLoaderMock} from "./helper/TranslateLoaderMock";
-import {TRANSLATE_PROVIDERS} from "../angular2-translator";
-import {TranslateComponent} from "../angular2-translator/TranslateComponent";
-import {TranslateService} from "../angular2-translator/TranslateService";
-import {TranslateLoader} from "../angular2-translator/TranslateLoader";
-import {JasminePromise} from "./helper/promise-matcher";
-import {TranslateConfig} from "../angular2-translator/TranslateConfig";
-import {TranslateLogHandler} from "../angular2-translator/TranslateService";
-import {fakeAsync} from "@angular/core/testing";
+import {
+    TRANSLATE_PROVIDERS,
+    TranslateComponent,
+    TranslateConfig,
+    TranslateLoader,
+    TranslateLogHandler,
+    TranslateService,
+} from "../angular2-translator";
 
-describe('TranslateComponent', function() {
+import {JasmineHelper}                                      from "./helper/JasmineHelper";
+import {TranslateLoaderMock}                                from "./helper/TranslateLoaderMock";
+import {JasminePromise, PromiseMatcher}                     from "./helper/promise-matcher";
+import {NoProviderError, ReflectiveInjector, ReflectiveKey} from "@angular/core";
+import {fakeAsync}                                          from "@angular/core/testing";
+
+describe("TranslateComponent", function() {
     beforeEach(function() {
-        TranslateLogHandler.error = () => {}
+        TranslateLogHandler.error = () => {};
     });
 
-    describe('constructor', function() {
-        it('requires a TranslateService', function () {
-            var injector = ReflectiveInjector.resolveAndCreate([
-                TranslateComponent
-            ]);
+    describe("constructor", function() {
+        it("requires a TranslateService", function () {
+            let injector = ReflectiveInjector.resolveAndCreate([ TranslateComponent ]);
 
-            var action = function () {
+            let action = function () {
                 injector.get(TranslateComponent);
             };
 
-            var providerError = new NoProviderError(injector, ReflectiveKey.get(TranslateService));
+            let providerError = new NoProviderError(injector, ReflectiveKey.get(TranslateService));
             providerError.addKey(injector, ReflectiveKey.get(TranslateComponent));
             expect(action).toThrow(providerError);
         });
     });
 
-    describe('instance', function() {
-        var translate:TranslateService;
-        var translateComponent:TranslateComponent;
+    describe("instance", function() {
+        let translate: TranslateService;
+        let translateComponent: TranslateComponent;
 
         beforeEach(function() {
             PromiseMatcher.install();
-            var injector = ReflectiveInjector.resolveAndCreate([
+            let injector = ReflectiveInjector.resolveAndCreate([
                 TRANSLATE_PROVIDERS,
-                provide(TranslateLoader, {useValue: new TranslateLoaderMock()}),
-                provide(TranslateConfig, {useValue: new TranslateConfig({
-                    providedLangs: ['en', 'de']
-                })})
+                { provide: TranslateLoader, useValue: new TranslateLoaderMock() },
+                { provide: TranslateConfig, useValue: new TranslateConfig( {
+                    providedLangs: [ "en", "de" ],
+                } ) },
             ]);
 
             translate = injector.get(TranslateService);
             translateComponent = new TranslateComponent(translate);
-            spyOn(translate, 'translate').and.returnValue(Promise.resolve('This is a text'));
+            spyOn(translate, "translate").and.returnValue(Promise.resolve("This is a text"));
         });
 
         afterEach(PromiseMatcher.uninstall);
 
-        it('starts translation when key got set', function() {
-            translateComponent.key = 'TEXT';
+        it("starts translation when key got set", function() {
+            translateComponent.key = "TEXT";
 
-            expect(translate.translate).toHaveBeenCalledWith('TEXT', {});
+            expect(translate.translate).toHaveBeenCalledWith("TEXT", {});
         });
 
-        it('starts translation when key is set and params got changed', function() {
-            translateComponent.key = 'TEXT';
+        it("starts translation when key is set and params got changed", function() {
+            translateComponent.key = "TEXT";
             JasmineHelper.calls(translate.translate).reset();
 
-            translateComponent.params = {some:'value'};
+            translateComponent.params = { some: "value" };
 
-            expect(translate.translate).toHaveBeenCalledWith('TEXT', {some:'value'});
+            expect(translate.translate).toHaveBeenCalledWith("TEXT", { some: "value" });
         });
 
-        it('restarts translation when key got changed', function() {
-            translateComponent.key = 'ANYTHING';
-            translateComponent.params = {some:'value'};
+        it("restarts translation when key got changed", function() {
+            translateComponent.key = "ANYTHING";
+            translateComponent.params = { some: "value" };
             JasmineHelper.calls(translate.translate).reset();
 
-            translateComponent.key = 'TEXT';
+            translateComponent.key = "TEXT";
 
-            expect(translate.translate).toHaveBeenCalledWith('TEXT', {some:'value'});
+            expect(translate.translate).toHaveBeenCalledWith("TEXT", { some: "value" });
         });
 
-        it('does not translate when key got not set', function() {
-            translateComponent.params = {some:'value'};
+        it("does not translate when key got not set", function() {
+            translateComponent.params = { some: "value" };
 
             expect(translate.translate).not.toHaveBeenCalled();
         });
 
-        it('does not accept non-object params', function() {
-            translateComponent.key = 'TEXT';
+        it("does not accept non-object params", function() {
+            translateComponent.key = "TEXT";
             JasmineHelper.calls(translate.translate).reset();
 
-            translateComponent.params = 'foo';
+            translateComponent.params = "foo";
 
             expect(translate.translate).not.toHaveBeenCalled();
         });
 
-        it('stores translation when promise got resolved', fakeAsync(function() {
-            translateComponent.key = 'TEXT';
+        it("stores translation when promise got resolved", fakeAsync(function() {
+            translateComponent.key = "TEXT";
 
             JasminePromise.flush();
 
-            expect(translateComponent.translation).toBe('This is a text');
+            expect(translateComponent.translation).toBe("This is a text");
         }));
 
-        it('restarts translation when language got changed', function() {
-            translateComponent.key = 'TEXT';
+        it("restarts translation when language got changed", function() {
+            translateComponent.key = "TEXT";
             JasmineHelper.calls(translate.translate).reset();
 
-            translate.lang = 'de';
+            translate.lang = "de";
 
-            expect(translate.translate).toHaveBeenCalledWith('TEXT', {});
+            expect(translate.translate).toHaveBeenCalledWith("TEXT", {});
         });
 
-        it('shows error if params are not object', function() {
-            spyOn(TranslateLogHandler, 'error');
+        it("shows error if params are not object", function() {
+            spyOn(TranslateLogHandler, "error");
 
-            translateComponent.params = 'foo';
+            translateComponent.params = "foo";
 
-            expect(TranslateLogHandler.error).toHaveBeenCalledWith('Params have to be an object');
+            expect(TranslateLogHandler.error).toHaveBeenCalledWith("Params have to be an object");
         });
     });
 });

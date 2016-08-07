@@ -1,7 +1,7 @@
 import {TranslateLoader} from "../angular2-translator/TranslateLoader";
 
-describe('TranslateLoader', function() {
-    it('is defined', function() {
+describe("TranslateLoader", function() {
+    it("is defined", function() {
         expect(TranslateLoader).toBeDefined();
     });
 
@@ -10,5 +10,5 @@ describe('TranslateLoader', function() {
     //  - is abstract
     //  - has abstract method load
 
-    // the interface: TranslateLoaderInterface { public load(lang:string):Promise<Object> }
+    // the interface: ITranslateLoader { public load(lang: string): Promise<Object> }
 });

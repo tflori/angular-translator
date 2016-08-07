@@ -1,135 +1,137 @@
-import {ReflectiveInjector, NoProviderError, ReflectiveKey, provide} from "@angular/core";
-import {PromiseMatcher, JasminePromise} from "./helper/promise-matcher";
-import {JasmineHelper} from "./helper/JasmineHelper";
-import {TRANSLATE_PROVIDERS} from "../angular2-translator";
-import {TranslatePipe} from "../angular2-translator/TranslatePipe";
-import {TranslateService, TranslateLogHandler} from "../angular2-translator/TranslateService";
-import {TranslateLoader} from "../angular2-translator/TranslateLoader";
-import {TranslateLoaderMock} from "./helper/TranslateLoaderMock";
-import {TranslateConfig} from "../angular2-translator/TranslateConfig";
-import {fakeAsync} from "@angular/core/testing";
+import {
+    TRANSLATE_PROVIDERS,
+    TranslateConfig,
+    TranslateLoader,
+    TranslateLogHandler,
+    TranslatePipe,
+    TranslateService,
+} from "../angular2-translator";
 
-describe('TranslatePipe', function() {
-    it('is defined', function () {
+import {JasmineHelper}                                      from "./helper/JasmineHelper";
+import {TranslateLoaderMock}                                from "./helper/TranslateLoaderMock";
+import {JasminePromise, PromiseMatcher}                     from "./helper/promise-matcher";
+import {NoProviderError, ReflectiveInjector, ReflectiveKey} from "@angular/core";
+import {fakeAsync}                                          from "@angular/core/testing";
+
+describe("TranslatePipe", function() {
+    it("is defined", function () {
         expect(TranslatePipe).toBeDefined();
     });
 
-    describe('constructor', function() {
-        it('requires a TranslateService', function () {
-            var injector = ReflectiveInjector.resolveAndCreate([
-                TranslatePipe
-            ]);
+    describe("constructor", function() {
+        it("requires a TranslateService", function () {
+            let injector = ReflectiveInjector.resolveAndCreate([ TranslatePipe ]);
 
-            var action = function () {
+            let action = function () {
                 injector.get(TranslatePipe);
             };
 
-            var providerError = new NoProviderError(injector, ReflectiveKey.get(TranslateService));
+            let providerError = new NoProviderError(injector, ReflectiveKey.get(TranslateService));
             providerError.addKey(injector, ReflectiveKey.get(TranslatePipe));
             expect(action).toThrow(providerError);
         });
     });
 
-    describe('transform', function() {
-        var translate:TranslateService;
-        var translatePipe:TranslatePipe;
+    describe("transform", function() {
+        let translate: TranslateService;
+        let translatePipe: TranslatePipe;
 
         beforeEach(function() {
             PromiseMatcher.install();
             TranslateLogHandler.error = () => {};
-            var injector = ReflectiveInjector.resolveAndCreate([
+            let injector = ReflectiveInjector.resolveAndCreate([
                 TRANSLATE_PROVIDERS,
-                provide(TranslateLoader, {useValue: new TranslateLoaderMock()}),
-                provide(TranslateConfig, {useValue: new TranslateConfig({
-                    providedLangs: ['en', 'de']
-                })}),
+                { provide: TranslateLoader, useValue: new TranslateLoaderMock() },
+                { provide: TranslateConfig, useValue: new TranslateConfig( {
+                    providedLangs: [ "en", "de" ],
+                } ) },
             ]);
 
             translate = injector.get(TranslateService);
             translatePipe = new TranslatePipe(translate);
-            spyOn(translate, 'translate').and.returnValue(Promise.resolve('This is a text'));
+            spyOn(translate, "translate").and.returnValue(Promise.resolve("This is a text"));
         });
 
         afterEach(PromiseMatcher.uninstall);
 
-        it('returns an empty string', function() {
-            var translation = translatePipe.transform('TEXT');
+        it("returns an empty string", function() {
+            let translation = translatePipe.transform("TEXT");
 
-            expect(translation).toBe('');
+            expect(translation).toBe("");
         });
 
-        it('calls translate to get translation', function() {
-            translatePipe.transform('TEXT');
+        it("calls translate to get translation", function() {
+            translatePipe.transform("TEXT");
 
-            expect(translate.translate).toHaveBeenCalledWith('TEXT', {});
+            expect(translate.translate).toHaveBeenCalledWith("TEXT", {});
         });
 
-        it('calls translate only once', function() {
-            translatePipe.transform('TEXT');
-            translatePipe.transform('TEXT');
+        it("calls translate only once", function() {
+            translatePipe.transform("TEXT");
+            translatePipe.transform("TEXT");
 
             expect(JasmineHelper.calls(translate.translate).count()).toBe(1);
         });
 
-        it('gets params from args[0]', function() {
-            translatePipe.transform('TEXT', [{some:'value'}]);
+        it("gets params from args[0]", function() {
+            translatePipe.transform("TEXT", [{ some: "value" }]);
 
-            expect(translate.translate).toHaveBeenCalledWith('TEXT', {some:'value'})
+            expect(translate.translate).toHaveBeenCalledWith("TEXT", { some: "value" });
         });
 
-        it('evaluates args[0] to get object', function() {
-            translatePipe.transform('TEXT', ['{some:\'value\'}']);
+        it("evaluates args[0] to get object", function() {
+            translatePipe.transform("TEXT", ["{some:'value'}"]);
 
-            expect(translate.translate).toHaveBeenCalledWith('TEXT', {some:'value'});
+            expect(translate.translate).toHaveBeenCalledWith("TEXT", { some: "value" });
         });
 
-        it('calls with empty object if args[0] got not evaluated to object', function() {
-            translatePipe.transform('TEXT', ['\'value\'']);
+        it("calls with empty object if args[0] got not evaluated to object", function() {
+            translatePipe.transform("TEXT", ["'value'"]);
 
-            expect(translate.translate).toHaveBeenCalledWith('TEXT', {});
+            expect(translate.translate).toHaveBeenCalledWith("TEXT", {});
         });
 
-        it('returns translation when promise got resolved', fakeAsync(function() {
-            translatePipe.transform('TEXT');
+        it("returns translation when promise got resolved", fakeAsync(function() {
+            translatePipe.transform("TEXT");
 
             JasminePromise.flush();
-            var translation = translatePipe.transform('TEXT');
+            let translation = translatePipe.transform("TEXT");
 
-            expect(translation).toBe('This is a text');
+            expect(translation).toBe("This is a text");
         }));
 
-        it('calls translate again when key changes', function() {
-            translatePipe.transform('ANYTHING');
-            translatePipe.transform('TEXT');
+        it("calls translate again when key changes", function() {
+            translatePipe.transform("ANYTHING");
+            translatePipe.transform("TEXT");
 
-            expect(translate.translate).toHaveBeenCalledWith('ANYTHING', {});
-            expect(translate.translate).toHaveBeenCalledWith('TEXT', {});
+            expect(translate.translate).toHaveBeenCalledWith("ANYTHING", {});
+            expect(translate.translate).toHaveBeenCalledWith("TEXT", {});
             expect(JasmineHelper.calls(translate.translate).count()).toBe(2);
         });
 
-        it('calls translate again when params changes', function() {
-            translatePipe.transform('TEXT', [{some:'value'}]);
-            translatePipe.transform('TEXT', [{some:'otherValue'}]);
+        it("calls translate again when params changes", function() {
+            translatePipe.transform("TEXT", [{ some: "value" }]);
+            translatePipe.transform("TEXT", [{ some: "otherValue" }]);
 
-            expect(translate.translate).toHaveBeenCalledWith('TEXT', {some:'value'});
-            expect(translate.translate).toHaveBeenCalledWith('TEXT', {some:'otherValue'});
+            expect(translate.translate).toHaveBeenCalledWith("TEXT", { some: "value" });
+            expect(translate.translate).toHaveBeenCalledWith("TEXT", { some: "otherValue" });
             expect(JasmineHelper.calls(translate.translate).count()).toBe(2);
         });
 
-        it('calls translate again when language got changed', function() {
-            translatePipe.transform('TEXT');
+        it("calls translate again when language got changed", function() {
+            translatePipe.transform("TEXT");
 
-            translate.lang = 'de';
+            translate.lang = "de";
 
             expect(JasmineHelper.calls(translate.translate).count()).toBe(2);
         });
 
-        it('shows error if params could not be parsed', function() {
-            spyOn(TranslateLogHandler, 'error');
+        it("shows error if params could not be parsed", function() {
+            spyOn(TranslateLogHandler, "error");
 
-            translatePipe.transform('TEXT', ['{baefa}']);
+            translatePipe.transform("TEXT", ["{baefa}"]);
 
-            expect(TranslateLogHandler.error).toHaveBeenCalledWith('\'{baefa}\' could not be parsed to object');
+            expect(TranslateLogHandler.error).toHaveBeenCalledWith("'{baefa}' could not be parsed to object");
         });
     });
 });
