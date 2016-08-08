@@ -244,13 +244,14 @@ export class TranslateService {
             this.logHandler.error("Parameters can not be an array.");
         } else {
             for (varName in __context) {
-                if (__context.hasOwnProperty(varName)) {
-                    if (varName === "__context" || !varName.match(/[a-zA-Z_][a-zA-Z0-9_]*/)) {
-                        this.logHandler.error("Parameter '" + varName + "' is not allowed.");
-                        continue;
-                    }
-                    func.push("try { var " + varName + " = __context['" + varName + "']; } catch(e) {}");
+                if (!__context.hasOwnProperty(varName)) {
+                    continue;
                 }
+                if (varName === "__context" || !varName.match(/[a-zA-Z_][a-zA-Z0-9_]*/)) {
+                    this.logHandler.error("Parameter '" + varName + "' is not allowed.");
+                    continue;
+                }
+                func.push("try { var " + varName + " = __context['" + varName + "']; } catch(e) {}");
             }
         }
         func.push("return (" + expression + "); })()");
