@@ -130,5 +130,41 @@ describe("TranslateLoaderJson", function () {
 
             expect(promise).toBeRejected();
         });
+
+        it("combines arrays to a string", function() {
+            let promise = loader.load("en");
+
+            connection.mockRespond(new Response(new ResponseOptions({
+                body: JSON.stringify({
+                    "COOKIE_INFORMATION": [
+                        "We are using cookies to adjust our website to the needs of our customers. ",
+                        "By using our websites you agree to store cookies on your computer, tablet or smartphone.",
+                    ],
+                }),
+                status: 200,
+            })));
+
+            expect(promise).toBeResolvedWith({
+                "COOKIE_INFORMATION": "We are using cookies to adjust our website to the needs of our customers. " +
+                "By using our websites you agree to store cookies on your computer, tablet or smartphone.",
+            });
+        });
+
+        it("filters non string values", function() {
+            let promise = loader.load("en");
+
+            connection.mockRespond(new Response(new ResponseOptions({
+                body: JSON.stringify({
+                    "ANSWER": 42,
+                    "COMBINED": [
+                        "7 multiplied by 6 is ",
+                        42,
+                    ],
+                }),
+                status: 200,
+            })));
+
+            expect(promise).toBeResolvedWith({"COMBINED": "7 multiplied by 6 is "});
+        });
     });
 });

@@ -36,7 +36,24 @@ export class TranslateLoaderJson extends TranslateLoader {
                 .subscribe(
                     (response) => {
                         if (response.status === 200) {
-                            resolve(response.json());
+                            let translations = response.json();
+                            let key;
+                            for (key in translations) {
+                                if (!translations.hasOwnProperty(key)) {
+                                    continue;
+                                }
+
+                                if (Array.isArray(translations[key])) {
+
+                                    translations[key] = translations[key]
+                                        .filter((v) => typeof v === "string")
+                                        .join("");
+
+                                } else if (typeof translations[key] !== "string") {
+                                    delete translations[key];
+                                }
+                            }
+                            resolve(translations);
                         } else {
                             reject("Language file could not be loaded (StatusCode: " + response.status + ")");
                         }
