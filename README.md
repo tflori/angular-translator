@@ -1,5 +1,76 @@
 # Angular2 Translator
 
+`angular2-translator` is a simple translation service for angular2 applications. It should support all necessary
+features for translation, like interpolation, references to other translations and so on.
+
+## Features
+### Interpolation
+
+It supports interpolation so you can:
+
+- output variables in your translations  
+  `"HELLO":"Hello {{name}}!"`
+- calculate in your translations  
+  `"ANSWER":"The answer is {{7*6}}"`
+- pluralize in your translations  
+  `"MESSAGES":"You have {{count}} new message{{count != 1 ? 's' : ''}}`
+- execute functions in your translations  
+  `"LAST_LOGIN":"Your last login was on {{lastLogin.format('MM/DD/YYYY')}}`
+  
+[* dynamic translations](https://gitlab.w00tserver.org:617/tflori/angular2-translator/blob/master/docs/dynamize.md)
+  
+### Refer to other translations
+
+By referring to other translations you can make it easy to have everywhere the same text without copy and paste.
+```json
+{
+  "GREETING": "Hello {{name}}!",
+  "REGISTERED": "[[GREETING:name]] Thanks for registering at this service.",
+  "LOGIN_CONFIRM": "[[GREETING:name]] Your last login was on {{lastLogin.format('L')}}."
+}
+```
+
+[* dynamic translations](https://gitlab.w00tserver.org:617/tflori/angular2-translator/blob/master/docs/dynamize.md)
+
+### Different loaders
+
+This module supports different loaders. Currently each loader has to load all translations for the app. You can write
+your own loader or use the only one we have developed for you - the JSON loader.
+
+[* TranslateLoader](https://gitlab.w00tserver.org:617/tflori/angular2-translator/blob/master/docs/TranslateLoader.md)
+
+#### JSON loader
+
+It is a very basic loader that loads your JSON translation files. A translation can be an array to allow multiline
+translations (to make the files readable and better structured).
+
+[* TranslateLoaderJson](https://gitlab.w00tserver.org:617/tflori/angular2-translator/blob/master/docs/TranslateLoaderJson.md)
+
+## How to use
+
+Simple basic usage:
+```javascript
+import {Component} from 'angular2/core';
+import {TranslateService, TranslatePipe, TranslateComponent} from 'angular2-translator';
+
+@Component({
+    selector: 'my-app',
+    template: '{TEXT|translate} is the same as <span translate="TEXT"></span>',
+    pipes: [TranslatePipe],
+    directives: [TranslateComponent]
+})
+export class AppComponent {
+    constructor(translate: TranslateService) {
+        translate.translate('TEXT').then(
+          (translation) => console.log(translation)
+        );
+    }
+}
+```
+
+To learn more have a look at 
+[the documentation](https://gitlab.w00tserver.org:617/tflori/angular2-translator/blob/master/docs/index.md)
+
 ## How to install
 
 ### Via npm
@@ -31,46 +102,3 @@ git clone https://gitlab.w00tserver.org:617/tflori/angular2-translator
 ln -s angular2-translator MyApp/libs/angular2-translator
 ```
 > You should know what you do and don't follow this guide for installation.
-
-## How to use
-
-Simple basic usage:
-```javascript
-import {Component} from 'angular2/core';
-import {TranslateService, TranslatePipe, TranslateComponent} from 'angular2-translator';
-
-@Component({
-    selector: 'my-app',
-    template: '{TEXT|translate} is the same as <span translate="TEXT"></span>',
-    pipes: [TranslatePipe],
-    directives: [TranslateComponent]
-})
-export class AppComponent {
-    constructor(translate: TranslateService) {
-        translate.translate('TEXT').then(
-          (translation) => console.log(translation)
-        );
-    }
-}
-```
-
-To learn more have a look at [the docs](https://gitlab.w00tserver.org:617/tflori/angular2-translator/blob/master/docs/index.md)
-
-## Features
-### Different loaders
-#### JSON loader
-
-Customize directory and extension
-```javascript
-import {MyApp} from './myApp';
-import {bootstrap} from 'angular2/platform/browser';
-import {provide} from 'angular2/core';
-import {HTTP_PROVIDERS} from 'angular2/http';
-import {TRANSLATE_PROVIDERS, TranslateLoaderJsonConfig} from 'angular2-translator';
-
-bootstrap(MyApp, [
-  HTTP_PROVIDERS,
-  TRANSLATE_PROVIDERS,
-  provide(TranslateLoaderJsonConfig, {useValue: new TranslateLoaderJsonConfig('app/localization', '-lang.json')})
-])
-```
