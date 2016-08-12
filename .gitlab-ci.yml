@@ -3,16 +3,15 @@ image: "iras/npmtest:1.0"
 variables:
   DISPLAY: ":23"
 
-artifacts:
-  paths:
-  - coverage/
-
 before_script:
   - npm -v
   - which npm
   - sh -c "/sbin/my_init" 2&>1 > /dev/null &
 
 test:
+  artifacts:
+    paths:
+    - coverage/
   script:
     - npm install
     - npm run tslint
