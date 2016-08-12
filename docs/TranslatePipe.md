@@ -27,7 +27,7 @@ Here are some examples how we can use it:
 ## Better translate before
 
 For the most usecases we suggest you to translate before in the component. Here are the examples again:
-```js
+```ts
 import {Component} from '@angular/core';
 import {TranslateService} from 'angular2-translator';
 

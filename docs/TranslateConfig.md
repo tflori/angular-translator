@@ -3,7 +3,7 @@
 The TranslateConfig is a dependency for TranslateService. As the name suggests it gives a configuration for the TranslateService.
 
 You can change the properties by giving an object to the constructor:
-```js
+```ts
 import {TranslateConfig} from 'angular2-translator';
 
 new TranslateConfig({
@@ -35,7 +35,7 @@ Because the setter for TranslateServer.lang is checking if language is provided 
 languages matches against this regular expression too. Otherwise you will never be able to switch to this language.
 
 Example:
-```js
+```ts
 import {TranslateConfig} from 'angular2-translator';
 
 var translateConfig = new TranslateConfig({
@@ -48,7 +48,7 @@ expect(translateConfig.langProvided('en-US')).toBe('EN/usa');
 ## Example
 
 This example shows how you usually use the TranslateConfig class:
-```js
+```ts
 import {bootstrap}    from 'angular2/platform/browser';
 import {provide} from 'angular2/core';
 import {HTTP_PROVIDERS} from 'angular2/http';

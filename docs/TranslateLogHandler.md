@@ -5,7 +5,7 @@ implements this interface uses console.error() to log errors. The other two func
 
 ## Declartion
 
-```js
+```ts
 interface TranslateLogHandler {
     error(message:string):void;
     info(message:string):void;

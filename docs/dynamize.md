@@ -13,7 +13,7 @@ Your translation file:
 ```
 
 In your component you can use it like this:
-```js
+```ts
 translateService.translate('NEW_MESSAGES', {count: 42}).then((translation) => this.translation = translation);
 ```
 
@@ -34,6 +34,12 @@ writing them behind a colon and comma separated.
 
 Other translations are loaded before the content of double braces got parsed.
 
+### Passing parameters
+
+Parameters can be passed directly under the same name, with a different name and partially.  To pass a variable with a 
+different name you define a getter. To pass a variable with the same name you can leave the getter empty. The getter
+can contain dots which means that you refer to the `object.key` and pass only key from this object.
+
 ### Limitations
 - the referred translation key can only contain `[A-Za-z0-9_.-]`
 - the submitted params can only contain `[A-Za-z0-9_]`
@@ -43,7 +49,9 @@ Other translations are loaded before the content of double braces got parsed.
 {
   "HELLO": "Hello",
   "GREET": "[[ HELLO ]] {{name}}",
-  "USER_LOGGED_IN": "[[GREET:name]], your last login was on {{lastLogin}}"
+  "USER_LOGGED_IN": "[[GREET:name]], your last login was on {{lastLogin}}",
+  "SALUTATION": "{{title ? title : (gender == 'w' ? 'Mrs.' : 'Mr.')}} {{firstName}} {{lastName}}",
+  "WELCOME": "Welcome [[ SALUTATION : title=user.title, gender=user.gender, firstName=user.firstName, lastName=user.lastName ]]"
 }
 ```
 
@@ -57,7 +65,7 @@ course language related.
 ## Provide parameters
 
 Parameters have to be stored in an object. That is easy when you using javascript:
-```js
+```ts
 this.user = {name:'Thomas', lastLogin: moment('2016-03-06 22:13:31')};
 translateService.translate('USER_LOGGED_IN', {name:this.user.name,lastLogin:this.user.lastLogin.fromNow()})
 ```
@@ -84,7 +92,7 @@ Another - some bit more realistic - example for usage of pipes:
 This works only if you define lastLogin in user as string, or use a method of moment in you translation.
  
 Define as string:
-```js
+```ts
 this.user = {name:'Thomas', lastLogin: moment('2016-03-06 22:13.31').format('LLL')}
 ```
 
