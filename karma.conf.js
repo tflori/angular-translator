@@ -43,13 +43,35 @@ module.exports = function (config) {
       'node_modules/**/*spec.js'
     ],
 
-    reporters: ['spec'],
+    preprocessors: {
+      'angular2-translator.js': 'coverage',
+      'angular2-translator/**/*.js': 'coverage'
+    },
+
+    reporters: ['spec', 'coverage'],
+
+    coverageReporter: {
+      dir: 'coverage',
+      reporters: [
+        { type: 'html' },
+        { type: 'text-summary' }
+      ]
+    },
+
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: false,
-    browsers: ['Chrome'],
     singleRun: true,
-    concurrency: Infinity
+    concurrency: Infinity,
+    customLaunchers: {
+      smallerChrome: {
+        base: "Chrome",
+        flags: [
+          "--window-size=1024,768"
+        ]
+      }
+    },
+    browsers: [ 'smallerChrome' ]
   });
 };

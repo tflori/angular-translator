@@ -64,7 +64,21 @@ System.registerDynamic("angular2-translator/TranslateLoaderJson", ["./TranslateL
         var file = _this._config.path + lang + _this._config.extension;
         _this._http.get(file).subscribe(function(response) {
           if (response.status === 200) {
-            resolve(response.json());
+            var translations = response.json();
+            var key = void 0;
+            for (key in translations) {
+              if (!translations.hasOwnProperty(key)) {
+                continue;
+              }
+              if (Array.isArray(translations[key])) {
+                translations[key] = translations[key].filter(function(v) {
+                  return typeof v === "string";
+                }).join("");
+              } else if (typeof translations[key] !== "string") {
+                delete translations[key];
+              }
+            }
+            resolve(translations);
           } else {
             reject("Language file could not be loaded (StatusCode: " + response.status + ")");
           }
@@ -432,23 +446,14 @@ System.registerDynamic("angular2-translator/TranslateService", ["./TranslateConf
           continue;
         }
         t = this._translations[lang][keys[i]];
-        t = t.replace(/\[\[\s*([A-Za-z0-9_.-]+)\s*:?\s*([A-Za-z0-9,_]+)?\s*]]/g, function(sub, key, vars) {
-          if (vars === void 0) {
-            vars = "";
-          }
-          var translationParams = {};
-          vars.split(",").map(function(relatedKey) {
-            if (Object.prototype.hasOwnProperty.call(params, relatedKey)) {
-              translationParams[relatedKey] = params[relatedKey];
-            }
-          });
-          return String(_this.instant(key, translationParams, lang));
+        t = t.replace(/\[\[([\sA-Za-z0-9_.,=:-]*)]]/g, function(s, sub) {
+          return _this._translateReferenced(s, sub, params, lang);
         });
         t = t.replace(/{{\s*(.*?)\s*}}/g, function(sub, expression) {
           try {
             return _this._parse(expression, params) || "";
           } catch (e) {
-            _this.logHandler.error("Parsing error for expression '" + expression + "'");
+            _this.logHandler.error("Parsing error for expression '" + sub + "'");
             return "";
           }
         });
@@ -480,17 +485,161 @@ System.registerDynamic("angular2-translator/TranslateService", ["./TranslateConf
         this.logHandler.error("Parameters can not be an array.");
       } else {
         for (varName in __context) {
-          if (__context.hasOwnProperty(varName)) {
-            if (varName === "__context" || !varName.match(/[a-zA-Z_][a-zA-Z0-9_]*/)) {
-              this.logHandler.error("Parameter '" + varName + "' is not allowed.");
-              continue;
-            }
-            func.push("try { var " + varName + " = __context['" + varName + "']; } catch(e) {}");
+          if (!__context.hasOwnProperty(varName)) {
+            continue;
           }
+          if (varName === "__context" || !varName.match(/[a-zA-Z_][a-zA-Z0-9_]*/)) {
+            this.logHandler.error("Parameter '" + varName + "' is not allowed.");
+            continue;
+          }
+          func.push("try { var " + varName + " = __context['" + varName + "']; } catch(e) {}");
         }
       }
       func.push("return (" + expression + "); })()");
       return eval(func.join("\n"));
+    };
+    TranslateService.prototype._referencedError = function(s, unexpected, expected, pos) {
+      var msg = "Parse error unexpected " + unexpected;
+      if (pos !== undefined) {
+        msg += " at pos " + (pos + 3);
+      }
+      if (expected) {
+        msg += " expected " + expected;
+      }
+      this.logHandler.error(msg + " in '" + s + "'");
+      return "";
+    };
+    TranslateService.prototype._transportParam = function(from, to, paramKey, getter) {
+      if (!getter) {
+        getter = paramKey;
+      }
+      var gPos = getter.indexOf(".");
+      if (gPos === -1) {
+        if (from.hasOwnProperty(getter)) {
+          to[paramKey] = from[getter];
+        }
+      } else {
+        var gObj = getter.substr(0, gPos);
+        var gGetter = getter.substr(gPos + 1);
+        if (from.hasOwnProperty(gObj) && typeof from[gObj] === "object") {
+          this._transportParam(from[gObj], to, paramKey, gGetter);
+        }
+      }
+    };
+    TranslateService.prototype._translateReferenced = function(s, sub, params, lang) {
+      var j;
+      var state = "wait_key";
+      var key;
+      var translateParams = {};
+      var paramKey;
+      var getter;
+      for (j = 0; j < sub.length; j++) {
+        switch (state) {
+          case "wait_key":
+            if (sub[j].match(/\s/)) {} else if (sub[j].match(/[A-Za-z0-9_.-]/)) {
+              state = "read_key";
+              key = sub[j];
+            } else {
+              return this._referencedError(s, "character", "key", j);
+            }
+            break;
+          case "read_key":
+            if (sub[j].match(/[A-Za-z0-9_.-]/)) {
+              key += sub[j];
+            } else if (sub[j] === ":") {
+              state = "wait_param";
+            } else if (sub[j].match(/\s/)) {
+              state = "key_readed";
+            } else {
+              return this._referencedError(s, "character", "colon or end", j);
+            }
+            break;
+          case "key_readed":
+            if (sub[j].match(/\s/)) {} else if (sub[j] === ":") {
+              state = "wait_param";
+            } else {
+              return this._referencedError(s, "character", "colon or end", j);
+            }
+            break;
+          case "wait_param":
+            if (sub[j].match(/\s/)) {} else if (sub[j].match(/[A-Za-z0-9_]/)) {
+              state = "read_param_key";
+              paramKey = sub[j];
+            } else {
+              return this._referencedError(s, "character", "parameter", j);
+            }
+            break;
+          case "read_param_key":
+            if (sub[j].match(/[A-Za-z0-9_]/)) {
+              paramKey += sub[j];
+            } else if (sub[j] === "=") {
+              state = "wait_getter";
+            } else if (sub[j] === ",") {
+              this._transportParam(params, translateParams, paramKey);
+              state = "wait_param";
+            } else if (sub[j].match(/\s/)) {
+              state = "param_key_readed";
+            } else {
+              return this._referencedError(s, "character", "comma, equal sign or end", j);
+            }
+            break;
+          case "param_key_readed":
+            if (sub[j].match(/\s/)) {} else if (sub[j] === "=") {
+              state = "wait_getter";
+            } else if (sub[j] === ",") {
+              this._transportParam(params, translateParams, paramKey);
+              state = "wait_param";
+            } else {
+              return this._referencedError(s, "character", "comma, equal sign or end", j);
+            }
+            break;
+          case "wait_getter":
+            if (sub[j].match(/\s/)) {} else if (sub[j].match(/[A-Za-z0-9_]/)) {
+              state = "read_getter";
+              getter = sub[j];
+            } else {
+              return this._referencedError(s, "character", "getter", j);
+            }
+            break;
+          case "read_getter":
+            if (sub[j].match(/[A-Za-z0-9_.]/)) {
+              getter += sub[j];
+            } else if (sub[j].match(/\s/)) {
+              state = "getter_readed";
+            } else if (sub[j] === ",") {
+              this._transportParam(params, translateParams, paramKey, getter);
+              state = "wait_param";
+            } else {
+              return this._referencedError(s, "character", "comma or end", j);
+            }
+            break;
+          case "getter_readed":
+            if (sub[j].match(/\s/)) {} else if (sub[j] === ",") {
+              this._transportParam(params, translateParams, paramKey, getter);
+              state = "wait_param";
+            } else {
+              return this._referencedError(s, "character", "comma or end", j);
+            }
+            break;
+        }
+      }
+      switch (state) {
+        case "param_key_readed":
+        case "read_param_key":
+          this._transportParam(params, translateParams, paramKey);
+          break;
+        case "getter_readed":
+        case "read_getter":
+          this._transportParam(params, translateParams, paramKey, getter);
+          break;
+        case "wait_key":
+          return this._referencedError(s, "end", "key");
+        case "wait_param":
+          return this._referencedError(s, "end", "parameter");
+        case "wait_getter":
+          return this._referencedError(s, "end", "getter");
+      }
+      return String(this.instant(key, translateParams, lang));
     };
     TranslateService = __decorate([core_1.Injectable(), __param(0, core_1.Inject(TranslateConfig_1.TranslateConfig)), __param(1, core_1.Inject(TranslateLoader_1.TranslateLoader)), __param(2, core_1.Inject(exports.TranslateLogHandler)), __metadata('design:paramtypes', [TranslateConfig_1.TranslateConfig, TranslateLoader_1.TranslateLoader, Object])], TranslateService);
     return TranslateService;
