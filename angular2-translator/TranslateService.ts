@@ -282,33 +282,22 @@ export class TranslateService {
     }
 
     /**
-     * Copies getter from one object to another object at paramKey.
+     * Gets a parameter from params defined by getter recursive.
      *
-     * Getter can have multi dimensions like 'comment.author'.
-     *
-     * @param {object}  from
-     * @param {object}  to
-     * @param {string}  paramKey
-     * @param {?string} getter
+     * @param   {object} params
+     * @param   {string} getter
+     * @returns {any}
      * @private
      */
-    private _transportParam(from: Object, to: Object, paramKey: string, getter?: string): void {
-        if (!getter) {
-            getter = paramKey;
-        }
+    private _getParam(params: Object, getter: string): any {
+        let pos = getter.indexOf(".");
 
-        let gPos = getter.indexOf(".");
-
-        if (gPos === -1) {
-            if (from.hasOwnProperty(getter)) {
-                to[paramKey] = from[getter];
-            }
+        if (pos === -1) {
+            return params.hasOwnProperty(getter) ? params[getter] : undefined;
         } else {
-            let gObj = getter.substr(0, gPos);
-            let gGetter = getter.substr(gPos + 1);
-            if (from.hasOwnProperty(gObj) && typeof from[gObj] === "object") {
-                this._transportParam(from[gObj], to, paramKey, gGetter);
-            }
+            let key = getter.substr(0, pos);
+            return params.hasOwnProperty(key) && typeof params[key] === "object" ?
+                this._getParam(params[key], getter.substr(pos + 1)) : undefined;
         }
     }
 
@@ -329,6 +318,22 @@ export class TranslateService {
         let translateParams = {};
         let paramKey;
         let getter;
+
+        let transferParam = (useGetter = true) => {
+            if (useGetter && !paramKey) {
+                if (typeof this._getParam(params, getter) !== "object") {
+                    this.logHandler.error("Only objects can be passed as params in '" + sub + "'");
+                } else {
+                    translateParams = this._getParam(params, getter);
+                }
+            } else {
+                if (!useGetter) {
+                    translateParams[paramKey] = this._getParam(params, paramKey);
+                } else {
+                    translateParams[paramKey] = this._getParam(params, getter);
+                }
+            }
+        };
 
         for (j = 0; j < expression.length; j++) {
             switch (state) {
@@ -369,8 +374,16 @@ export class TranslateService {
                     if (expression[j].match(/\s/)) {
                         // nothing to do here
                     } else if (expression[j].match(/[A-Za-z0-9_]/)) {
-                        state = "read_param_key";
+                        state    = "read_param_key";
                         paramKey = expression[j];
+                    } else if (expression[j] === "=") {
+                        if (Object.keys(translateParams).length > 0) {
+                            this.logHandler.error(
+                                "Parse error only first parameter can be passed as params in " + "'" + sub + "'"
+                            );
+                            return "";
+                        }
+                        state = "wait_getter";
                     } else {
                         return this._referencedError(sub, "character", "parameter", j);
                     }
@@ -382,7 +395,7 @@ export class TranslateService {
                     } else if (expression[j] === "=") {
                         state = "wait_getter";
                     } else if (expression[j] === ",") {
-                        this._transportParam(params, translateParams, paramKey);
+                        transferParam(false);
                         state = "wait_param";
                     } else if (expression[j].match(/\s/)) {
                         state = "param_key_readed";
@@ -397,7 +410,7 @@ export class TranslateService {
                     } else if (expression[j] === "=") {
                         state = "wait_getter";
                     } else if (expression[j] === ",") {
-                        this._transportParam(params, translateParams, paramKey);
+                        transferParam(false);
                         state = "wait_param";
                     } else {
                         return this._referencedError(sub, "character", "comma, equal sign or end", j);
@@ -421,7 +434,7 @@ export class TranslateService {
                     } else if (expression[j].match(/\s/)) {
                         state = "getter_readed";
                     } else if (expression[j] === ",") {
-                        this._transportParam(params, translateParams, paramKey, getter);
+                        transferParam();
                         state = "wait_param";
                     } else {
                         return this._referencedError(sub, "character", "comma or end", j);
@@ -432,7 +445,7 @@ export class TranslateService {
                     if (expression[j].match(/\s/)) {
                         // nothing to do here
                     } else if (expression[j] === ",") {
-                        this._transportParam(params, translateParams, paramKey, getter);
+                        transferParam();
                         state = "wait_param";
                     } else {
                         return this._referencedError(sub, "character", "comma or end", j);
@@ -444,12 +457,14 @@ export class TranslateService {
         switch (state) {
             case "param_key_readed":
             case "read_param_key":
-                this._transportParam(params, translateParams, paramKey);
+                transferParam(false);
                 break;
+
             case "getter_readed":
             case "read_getter":
-                this._transportParam(params, translateParams, paramKey, getter);
+                transferParam();
                 break;
+
             case "wait_key":
                 return this._referencedError(sub, "end", "key");
             case "wait_param":

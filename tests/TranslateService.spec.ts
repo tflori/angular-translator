@@ -1000,6 +1000,85 @@ describe("TranslateService", function () {
 
                     expect(translation).toBe("New comment from Mr. John Doe.");
                 }));
+
+                it("provides the object under getter for params", fakeAsync(function() {
+                    translate.waitForTranslation();
+                    loaderPromiseResolve({
+                        "NEW_COMMENT": "New comment from [[ SALUTATION : = comment.author ]].",
+                        "SALUTATION": "{{title ? title : (gender === 'w' ? 'Mrs.' : 'Mr.')}} " +
+                        "{{first}} {{last}}",
+                    });
+                    JasminePromise.flush();
+
+                    let translation = translate.instant("NEW_COMMENT", {
+                        comment: {
+                            author: {
+                                first: "Jane",
+                                gender: "w",
+                                last: "Doe",
+                                title: undefined,
+                            },
+                            title: "Lorem ipsum usum",
+                        },
+                    });
+
+                    expect(translation).toBe("New comment from Mrs. Jane Doe.");
+                }));
+
+                it("accepts only objects for params", fakeAsync(function() {
+                    translate.waitForTranslation();
+                    loaderPromiseResolve({
+                        "A": "[[ T : = a ]]",
+                        "T": "Hello {{who}}!",
+                    });
+                    JasminePromise.flush();
+                    spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+
+                    let translation = translate.instant("A", { a: "string" });
+
+                    expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                        "Only objects can be passed as params in " +
+                        "'[[ T : = a ]]'"
+                    );
+                    expect(translation).toBe("Hello !");
+                }));
+
+                it("accepts only first parameter without key", fakeAsync(function() {
+                    translate.waitForTranslation();
+                    loaderPromiseResolve({
+                        "A": "[[ T : b , = a ]]",
+                        "T": "Hello {{who}}!",
+                    });
+                    JasminePromise.flush();
+                    spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+
+                    let translation = translate.instant("A", {
+                        a: {},
+                        b: "string",
+                    });
+
+                    expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                        "Parse error only first parameter can be passed as params in " +
+                        "'[[ T : b , = a ]]'"
+                    );
+                    expect(translation).toBe("");
+                }));
+
+                it("second parameter got added to the object", fakeAsync(function() {
+                    translate.waitForTranslation();
+                    loaderPromiseResolve({
+                        "TEST":      "[[ REFERENCE: = text, person = world ]]",
+                        "REFERENCE": "{{hello}} {{person}}!",
+                    });
+                    JasminePromise.flush();
+
+                    let translation = translate.instant("TEST", {
+                        text: { hello: "Hello" },
+                        world: "world",
+                    });
+
+                    expect(translation).toBe("Hello world!");
+                }));
             });
 
             it("informs about missing translation", function() {
