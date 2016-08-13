@@ -9,6 +9,9 @@ before_script:
   - sh -c "/sbin/my_init" 2&>1 > /dev/null &
 
 test:
+  artifacts:
+    paths:
+    - coverage/
   script:
     - npm install
     - npm run tslint

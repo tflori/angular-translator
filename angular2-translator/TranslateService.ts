@@ -183,26 +183,16 @@ export class TranslateService {
             }
             t = this._translations[lang][keys[i]];
 
-            // translate related
-            t = t.replace(
-                /\[\[\s*([A-Za-z0-9_.-]+)\s*:?\s*([A-Za-z0-9,_]+)?\s*]]/g,
-                (sub: string, key: string, vars: string = ""): string => {
-                    let translationParams = {};
-                    vars.split(",").map((relatedKey) => {
-                        if (Object.prototype.hasOwnProperty.call(params, relatedKey)) {
-                            translationParams[relatedKey] = params[relatedKey];
-                        }
-                    });
-                    return String(this.instant(key, translationParams, lang));
-                }
-            );
+            t = t.replace(/\[\[([\sA-Za-z0-9_.,=:-]*)]]/g, (sub: string, expression: string) => {
+                return this._translateReferenced(sub, expression, params, lang);
+            });
 
             // simple interpolation
             t = t.replace(/{{\s*(.*?)\s*}}/g, (sub: string, expression: string) => {
                 try {
                     return this._parse(expression, params) || "";
                 } catch (e) {
-                    this.logHandler.error("Parsing error for expression '" + expression + "'");
+                    this.logHandler.error("Parsing error for expression '" + sub + "'");
                     return "";
                 }
             });
@@ -236,7 +226,15 @@ export class TranslateService {
         return this._loadedLangs[lang];
     }
 
-    private _parse(expression: string, __context: any) {
+    /**
+     * Parses the expression in the given __context.
+     *
+     * @param   {string} expression
+     * @param   {object} __context
+     * @returns {string}
+     * @private
+     */
+    private _parse(expression: string, __context: any): string {
         let func: string[] = [];
         let varName;
         func.push("(function() {");
@@ -256,5 +254,225 @@ export class TranslateService {
         }
         func.push("return (" + expression + "); })()");
         return eval(func.join("\n"));
+    }
+
+    /**
+     * Outputs a parse error for an error in translation references.
+     *
+     * @param   {string} sub
+     * @param   {string} unexpected
+     * @param   {string} expected
+     * @param   {number} pos
+     * @returns {string}
+     * @private
+     */
+    private _referencedError(sub: string, unexpected: string, expected?: string, pos?: string): string {
+        let msg = "Parse error unexpected " + unexpected;
+
+        if (pos !== undefined) {
+            msg += " at pos " + (pos + 3);
+        }
+
+        if (expected) {
+            msg += " expected " + expected;
+        }
+
+        this.logHandler.error(msg + " in '" + sub + "'");
+        return "";
+    }
+
+    /**
+     * Gets a parameter from params defined by getter recursive.
+     *
+     * @param   {object} params
+     * @param   {string} getter
+     * @returns {any}
+     * @private
+     */
+    private _getParam(params: Object, getter: string): any {
+        let pos = getter.indexOf(".");
+
+        if (pos === -1) {
+            return params.hasOwnProperty(getter) ? params[getter] : undefined;
+        } else {
+            let key = getter.substr(0, pos);
+            return params.hasOwnProperty(key) && typeof params[key] === "object" ?
+                this._getParam(params[key], getter.substr(pos + 1)) : undefined;
+        }
+    }
+
+    /**
+     * Translates a reference expression like '<key> [: <param> [= <getter> [, <param..n> [= <getter..n>]]]]'
+     *
+     * @param   {string} sub
+     * @param   {string} expression
+     * @param   {Object} params
+     * @param   {string} lang
+     * @returns {string}
+     * @private
+     */
+    private _translateReferenced(sub: string, expression: string, params: Object, lang: string): string {
+        let j;
+        let state = "wait_key";
+        let key;
+        let translateParams = {};
+        let paramKey;
+        let getter;
+
+        let transferParam = (useGetter = true) => {
+            if (useGetter && !paramKey) {
+                if (typeof this._getParam(params, getter) !== "object") {
+                    this.logHandler.error("Only objects can be passed as params in '" + sub + "'");
+                } else {
+                    translateParams = this._getParam(params, getter);
+                }
+            } else {
+                if (!useGetter) {
+                    translateParams[paramKey] = this._getParam(params, paramKey);
+                } else {
+                    translateParams[paramKey] = this._getParam(params, getter);
+                }
+            }
+        };
+
+        for (j = 0; j < expression.length; j++) {
+            switch (state) {
+                case "wait_key":
+                    if (expression[j].match(/\s/)) {
+                        // nothing to do here
+                    } else if (expression[j].match(/[A-Za-z0-9_.-]/)) {
+                        state = "read_key";
+                        key = expression[j];
+                    } else {
+                        return this._referencedError(sub, "character", "key", j);
+                    }
+                    break;
+
+                case "read_key":
+                    if (expression[j].match(/[A-Za-z0-9_.-]/)) {
+                        key += expression[j];
+                    } else if (expression[j] === ":") {
+                        state = "wait_param";
+                    } else if (expression[j].match(/\s/)) {
+                        state = "key_readed";
+                    } else {
+                        return this._referencedError(sub, "character", "colon or end", j);
+                    }
+                    break;
+
+                case "key_readed":
+                    if (expression[j].match(/\s/)) {
+                        // nothing to do here
+                    } else if (expression[j] === ":") {
+                        state = "wait_param";
+                    } else {
+                        return this._referencedError(sub, "character", "colon or end", j);
+                    }
+                    break;
+
+                case "wait_param":
+                    if (expression[j].match(/\s/)) {
+                        // nothing to do here
+                    } else if (expression[j].match(/[A-Za-z0-9_]/)) {
+                        state    = "read_param_key";
+                        paramKey = expression[j];
+                    } else if (expression[j] === "=") {
+                        if (Object.keys(translateParams).length > 0) {
+                            this.logHandler.error(
+                                "Parse error only first parameter can be passed as params in " + "'" + sub + "'"
+                            );
+                            return "";
+                        }
+                        state = "wait_getter";
+                    } else {
+                        return this._referencedError(sub, "character", "parameter", j);
+                    }
+                    break;
+
+                case "read_param_key":
+                    if (expression[j].match(/[A-Za-z0-9_]/)) {
+                        paramKey += expression[j];
+                    } else if (expression[j] === "=") {
+                        state = "wait_getter";
+                    } else if (expression[j] === ",") {
+                        transferParam(false);
+                        state = "wait_param";
+                    } else if (expression[j].match(/\s/)) {
+                        state = "param_key_readed";
+                    } else {
+                        return this._referencedError(sub, "character", "comma, equal sign or end", j);
+                    }
+                    break;
+
+                case "param_key_readed":
+                    if (expression[j].match(/\s/)) {
+                        // nothing to do here
+                    } else if (expression[j] === "=") {
+                        state = "wait_getter";
+                    } else if (expression[j] === ",") {
+                        transferParam(false);
+                        state = "wait_param";
+                    } else {
+                        return this._referencedError(sub, "character", "comma, equal sign or end", j);
+                    }
+                    break;
+
+                case "wait_getter":
+                    if (expression[j].match(/\s/)) {
+                        // nothing to do here
+                    } else if (expression[j].match(/[A-Za-z0-9_]/)) {
+                        state = "read_getter";
+                        getter = expression[j];
+                    } else {
+                        return this._referencedError(sub, "character", "getter", j);
+                    }
+                    break;
+
+                case "read_getter":
+                    if (expression[j].match(/[A-Za-z0-9_.]/)) {
+                        getter += expression[j];
+                    } else if (expression[j].match(/\s/)) {
+                        state = "getter_readed";
+                    } else if (expression[j] === ",") {
+                        transferParam();
+                        state = "wait_param";
+                    } else {
+                        return this._referencedError(sub, "character", "comma or end", j);
+                    }
+                    break;
+
+                case "getter_readed":
+                    if (expression[j].match(/\s/)) {
+                        // nothing to do here
+                    } else if (expression[j] === ",") {
+                        transferParam();
+                        state = "wait_param";
+                    } else {
+                        return this._referencedError(sub, "character", "comma or end", j);
+                    }
+                    break;
+            }
+        }
+
+        switch (state) {
+            case "param_key_readed":
+            case "read_param_key":
+                transferParam(false);
+                break;
+
+            case "getter_readed":
+            case "read_getter":
+                transferParam();
+                break;
+
+            case "wait_key":
+                return this._referencedError(sub, "end", "key");
+            case "wait_param":
+                return this._referencedError(sub, "end", "parameter");
+            case "wait_getter":
+                return this._referencedError(sub, "end", "getter");
+        }
+
+        return String(this.instant(key, translateParams, lang));
     }
 }

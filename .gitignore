@@ -1,5 +1,6 @@
 npm-debug.log
 node_modules
+coverage/*
 *.map
 *.d.ts
 !tests/helper/promise-matchers.d.ts
