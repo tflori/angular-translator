@@ -67,9 +67,6 @@ System.registerDynamic("angular2-translator/TranslateLoaderJson", ["./TranslateL
             var translations = response.json();
             var key = void 0;
             for (key in translations) {
-              if (!translations.hasOwnProperty(key)) {
-                continue;
-              }
               if (Array.isArray(translations[key])) {
                 translations[key] = translations[key].filter(function(v) {
                   return typeof v === "string";
@@ -509,30 +506,41 @@ System.registerDynamic("angular2-translator/TranslateService", ["./TranslateConf
       this.logHandler.error(msg + " in '" + sub + "'");
       return "";
     };
-    TranslateService.prototype._transportParam = function(from, to, paramKey, getter) {
-      if (!getter) {
-        getter = paramKey;
-      }
-      var gPos = getter.indexOf(".");
-      if (gPos === -1) {
-        if (from.hasOwnProperty(getter)) {
-          to[paramKey] = from[getter];
-        }
+    TranslateService.prototype._getParam = function(params, getter) {
+      var pos = getter.indexOf(".");
+      if (pos === -1) {
+        return params.hasOwnProperty(getter) ? params[getter] : undefined;
       } else {
-        var gObj = getter.substr(0, gPos);
-        var gGetter = getter.substr(gPos + 1);
-        if (from.hasOwnProperty(gObj) && typeof from[gObj] === "object") {
-          this._transportParam(from[gObj], to, paramKey, gGetter);
-        }
+        var key = getter.substr(0, pos);
+        return params.hasOwnProperty(key) && typeof params[key] === "object" ? this._getParam(params[key], getter.substr(pos + 1)) : undefined;
       }
     };
     TranslateService.prototype._translateReferenced = function(sub, expression, params, lang) {
+      var _this = this;
       var j;
       var state = "wait_key";
       var key;
       var translateParams = {};
       var paramKey;
       var getter;
+      var transferParam = function(useGetter) {
+        if (useGetter === void 0) {
+          useGetter = true;
+        }
+        if (useGetter && !paramKey) {
+          if (typeof _this._getParam(params, getter) !== "object") {
+            _this.logHandler.error("Only objects can be passed as params in '" + sub + "'");
+          } else {
+            translateParams = _this._getParam(params, getter);
+          }
+        } else {
+          if (!useGetter) {
+            translateParams[paramKey] = _this._getParam(params, paramKey);
+          } else {
+            translateParams[paramKey] = _this._getParam(params, getter);
+          }
+        }
+      };
       for (j = 0; j < expression.length; j++) {
         switch (state) {
           case "wait_key":
@@ -565,6 +573,12 @@ System.registerDynamic("angular2-translator/TranslateService", ["./TranslateConf
             if (expression[j].match(/\s/)) {} else if (expression[j].match(/[A-Za-z0-9_]/)) {
               state = "read_param_key";
               paramKey = expression[j];
+            } else if (expression[j] === "=") {
+              if (Object.keys(translateParams).length > 0) {
+                this.logHandler.error("Parse error only first parameter can be passed as params in " + "'" + sub + "'");
+                return "";
+              }
+              state = "wait_getter";
             } else {
               return this._referencedError(sub, "character", "parameter", j);
             }
@@ -575,7 +589,7 @@ System.registerDynamic("angular2-translator/TranslateService", ["./TranslateConf
             } else if (expression[j] === "=") {
               state = "wait_getter";
             } else if (expression[j] === ",") {
-              this._transportParam(params, translateParams, paramKey);
+              transferParam(false);
               state = "wait_param";
             } else if (expression[j].match(/\s/)) {
               state = "param_key_readed";
@@ -587,7 +601,7 @@ System.registerDynamic("angular2-translator/TranslateService", ["./TranslateConf
             if (expression[j].match(/\s/)) {} else if (expression[j] === "=") {
               state = "wait_getter";
             } else if (expression[j] === ",") {
-              this._transportParam(params, translateParams, paramKey);
+              transferParam(false);
               state = "wait_param";
             } else {
               return this._referencedError(sub, "character", "comma, equal sign or end", j);
@@ -607,7 +621,7 @@ System.registerDynamic("angular2-translator/TranslateService", ["./TranslateConf
             } else if (expression[j].match(/\s/)) {
               state = "getter_readed";
             } else if (expression[j] === ",") {
-              this._transportParam(params, translateParams, paramKey, getter);
+              transferParam();
               state = "wait_param";
             } else {
               return this._referencedError(sub, "character", "comma or end", j);
@@ -615,7 +629,7 @@ System.registerDynamic("angular2-translator/TranslateService", ["./TranslateConf
             break;
           case "getter_readed":
             if (expression[j].match(/\s/)) {} else if (expression[j] === ",") {
-              this._transportParam(params, translateParams, paramKey, getter);
+              transferParam();
               state = "wait_param";
             } else {
               return this._referencedError(sub, "character", "comma or end", j);
@@ -626,11 +640,11 @@ System.registerDynamic("angular2-translator/TranslateService", ["./TranslateConf
       switch (state) {
         case "param_key_readed":
         case "read_param_key":
-          this._transportParam(params, translateParams, paramKey);
+          transferParam(false);
           break;
         case "getter_readed":
         case "read_getter":
-          this._transportParam(params, translateParams, paramKey, getter);
+          transferParam();
           break;
         case "wait_key":
           return this._referencedError(sub, "end", "key");

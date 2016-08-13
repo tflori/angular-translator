@@ -39,10 +39,6 @@ export class TranslateLoaderJson extends TranslateLoader {
                             let translations = response.json();
                             let key;
                             for (key in translations) {
-                                if (!translations.hasOwnProperty(key)) {
-                                    continue;
-                                }
-
                                 if (Array.isArray(translations[key])) {
 
                                     translations[key] = translations[key]

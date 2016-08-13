@@ -1,5 +1,9 @@
 # Change Log
 
+## Version 1.0.5
+* added code coverage tests
+* improved translation references by adding named parameters (solves #10)
+
 ## Version 1.0.4
 * allowed multi line translations in TranslateLoaderJson (solves #9)
 * added jslint and tslint to ci process (solves #8)
