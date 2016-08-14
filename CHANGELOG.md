@@ -1,6 +1,6 @@
 # Change Log
 
-## Version 1.0.5
+## Version 1.0.5 -> 1.1.0
 * added code coverage tests
 * improved translation references by adding named parameters (solves #10)
 
