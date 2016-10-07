@@ -234,12 +234,12 @@ describe("TranslateService", function () {
             });
 
             it("informs about language change", function() {
-                spyOn(TranslateLogHandler, "info");
+                spyOn(translate.logHandler, "info");
                 translateConfig.providedLangs = [ "de/de" ];
 
                 translate.lang = "de-DE";
 
-                expect(TranslateLogHandler.info).toHaveBeenCalledWith("Language changed to de/de");
+                expect(translate.logHandler.info).toHaveBeenCalledWith("Language changed to de/de");
             });
         });
 
@@ -276,7 +276,7 @@ describe("TranslateService", function () {
             }));
 
             it("rejects when loader rejects", fakeAsync(function() {
-                TranslateLogHandler.error = () => {};
+                translate.logHandler.error = () => {};
                 let promise = translate.waitForTranslation();
 
                 loaderPromiseReject();
@@ -326,23 +326,23 @@ describe("TranslateService", function () {
             });
 
             it("informs about loaded language", fakeAsync(function() {
-                spyOn(TranslateLogHandler, "info");
+                spyOn(translate.logHandler, "info");
 
                 translate.waitForTranslation();
                 loaderPromiseResolve();
                 JasminePromise.flush();
 
-                expect(TranslateLogHandler.info).toHaveBeenCalledWith("Language en got loaded");
+                expect(translate.logHandler.info).toHaveBeenCalledWith("Language en got loaded");
             }));
 
             it("shows error when language could not be loaded", fakeAsync(function() {
-                spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                 translate.waitForTranslation();
                 loaderPromiseReject("File not found");
                 JasminePromise.flush();
 
-                expect(TranslateLogHandler.error)
+                expect(translate.logHandler.error)
                     .toHaveBeenCalledWith("Language en could not be loaded (File not found)");
             }));
         });
@@ -403,7 +403,7 @@ describe("TranslateService", function () {
             });
 
             it("resolves keys if laguage could not be loaded", fakeAsync(function() {
-                TranslateLogHandler.error = () => {};
+                translate.logHandler.error = () => {};
                 let promise                = translate.translate(["TEXT", "OTHER_TEXT"]);
 
                 loaderPromiseReject();
@@ -507,7 +507,7 @@ describe("TranslateService", function () {
                     BROKEN: 'This "{{notExisting.func()}}" is empty string',
                 });
                 JasminePromise.flush();
-                TranslateLogHandler.error = () => {};
+                translate.logHandler.error = () => {};
 
                 let translation = translate.instant("BROKEN");
 
@@ -521,7 +521,7 @@ describe("TranslateService", function () {
                         WELCOME: "Welcome [[]]!",
                     });
                     JasminePromise.flush();
-                    TranslateLogHandler.error = () => {};
+                    translate.logHandler.error = () => {};
 
                     let translation = translate.instant("WELCOME");
 
@@ -535,21 +535,21 @@ describe("TranslateService", function () {
                         WELCOME: "Welcome [[]]!",
                     });
                     JasminePromise.flush();
-                    spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                    spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                     let translation = translate.instant("WELCOME");
 
                     expect(translation).toBe("Welcome !");
-                    expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                    expect(translate.logHandler.error).toHaveBeenCalledWith(
                         "Parse error unexpected end expected key in '[[]]'"
                     );
 
-                    JasmineHelper.calls(TranslateLogHandler.error).reset();
+                    JasmineHelper.calls(translate.logHandler.error).reset();
 
                     translation = translate.instant("HELLO");
 
                     expect(translation).toBe("Hello !");
-                    expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                    expect(translate.logHandler.error).toHaveBeenCalledWith(
                         "Parse error unexpected character at pos 3 expected key in '[[:]]'"
                     );
                 }));
@@ -560,12 +560,12 @@ describe("TranslateService", function () {
                         WELCOME: "Welcome [[A]]!",
                     });
                     JasminePromise.flush();
-                    spyOn(TranslateLogHandler, "info").and.callFake(() => {});
+                    spyOn(translate.logHandler, "info").and.callFake(() => {});
 
                     let translation = translate.instant("WELCOME");
 
                     expect(translation).toBe("Welcome A!");
-                    expect(TranslateLogHandler.info).toHaveBeenCalledWith(
+                    expect(translate.logHandler.info).toHaveBeenCalledWith(
                         "Translation for 'A' in language en not found"
                     );
                 }));
@@ -576,12 +576,12 @@ describe("TranslateService", function () {
                         WELCOME: "Welcome [[ \t\n]]!",
                     });
                     JasminePromise.flush();
-                    spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                    spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                     let translation = translate.instant("WELCOME");
 
                     expect(translation).toBe("Welcome !");
-                    expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                    expect(translate.logHandler.error).toHaveBeenCalledWith(
                         "Parse error unexpected end expected key in '[[ \t\n]]'"
                     );
                 }));
@@ -592,12 +592,12 @@ describe("TranslateService", function () {
                         WELCOME: "Welcome [[ A B ]]!",
                     });
                     JasminePromise.flush();
-                    spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                    spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                     let translation = translate.instant("WELCOME");
 
                     expect(translation).toBe("Welcome !");
-                    expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                    expect(translate.logHandler.error).toHaveBeenCalledWith(
                         "Parse error unexpected character at pos 6 expected colon or end in '[[ A B ]]'"
                     );
                 }));
@@ -608,7 +608,7 @@ describe("TranslateService", function () {
                         WELCOME: "Welcome [[ ABC ]]!",
                     });
                     JasminePromise.flush();
-                    spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                    spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                     let translation = translate.instant("WELCOME");
 
@@ -621,11 +621,11 @@ describe("TranslateService", function () {
                         A: "[[ T :. ]]",
                     });
                     JasminePromise.flush();
-                    spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                    spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                     translate.instant("A");
 
-                    expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                    expect(translate.logHandler.error).toHaveBeenCalledWith(
                         "Parse error unexpected character at pos 7 expected parameter in " +
                         "'[[ T :. ]]'"
                     );
@@ -637,11 +637,11 @@ describe("TranslateService", function () {
                         A: "[[ T : ]]",
                     });
                     JasminePromise.flush();
-                    spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                    spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                     translate.instant("A");
 
-                    expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                    expect(translate.logHandler.error).toHaveBeenCalledWith(
                         "Parse error unexpected end expected parameter in " +
                         "'[[ T : ]]'"
                     );
@@ -656,27 +656,27 @@ describe("TranslateService", function () {
                         C: "[[ T: ]]!",
                     });
                     JasminePromise.flush();
-                    spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                    spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                     translate.instant("A");
 
-                    expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                    expect(translate.logHandler.error).toHaveBeenCalledWith(
                         "Parse error unexpected character at pos 5 expected colon or end in '[[ T, ]]'"
                     );
 
-                    JasmineHelper.calls(TranslateLogHandler.error).reset();
+                    JasmineHelper.calls(translate.logHandler.error).reset();
 
                     translate.instant("B");
 
-                    expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                    expect(translate.logHandler.error).toHaveBeenCalledWith(
                         "Parse error unexpected character at pos 5 expected colon or end in '[[ T= ]]'"
                     );
 
-                    JasmineHelper.calls(TranslateLogHandler.error).reset();
+                    JasmineHelper.calls(translate.logHandler.error).reset();
 
                     translate.instant("C");
 
-                    expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                    expect(translate.logHandler.error).toHaveBeenCalledWith(
                         "Parse error unexpected end expected parameter in '[[ T: ]]'"
                     );
                 }));
@@ -687,11 +687,11 @@ describe("TranslateService", function () {
                         A: "[[ T : ]]!",
                     });
                     JasminePromise.flush();
-                    spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                    spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                     translate.instant("A");
 
-                    expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                    expect(translate.logHandler.error).toHaveBeenCalledWith(
                         "Parse error unexpected end expected parameter in '[[ T : ]]'"
                     );
                 }));
@@ -716,7 +716,7 @@ describe("TranslateService", function () {
                         HACK: "{{privateVar}}{{givenVar}}",
                     });
                     JasminePromise.flush();
-                    TranslateLogHandler.error = () => {};
+                    translate.logHandler.error = () => {};
 
                     let translation = translate.instant("CALL", {
                         givenVar:   "given",
@@ -738,30 +738,30 @@ describe("TranslateService", function () {
                     translate.waitForTranslation();
                     loaderPromiseResolve(translations);
                     JasminePromise.flush();
-                    spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                    spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                     for (let key in translations) {
                         if (!translations.hasOwnProperty(key)) {
                             continue;
                         }
-                        JasmineHelper.calls(TranslateLogHandler.error).reset();
+                        JasmineHelper.calls(translate.logHandler.error).reset();
 
                         translate.instant(key);
 
                         if ([ "A", "B", "C" ].indexOf(key) > -1) {
                             // unexpected character for [.:-]
-                            expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                            expect(translate.logHandler.error).toHaveBeenCalledWith(
                                 "Parse error unexpected character at pos 9 expected comma, equal sign or end in " +
                                 "'" + translations[key] + "'"
                             );
                         } else if (key === "D") {
                             // unexpected end expected parameter for [,]
-                            expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                            expect(translate.logHandler.error).toHaveBeenCalledWith(
                                 "Parse error unexpected end expected parameter in '" + translations[key] + "'"
                             );
                         } else if (key === "E") {
                             // unexpected end expected parameter for [=]
-                            expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                            expect(translate.logHandler.error).toHaveBeenCalledWith(
                                 "Parse error unexpected end expected getter in '" + translations[key] + "'"
                             );
                         }
@@ -774,11 +774,11 @@ describe("TranslateService", function () {
                         A: "[[ T : foo bar ]]!",
                     });
                     JasminePromise.flush();
-                    spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                    spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                     translate.instant("A");
 
-                    expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                    expect(translate.logHandler.error).toHaveBeenCalledWith(
                         "Parse error unexpected character at pos 12 expected comma, equal sign or end in " +
                         "'[[ T : foo bar ]]'"
                     );
@@ -790,11 +790,11 @@ describe("TranslateService", function () {
                         A: "[[ T : a , ]]",
                     });
                     JasminePromise.flush();
-                    spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                    spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                     translate.instant("A");
 
-                    expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                    expect(translate.logHandler.error).toHaveBeenCalledWith(
                         "Parse error unexpected end expected parameter in " +
                         "'[[ T : a , ]]'"
                     );
@@ -806,11 +806,11 @@ describe("TranslateService", function () {
                         A: "[[ T : foo =]]!",
                     });
                     JasminePromise.flush();
-                    spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                    spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                     translate.instant("A");
 
-                    expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                    expect(translate.logHandler.error).toHaveBeenCalledWith(
                         "Parse error unexpected end expected getter in " +
                         "'[[ T : foo =]]'"
                     );
@@ -843,11 +843,11 @@ describe("TranslateService", function () {
                         A: "[[ T : foo ==]]",
                     });
                     JasminePromise.flush();
-                    spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                    spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                     translate.instant("A");
 
-                    expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                    expect(translate.logHandler.error).toHaveBeenCalledWith(
                         "Parse error unexpected character at pos 13 expected getter in " +
                         "'[[ T : foo ==]]'"
                     );
@@ -859,11 +859,11 @@ describe("TranslateService", function () {
                         A: "[[ T : foo = ]]",
                     });
                     JasminePromise.flush();
-                    spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                    spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                     translate.instant("A");
 
-                    expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                    expect(translate.logHandler.error).toHaveBeenCalledWith(
                         "Parse error unexpected end expected getter in " +
                         "'[[ T : foo = ]]'"
                     );
@@ -888,11 +888,11 @@ describe("TranslateService", function () {
                         A: "[[ T : foo = a=]]",
                     });
                     JasminePromise.flush();
-                    spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                    spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                     translate.instant("A");
 
-                    expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                    expect(translate.logHandler.error).toHaveBeenCalledWith(
                         "Parse error unexpected character at pos 15 expected comma or end in " +
                         "'[[ T : foo = a=]]'"
                     );
@@ -904,11 +904,11 @@ describe("TranslateService", function () {
                         A: "[[ T : foo = a a]]",
                     });
                     JasminePromise.flush();
-                    spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                    spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                     translate.instant("A");
 
-                    expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                    expect(translate.logHandler.error).toHaveBeenCalledWith(
                         "Parse error unexpected character at pos 16 expected comma or end in " +
                         "'[[ T : foo = a a]]'"
                     );
@@ -921,20 +921,20 @@ describe("TranslateService", function () {
                         B: "[[ T : foo = a,]]",
                     });
                     JasminePromise.flush();
-                    spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                    spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                     translate.instant("A");
 
-                    expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                    expect(translate.logHandler.error).toHaveBeenCalledWith(
                         "Parse error unexpected end expected parameter in " +
                         "'[[ T : foo = a ,]]'"
                     );
 
-                    JasmineHelper.calls(TranslateLogHandler.error).reset();
+                    JasmineHelper.calls(translate.logHandler.error).reset();
 
                     translate.instant("B");
 
-                    expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                    expect(translate.logHandler.error).toHaveBeenCalledWith(
                         "Parse error unexpected end expected parameter in " +
                         "'[[ T : foo = a,]]'"
                     );
@@ -963,7 +963,7 @@ describe("TranslateService", function () {
                         T: "{{h}} {{a}}{{b}}{{c}}{{d}}!",
                     });
                     JasminePromise.flush();
-                    TranslateLogHandler.error = () => {};
+                    translate.logHandler.error = () => {};
 
                     let translations = translate.instant(
                         [ "A", "B", "C", "D" ],
@@ -1030,11 +1030,11 @@ describe("TranslateService", function () {
                         T: "Hello {{who}}!",
                     });
                     JasminePromise.flush();
-                    spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                    spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                     let translation = translate.instant("A", { a: "string" });
 
-                    expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                    expect(translate.logHandler.error).toHaveBeenCalledWith(
                         "Only objects can be passed as params in " +
                         "'[[ T : = a ]]'"
                     );
@@ -1048,14 +1048,14 @@ describe("TranslateService", function () {
                         T: "Hello {{who}}!",
                     });
                     JasminePromise.flush();
-                    spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                    spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                     let translation = translate.instant("A", {
                         a: {},
                         b: "string",
                     });
 
-                    expect(TranslateLogHandler.error).toHaveBeenCalledWith(
+                    expect(translate.logHandler.error).toHaveBeenCalledWith(
                         "Parse error only first parameter can be passed as params in " +
                         "'[[ T : b , = a ]]'"
                     );
@@ -1080,11 +1080,11 @@ describe("TranslateService", function () {
             });
 
             it("informs about missing translation", function() {
-                spyOn(TranslateLogHandler, "info");
+                spyOn(translate.logHandler, "info");
 
                 translate.instant("UNDEFINED");
 
-                expect(TranslateLogHandler.info)
+                expect(translate.logHandler.info)
                     .toHaveBeenCalledWith("Translation for \'UNDEFINED\' in language en not found");
             });
 
@@ -1094,11 +1094,11 @@ describe("TranslateService", function () {
                     BROKEN: 'This "{{notExisting.func()}}" is empty string',
                 });
                 JasminePromise.flush();
-                spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                 translate.instant("BROKEN");
 
-                expect(TranslateLogHandler.error)
+                expect(translate.logHandler.error)
                     .toHaveBeenCalledWith("Parsing error for expression \'{{notExisting.func()}}\'");
 
             }));
@@ -1109,11 +1109,11 @@ describe("TranslateService", function () {
                     INTERPOLATION: "The sum from 1+2 is {{1+2}}",
                 });
                 JasminePromise.flush();
-                spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                 translate.instant("INTERPOLATION", {__context: "at work"});
 
-                expect(TranslateLogHandler.error).toHaveBeenCalledWith("Parameter \'__context\' is not allowed.");
+                expect(translate.logHandler.error).toHaveBeenCalledWith("Parameter \'__context\' is not allowed.");
             }));
 
             it("can not get numeric keys in parameter", fakeAsync(function() {
@@ -1122,13 +1122,13 @@ describe("TranslateService", function () {
                     INTERPOLATION: "The sum from 1+2 is {{1+2}}",
                 });
                 JasminePromise.flush();
-                spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                 translate.instant("INTERPOLATION", {
                     42: "the answer",
                 });
 
-                expect(TranslateLogHandler.error).toHaveBeenCalledWith("Parameter \'42\' is not allowed.");
+                expect(translate.logHandler.error).toHaveBeenCalledWith("Parameter \'42\' is not allowed.");
             }));
 
             it("continues with other parameters after __context", fakeAsync(function() {
@@ -1137,7 +1137,7 @@ describe("TranslateService", function () {
                     VARIABLES_TEST: "This {{count > 5 ? 'is interesting' : 'is boring'}}",
                 });
                 JasminePromise.flush();
-                TranslateLogHandler.error = () => {};
+                translate.logHandler.error = () => {};
 
                 let translation = translate.instant("VARIABLES_TEST", {__context: "at work", count: 6});
 
@@ -1150,7 +1150,7 @@ describe("TranslateService", function () {
                     VARIABLES_TEST: "This {{count > 5 ? 'is interesting' : 'is boring'}}",
                 });
                 JasminePromise.flush();
-                TranslateLogHandler.error = () => {};
+                translate.logHandler.error = () => {};
 
                 let translation = translate.instant("VARIABLES_TEST", {42: "the answer", count: 6});
 
@@ -1163,12 +1163,12 @@ describe("TranslateService", function () {
                     INTERPOLATION: "The sum from 1+2 is {{1+2}}",
                 });
                 JasminePromise.flush();
-                spyOn(TranslateLogHandler, "error").and.callFake(() => {});
+                spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                 let translation = translate.instant("INTERPOLATION", [1, 2, 3]);
 
                 expect(translation).toBe("The sum from 1+2 is 3");
-                expect(TranslateLogHandler.error).toHaveBeenCalledWith("Parameters can not be an array.");
+                expect(translate.logHandler.error).toHaveBeenCalledWith("Parameters can not be an array.");
             }));
         });
     });

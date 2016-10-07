@@ -3,11 +3,17 @@ import {
     TranslateLoaderJsonConfig,
 } from "../angular2-translator";
 
-import {JasmineHelper}                                        from "./helper/JasmineHelper";
-import {PromiseMatcher}                                       from "./helper/promise-matcher";
-import {ReflectiveInjector}                                   from "@angular/core";
-import {RequestMethod, Response, ResponseOptions, XHRBackend} from "@angular/http";
-import {MockBackend, MockConnection}                          from "@angular/http/testing";
+import {JasmineHelper}               from "./helper/JasmineHelper";
+import {PromiseMatcher}              from "./helper/promise-matcher";
+import {TestBed}                     from "@angular/core/testing";
+import {
+    HttpModule,
+    RequestMethod,
+    Response,
+    ResponseOptions,
+    XHRBackend,
+}                                    from "@angular/http";
+import {MockBackend, MockConnection} from "@angular/http/testing";
 
 describe("TranslateLoaderJsonConfig", function () {
     it("is defined", function () {
@@ -40,17 +46,16 @@ describe("TranslateLoaderJson", function () {
 
     describe("constructor", function () {
         it("requires a TranslateLoaderJsonConfig", function () {
-            let injector = ReflectiveInjector.resolveAndCreate([
-                TranslateLoaderJson,
-            ]);
+            TestBed.configureTestingModule({
+                imports: [ HttpModule ],
+                providers: [ TranslateLoaderJson ],
+            });
 
             let action = function () {
-                injector.get(TranslateLoaderJson);
+                TestBed.get(TranslateLoaderJson);
             };
 
-            // let providerError = new NoProviderError(injector, ReflectiveKey.get(TranslateLoaderJsonConfig));
-            // providerError.addKey(injector, ReflectiveKey.get(TranslateLoaderJson));
-            expect(action).toThrow();
+            expect(action).toThrow(new Error("No provider for TranslateLoaderJsonConfig!"));
         });
     });
 
@@ -60,16 +65,20 @@ describe("TranslateLoaderJson", function () {
         let connection: MockConnection;
 
         beforeEach(function () {
-            PromiseMatcher.install();
+            TestBed.configureTestingModule({
+                imports: [ HttpModule ],
+                providers: [
+                    { provide: XHRBackend, useClass: MockBackend },
+                    { provide: TranslateLoaderJsonConfig, useValue: new TranslateLoaderJsonConfig() },
+                    TranslateLoaderJson,
+                ],
+            });
 
-            let injector: ReflectiveInjector = ReflectiveInjector.resolveAndCreate([
-                { provide: XHRBackend, useClass: MockBackend },
-                { provide: TranslateLoaderJsonConfig, useValue: new TranslateLoaderJsonConfig() },
-                TranslateLoaderJson,
-            ]);
-            backend               = injector.get(XHRBackend);
-            loader                = injector.get(TranslateLoaderJson);
+            backend               = TestBed.get(XHRBackend);
+            loader                = TestBed.get(TranslateLoaderJson);
             backend.connections.subscribe((c: MockConnection) => connection = c);
+
+            PromiseMatcher.install();
         });
 
         afterEach(PromiseMatcher.uninstall);
