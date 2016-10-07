@@ -4,6 +4,7 @@
     "no-empty": false,
     "no-eval": false,
     "switch-default": false,
-    "variable-name": "allow-leading-underscore"
+    "variable-name": "allow-leading-underscore",
+    "only-arrow-functions": false
   }
 }
