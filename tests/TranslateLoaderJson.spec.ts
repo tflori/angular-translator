@@ -3,11 +3,12 @@ import {
     TranslateLoaderJsonConfig,
 } from "../angular2-translator";
 
-import {JasmineHelper}                                                        from "./helper/JasmineHelper";
-import {PromiseMatcher}                                                       from "./helper/promise-matcher";
-import {NoProviderError, ReflectiveInjector, ReflectiveKey}                   from "@angular/core";
-import {HTTP_PROVIDERS, RequestMethod, Response, ResponseOptions, XHRBackend} from "@angular/http";
-import {MockBackend, MockConnection}                                          from "@angular/http/testing";
+import {JasmineHelper}                                        from "./helper/JasmineHelper";
+import {PromiseMatcher}                                       from "./helper/promise-matcher";
+import {ReflectiveInjector, ReflectiveKey}                    from "@angular/core";
+// import {NoProviderError}                                      from "@angular/core/src/di/reflective_errors";
+import {RequestMethod, Response, ResponseOptions, XHRBackend} from "@angular/http";
+import {MockBackend, MockConnection}                          from "@angular/http/testing";
 
 describe("TranslateLoaderJsonConfig", function () {
     it("is defined", function () {
@@ -41,7 +42,6 @@ describe("TranslateLoaderJson", function () {
     describe("constructor", function () {
         it("requires a TranslateLoaderJsonConfig", function () {
             let injector = ReflectiveInjector.resolveAndCreate([
-                HTTP_PROVIDERS,
                 TranslateLoaderJson,
             ]);
 
@@ -49,9 +49,9 @@ describe("TranslateLoaderJson", function () {
                 injector.get(TranslateLoaderJson);
             };
 
-            let providerError = new NoProviderError(injector, ReflectiveKey.get(TranslateLoaderJsonConfig));
-            providerError.addKey(injector, ReflectiveKey.get(TranslateLoaderJson));
-            expect(action).toThrow(providerError);
+            // let providerError = new NoProviderError(injector, ReflectiveKey.get(TranslateLoaderJsonConfig));
+            // providerError.addKey(injector, ReflectiveKey.get(TranslateLoaderJson));
+            expect(action).toThrow();
         });
     });
 
@@ -64,7 +64,6 @@ describe("TranslateLoaderJson", function () {
             PromiseMatcher.install();
 
             let injector: ReflectiveInjector = ReflectiveInjector.resolveAndCreate([
-                HTTP_PROVIDERS,
                 { provide: XHRBackend, useClass: MockBackend },
                 { provide: TranslateLoaderJsonConfig, useValue: new TranslateLoaderJsonConfig() },
                 TranslateLoaderJson,

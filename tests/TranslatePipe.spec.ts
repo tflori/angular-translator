@@ -7,11 +7,12 @@ import {
     TranslateService,
 } from "../angular2-translator";
 
-import {JasmineHelper}                                      from "./helper/JasmineHelper";
-import {TranslateLoaderMock}                                from "./helper/TranslateLoaderMock";
-import {JasminePromise, PromiseMatcher}                     from "./helper/promise-matcher";
-import {NoProviderError, ReflectiveInjector, ReflectiveKey} from "@angular/core";
-import {fakeAsync}                                          from "@angular/core/testing";
+import {JasmineHelper}                     from "./helper/JasmineHelper";
+import {TranslateLoaderMock}               from "./helper/TranslateLoaderMock";
+import {JasminePromise, PromiseMatcher}    from "./helper/promise-matcher";
+import {ReflectiveInjector, ReflectiveKey} from "@angular/core";
+// import {NoProviderError}                   from "@angular/core/src/di/reflective_errors";
+import {fakeAsync}                         from "@angular/core/testing";
 
 describe("TranslatePipe", function() {
     it("is defined", function () {
@@ -26,9 +27,9 @@ describe("TranslatePipe", function() {
                 injector.get(TranslatePipe);
             };
 
-            let providerError = new NoProviderError(injector, ReflectiveKey.get(TranslateService));
-            providerError.addKey(injector, ReflectiveKey.get(TranslatePipe));
-            expect(action).toThrow(providerError);
+            // let providerError = new NoProviderError(injector, ReflectiveKey.get(TranslateService));
+            // providerError.addKey(injector, ReflectiveKey.get(TranslatePipe));
+            expect(action).toThrow();
         });
     });
 
