@@ -44,16 +44,16 @@ export class PromiseMatcher {
         };
 
         jasmine.addMatchers({
-            toBeRejected: function(util, customs) {
+            toBeRejected(util, customs) {
                 return { compare: createCompareFn(util, customs, "rejected") };
             },
-            toBeRejectedWith: function(util, customs) {
+            toBeRejectedWith(util, customs) {
                 return { compare: createCompareFn(util, customs, "rejected", true) };
             },
-            toBeResolved: function(util, customs) {
+            toBeResolved(util, customs) {
                 return { compare: createCompareFn(util, customs, "resolved") };
             },
-            toBeResolvedWith: function(util, customs) {
+            toBeResolvedWith(util, customs) {
                 return { compare: createCompareFn(util, customs, "resolved", true) };
             },
         });

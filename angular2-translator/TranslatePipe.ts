@@ -61,8 +61,8 @@ export class TranslatePipe implements PipeTransform {
 
         if (!this._promise) {
             this._translated = {
-                key: key,
-                params: params,
+                key,
+                params,
             };
             this._startTranslation();
         }

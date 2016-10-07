@@ -3,12 +3,27 @@ import {TranslateLoader}                                from "./angular2-transla
 import {TranslateLoaderJson, TranslateLoaderJsonConfig} from "./angular2-translator/TranslateLoaderJson";
 import {TranslateLogHandler, TranslateService}          from "./angular2-translator/TranslateService";
 
+import {NgModule}                                       from "@angular/core";
+import {HttpModule}                                     from "@angular/http";
+
 export * from "./angular2-translator/TranslateService";
 export * from "./angular2-translator/TranslatePipe";
 export * from "./angular2-translator/TranslateComponent";
 export * from "./angular2-translator/TranslateConfig";
 export * from "./angular2-translator/TranslateLoader";
 export * from "./angular2-translator/TranslateLoaderJson";
+
+@NgModule({
+    imports: [HttpModule],
+    providers: [
+        { provide: TranslateConfig, useValue: new TranslateConfig({}) },
+        { provide: TranslateLoaderJsonConfig, useValue: new TranslateLoaderJsonConfig() },
+        { provide: TranslateLoader, useClass: TranslateLoaderJson },
+        { provide: TranslateLogHandler, useValue: TranslateLogHandler },
+        TranslateService,
+    ],
+})
+export class TranslatorModule {}
 
 export const TRANSLATE_PROVIDERS: any[] = [
     { provide: TranslateConfig, useValue: new TranslateConfig({}) },

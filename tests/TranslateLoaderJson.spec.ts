@@ -3,11 +3,17 @@ import {
     TranslateLoaderJsonConfig,
 } from "../angular2-translator";
 
-import {JasmineHelper}                                                        from "./helper/JasmineHelper";
-import {PromiseMatcher}                                                       from "./helper/promise-matcher";
-import {NoProviderError, ReflectiveInjector, ReflectiveKey}                   from "@angular/core";
-import {HTTP_PROVIDERS, RequestMethod, Response, ResponseOptions, XHRBackend} from "@angular/http";
-import {MockBackend, MockConnection}                                          from "@angular/http/testing";
+import {JasmineHelper}               from "./helper/JasmineHelper";
+import {PromiseMatcher}              from "./helper/promise-matcher";
+import {TestBed}                     from "@angular/core/testing";
+import {
+    HttpModule,
+    RequestMethod,
+    Response,
+    ResponseOptions,
+    XHRBackend,
+}                                    from "@angular/http";
+import {MockBackend, MockConnection} from "@angular/http/testing";
 
 describe("TranslateLoaderJsonConfig", function () {
     it("is defined", function () {
@@ -40,18 +46,16 @@ describe("TranslateLoaderJson", function () {
 
     describe("constructor", function () {
         it("requires a TranslateLoaderJsonConfig", function () {
-            let injector = ReflectiveInjector.resolveAndCreate([
-                HTTP_PROVIDERS,
-                TranslateLoaderJson,
-            ]);
+            TestBed.configureTestingModule({
+                imports: [ HttpModule ],
+                providers: [ TranslateLoaderJson ],
+            });
 
             let action = function () {
-                injector.get(TranslateLoaderJson);
+                TestBed.get(TranslateLoaderJson);
             };
 
-            let providerError = new NoProviderError(injector, ReflectiveKey.get(TranslateLoaderJsonConfig));
-            providerError.addKey(injector, ReflectiveKey.get(TranslateLoaderJson));
-            expect(action).toThrow(providerError);
+            expect(action).toThrow(new Error("No provider for TranslateLoaderJsonConfig!"));
         });
     });
 
@@ -61,17 +65,20 @@ describe("TranslateLoaderJson", function () {
         let connection: MockConnection;
 
         beforeEach(function () {
-            PromiseMatcher.install();
+            TestBed.configureTestingModule({
+                imports: [ HttpModule ],
+                providers: [
+                    { provide: XHRBackend, useClass: MockBackend },
+                    { provide: TranslateLoaderJsonConfig, useValue: new TranslateLoaderJsonConfig() },
+                    TranslateLoaderJson,
+                ],
+            });
 
-            let injector: ReflectiveInjector = ReflectiveInjector.resolveAndCreate([
-                HTTP_PROVIDERS,
-                { provide: XHRBackend, useClass: MockBackend },
-                { provide: TranslateLoaderJsonConfig, useValue: new TranslateLoaderJsonConfig() },
-                TranslateLoaderJson,
-            ]);
-            backend               = injector.get(XHRBackend);
-            loader                = injector.get(TranslateLoaderJson);
+            backend               = TestBed.get(XHRBackend);
+            loader                = TestBed.get(TranslateLoaderJson);
             backend.connections.subscribe((c: MockConnection) => connection = c);
+
+            PromiseMatcher.install();
         });
 
         afterEach(PromiseMatcher.uninstall);
@@ -102,7 +109,7 @@ describe("TranslateLoaderJson", function () {
             let promise = loader.load("en");
 
             connection.mockRespond(new Response(new ResponseOptions({
-                body: JSON.stringify({ "TEXT": "This is a text" }),
+                body: JSON.stringify({ TEXT: "This is a text" }),
                 status: 200,
             })));
 
@@ -113,11 +120,11 @@ describe("TranslateLoaderJson", function () {
             let promise = loader.load("en");
 
             connection.mockRespond(new Response(new ResponseOptions({
-                body: JSON.stringify({ "TEXT": "This is a text" }),
+                body: JSON.stringify({ TEXT: "This is a text" }),
                 status: 200,
             })));
 
-            expect(promise).toBeResolvedWith({ "TEXT": "This is a text" });
+            expect(promise).toBeResolvedWith({ TEXT: "This is a text" });
         });
 
         it("rejectes when connection fails", function() {
@@ -136,7 +143,7 @@ describe("TranslateLoaderJson", function () {
 
             connection.mockRespond(new Response(new ResponseOptions({
                 body: JSON.stringify({
-                    "COOKIE_INFORMATION": [
+                    COOKIE_INFORMATION: [
                         "We are using cookies to adjust our website to the needs of our customers. ",
                         "By using our websites you agree to store cookies on your computer, tablet or smartphone.",
                     ],
@@ -145,7 +152,7 @@ describe("TranslateLoaderJson", function () {
             })));
 
             expect(promise).toBeResolvedWith({
-                "COOKIE_INFORMATION": "We are using cookies to adjust our website to the needs of our customers. " +
+                COOKIE_INFORMATION: "We are using cookies to adjust our website to the needs of our customers. " +
                 "By using our websites you agree to store cookies on your computer, tablet or smartphone.",
             });
         });
@@ -155,8 +162,8 @@ describe("TranslateLoaderJson", function () {
 
             connection.mockRespond(new Response(new ResponseOptions({
                 body: JSON.stringify({
-                    "ANSWER": 42,
-                    "COMBINED": [
+                    ANSWER: 42,
+                    COMBINED: [
                         "7 multiplied by 6 is ",
                         42,
                     ],
@@ -164,7 +171,7 @@ describe("TranslateLoaderJson", function () {
                 status: 200,
             })));
 
-            expect(promise).toBeResolvedWith({"COMBINED": "7 multiplied by 6 is "});
+            expect(promise).toBeResolvedWith({COMBINED: "7 multiplied by 6 is "});
         });
     });
 });
