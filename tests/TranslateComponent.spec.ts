@@ -7,12 +7,11 @@ import {
     TranslateService,
 } from "../angular2-translator";
 
-import {JasmineHelper}                     from "./helper/JasmineHelper";
-import {TranslateLoaderMock}               from "./helper/TranslateLoaderMock";
-import {JasminePromise, PromiseMatcher}    from "./helper/promise-matcher";
-import {ReflectiveInjector, ReflectiveKey} from "@angular/core";
-// import {NoProviderError}                   from "@angular/core/src/di/reflective_errors";
-import {fakeAsync}                         from "@angular/core/testing";
+import {JasmineHelper}                  from "./helper/JasmineHelper";
+import {JasminePromise, PromiseMatcher} from "./helper/promise-matcher";
+import {TranslateLoaderMock}            from "./helper/TranslateLoaderMock";
+import {ReflectiveInjector}             from "@angular/core";
+import {fakeAsync}                      from "@angular/core/testing";
 
 describe("TranslateComponent", function() {
     beforeEach(function() {

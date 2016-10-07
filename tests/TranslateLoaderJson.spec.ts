@@ -5,8 +5,7 @@ import {
 
 import {JasmineHelper}                                        from "./helper/JasmineHelper";
 import {PromiseMatcher}                                       from "./helper/promise-matcher";
-import {ReflectiveInjector, ReflectiveKey}                    from "@angular/core";
-// import {NoProviderError}                                      from "@angular/core/src/di/reflective_errors";
+import {ReflectiveInjector}                                   from "@angular/core";
 import {RequestMethod, Response, ResponseOptions, XHRBackend} from "@angular/http";
 import {MockBackend, MockConnection}                          from "@angular/http/testing";
 
@@ -101,7 +100,7 @@ describe("TranslateLoaderJson", function () {
             let promise = loader.load("en");
 
             connection.mockRespond(new Response(new ResponseOptions({
-                body: JSON.stringify({ "TEXT": "This is a text" }),
+                body: JSON.stringify({ TEXT: "This is a text" }),
                 status: 200,
             })));
 
@@ -112,11 +111,11 @@ describe("TranslateLoaderJson", function () {
             let promise = loader.load("en");
 
             connection.mockRespond(new Response(new ResponseOptions({
-                body: JSON.stringify({ "TEXT": "This is a text" }),
+                body: JSON.stringify({ TEXT: "This is a text" }),
                 status: 200,
             })));
 
-            expect(promise).toBeResolvedWith({ "TEXT": "This is a text" });
+            expect(promise).toBeResolvedWith({ TEXT: "This is a text" });
         });
 
         it("rejectes when connection fails", function() {
@@ -135,7 +134,7 @@ describe("TranslateLoaderJson", function () {
 
             connection.mockRespond(new Response(new ResponseOptions({
                 body: JSON.stringify({
-                    "COOKIE_INFORMATION": [
+                    COOKIE_INFORMATION: [
                         "We are using cookies to adjust our website to the needs of our customers. ",
                         "By using our websites you agree to store cookies on your computer, tablet or smartphone.",
                     ],
@@ -144,7 +143,7 @@ describe("TranslateLoaderJson", function () {
             })));
 
             expect(promise).toBeResolvedWith({
-                "COOKIE_INFORMATION": "We are using cookies to adjust our website to the needs of our customers. " +
+                COOKIE_INFORMATION: "We are using cookies to adjust our website to the needs of our customers. " +
                 "By using our websites you agree to store cookies on your computer, tablet or smartphone.",
             });
         });
@@ -154,8 +153,8 @@ describe("TranslateLoaderJson", function () {
 
             connection.mockRespond(new Response(new ResponseOptions({
                 body: JSON.stringify({
-                    "ANSWER": 42,
-                    "COMBINED": [
+                    ANSWER: 42,
+                    COMBINED: [
                         "7 multiplied by 6 is ",
                         42,
                     ],
@@ -163,7 +162,7 @@ describe("TranslateLoaderJson", function () {
                 status: 200,
             })));
 
-            expect(promise).toBeResolvedWith({"COMBINED": "7 multiplied by 6 is "});
+            expect(promise).toBeResolvedWith({COMBINED: "7 multiplied by 6 is "});
         });
     });
 });

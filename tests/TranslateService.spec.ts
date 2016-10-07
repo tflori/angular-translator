@@ -1,5 +1,4 @@
 import {
-    TRANSLATE_PROVIDERS,
     TranslateConfig,
     TranslateLoader,
     TranslateLogHandler,
@@ -8,11 +7,10 @@ import {
 } from "../angular2-translator";
 
 import {JasmineHelper}                  from "./helper/JasmineHelper";
-import {TranslateLoaderMock}            from "./helper/TranslateLoaderMock";
 import {JasminePromise, PromiseMatcher} from "./helper/promise-matcher";
+import {TranslateLoaderMock}            from "./helper/TranslateLoaderMock";
 import {ReflectiveInjector}             from "@angular/core";
 import {TestBed, fakeAsync}             from "@angular/core/testing";
-import {HttpModule}                     from "@angular/http";
 import {Observable}                     from "rxjs/Observable";
 
 describe("TranslateService", function () {
@@ -271,7 +269,7 @@ describe("TranslateService", function () {
             it("resolves when loader resolves", fakeAsync(function() {
                 let promise = translate.waitForTranslation();
 
-                loaderPromiseResolve({ "TEXT": "This is a text" });
+                loaderPromiseResolve({ TEXT: "This is a text" });
                 JasminePromise.flush();
 
                 expect(promise).toBeResolved();
@@ -296,7 +294,7 @@ describe("TranslateService", function () {
 
             it("returns the already resolved promise", fakeAsync(function() {
                 let firstPromise = translate.waitForTranslation();
-                loaderPromiseResolve({ "TEXT": "This is a text" });
+                loaderPromiseResolve({ TEXT: "This is a text" });
                 JasminePromise.flush();
 
                 let secondPromise = translate.waitForTranslation();
@@ -418,7 +416,7 @@ describe("TranslateService", function () {
                 spyOn(translate, "instant");
                 translate.translate("TEXT");
 
-                loaderPromiseResolve({"TEXT": "This is a text"});
+                loaderPromiseResolve({TEXT: "This is a text"});
                 JasminePromise.flush();
 
                 expect(translate.instant).toHaveBeenCalledWith("TEXT", {}, translate.lang);
@@ -428,7 +426,7 @@ describe("TranslateService", function () {
                 spyOn(translate, "instant").and.returnValue("This is a text");
                 let promise = translate.translate("TEXT");
 
-                loaderPromiseResolve({"TEXT": "This is a text"});
+                loaderPromiseResolve({TEXT: "This is a text"});
 
                 expect(promise).toBeResolvedWith("This is a text");
             }));
@@ -520,7 +518,7 @@ describe("TranslateService", function () {
                 it("removes valid translation references", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "WELCOME": "Welcome [[]]!",
+                        WELCOME: "Welcome [[]]!",
                     });
                     JasminePromise.flush();
                     TranslateLogHandler.error = () => {};
@@ -533,8 +531,8 @@ describe("TranslateService", function () {
                 it("logs an error if reference has no key", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "WELCOME": "Welcome [[]]!",
-                        "HELLO": "Hello [[:]]!",
+                        HELLO: "Hello [[:]]!",
+                        WELCOME: "Welcome [[]]!",
                     });
                     JasminePromise.flush();
                     spyOn(TranslateLogHandler, "error").and.callFake(() => {});
@@ -559,7 +557,7 @@ describe("TranslateService", function () {
                 it("reads the key after opening brackets", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "WELCOME": "Welcome [[A]]!",
+                        WELCOME: "Welcome [[A]]!",
                     });
                     JasminePromise.flush();
                     spyOn(TranslateLogHandler, "info").and.callFake(() => {});
@@ -575,7 +573,7 @@ describe("TranslateService", function () {
                 it("ignores spaces before key", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "WELCOME": "Welcome [[ \t\n]]!",
+                        WELCOME: "Welcome [[ \t\n]]!",
                     });
                     JasminePromise.flush();
                     spyOn(TranslateLogHandler, "error").and.callFake(() => {});
@@ -591,7 +589,7 @@ describe("TranslateService", function () {
                 it("key is finish after space character", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "WELCOME": "Welcome [[ A B ]]!",
+                        WELCOME: "Welcome [[ A B ]]!",
                     });
                     JasminePromise.flush();
                     spyOn(TranslateLogHandler, "error").and.callFake(() => {});
@@ -607,7 +605,7 @@ describe("TranslateService", function () {
                 it("key can have more than one character", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "WELCOME": "Welcome [[ ABC ]]!",
+                        WELCOME: "Welcome [[ ABC ]]!",
                     });
                     JasminePromise.flush();
                     spyOn(TranslateLogHandler, "error").and.callFake(() => {});
@@ -620,7 +618,7 @@ describe("TranslateService", function () {
                 it("expects a parameter after colon", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "A": "[[ T :. ]]",
+                        A: "[[ T :. ]]",
                     });
                     JasminePromise.flush();
                     spyOn(TranslateLogHandler, "error").and.callFake(() => {});
@@ -636,7 +634,7 @@ describe("TranslateService", function () {
                 it("ignores spaces after colon", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "A": "[[ T : ]]",
+                        A: "[[ T : ]]",
                     });
                     JasminePromise.flush();
                     spyOn(TranslateLogHandler, "error").and.callFake(() => {});
@@ -653,9 +651,9 @@ describe("TranslateService", function () {
                     // for key is allowed [A-Za-z0-9_.-] not [,=:]
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "A": "[[ T, ]]!",
-                        "B": "[[ T= ]]!",
-                        "C": "[[ T: ]]!",
+                        A: "[[ T, ]]!",
+                        B: "[[ T= ]]!",
+                        C: "[[ T: ]]!",
                     });
                     JasminePromise.flush();
                     spyOn(TranslateLogHandler, "error").and.callFake(() => {});
@@ -686,7 +684,7 @@ describe("TranslateService", function () {
                 it("waits for parameters after colon", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "A": "[[ T : ]]!",
+                        A: "[[ T : ]]!",
                     });
                     JasminePromise.flush();
                     spyOn(TranslateLogHandler, "error").and.callFake(() => {});
@@ -701,8 +699,8 @@ describe("TranslateService", function () {
                 it("reads the parameter key passes this parameter to referenced translation", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "A": "[[ T : a]]",
-                        "T": "{{a}}",
+                        A: "[[ T : a]]",
+                        T: "{{a}}",
                     });
                     JasminePromise.flush();
 
@@ -731,11 +729,11 @@ describe("TranslateService", function () {
                 it("throws an error for illegal parameter characters", fakeAsync(function() {
                     // for parameter is allowed [A-Za-z0-9_] not [.,=:-]
                     let translations = {
-                        "A": "[[ T : a.]]",
-                        "B": "[[ T : a:]]",
-                        "C": "[[ T : a-]]",
-                        "D": "[[ T : a,]]",
-                        "E": "[[ T : a=]]",
+                        A: "[[ T : a.]]",
+                        B: "[[ T : a:]]",
+                        C: "[[ T : a-]]",
+                        D: "[[ T : a,]]",
+                        E: "[[ T : a=]]",
                     };
                     translate.waitForTranslation();
                     loaderPromiseResolve(translations);
@@ -773,7 +771,7 @@ describe("TranslateService", function () {
                 it("stops param reading after space", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "A": "[[ T : foo bar ]]!",
+                        A: "[[ T : foo bar ]]!",
                     });
                     JasminePromise.flush();
                     spyOn(TranslateLogHandler, "error").and.callFake(() => {});
@@ -789,7 +787,7 @@ describe("TranslateService", function () {
                 it("expects comma after reading param key", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "A": "[[ T : a , ]]",
+                        A: "[[ T : a , ]]",
                     });
                     JasminePromise.flush();
                     spyOn(TranslateLogHandler, "error").and.callFake(() => {});
@@ -805,7 +803,7 @@ describe("TranslateService", function () {
                 it("waits for a getter after equal sign", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "A": "[[ T : foo =]]!",
+                        A: "[[ T : foo =]]!",
                     });
                     JasminePromise.flush();
                     spyOn(TranslateLogHandler, "error").and.callFake(() => {});
@@ -842,7 +840,7 @@ describe("TranslateService", function () {
                 it("throws error if getter begins with illegal character", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "A": "[[ T : foo ==]]",
+                        A: "[[ T : foo ==]]",
                     });
                     JasminePromise.flush();
                     spyOn(TranslateLogHandler, "error").and.callFake(() => {});
@@ -858,7 +856,7 @@ describe("TranslateService", function () {
                 it("ignores space in front of getter", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "A": "[[ T : foo = ]]",
+                        A: "[[ T : foo = ]]",
                     });
                     JasminePromise.flush();
                     spyOn(TranslateLogHandler, "error").and.callFake(() => {});
@@ -874,8 +872,8 @@ describe("TranslateService", function () {
                 it("continues reading getter", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "A": "[[ T : foo = ab]]",
-                        "T": "{{foo}}",
+                        A: "[[ T : foo = ab]]",
+                        T: "{{foo}}",
                     });
                     JasminePromise.flush();
 
@@ -887,7 +885,7 @@ describe("TranslateService", function () {
                 it("throws error if getter contains illegal character", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "A": "[[ T : foo = a=]]",
+                        A: "[[ T : foo = a=]]",
                     });
                     JasminePromise.flush();
                     spyOn(TranslateLogHandler, "error").and.callFake(() => {});
@@ -903,7 +901,7 @@ describe("TranslateService", function () {
                 it("stops reading getter after space", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "A": "[[ T : foo = a a]]",
+                        A: "[[ T : foo = a a]]",
                     });
                     JasminePromise.flush();
                     spyOn(TranslateLogHandler, "error").and.callFake(() => {});
@@ -919,8 +917,8 @@ describe("TranslateService", function () {
                 it("waits for next parameter after comma", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "A": "[[ T : foo = a ,]]",
-                        "B": "[[ T : foo = a,]]",
+                        A: "[[ T : foo = a ,]]",
+                        B: "[[ T : foo = a,]]",
                     });
                     JasminePromise.flush();
                     spyOn(TranslateLogHandler, "error").and.callFake(() => {});
@@ -945,8 +943,8 @@ describe("TranslateService", function () {
                 it("ignores spaces after reading getter", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "A": "[[ T : foo = ab  ]]",
-                        "T": "{{foo}}",
+                        A: "[[ T : foo = ab  ]]",
+                        T: "{{foo}}",
                     });
                     JasminePromise.flush();
 
@@ -958,11 +956,11 @@ describe("TranslateService", function () {
                 it("transports multiple parameters", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "A": "[[ T : h,a  ]]",
-                        "B": "[[ T : h ,b  ]]",
-                        "C": "[[ T : h=h,c  ]]",
-                        "D": "[[ T : h=h ,d  ]]",
-                        "T": "{{h}} {{a}}{{b}}{{c}}{{d}}!",
+                        A: "[[ T : h,a  ]]",
+                        B: "[[ T : h ,b  ]]",
+                        C: "[[ T : h=h,c  ]]",
+                        D: "[[ T : h=h ,d  ]]",
+                        T: "{{h}} {{a}}{{b}}{{c}}{{d}}!",
                     });
                     JasminePromise.flush();
                     TranslateLogHandler.error = () => {};
@@ -981,8 +979,8 @@ describe("TranslateService", function () {
                 it("gets deep objects", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "NEW_COMMENT": "New comment from [[ SALUTATION : name = comment.author ]].",
-                        "SALUTATION": "{{name.title ? name.title : (name.gender === 'w' ? 'Ms.' : 'Mr.')}} " +
+                        NEW_COMMENT: "New comment from [[ SALUTATION : name = comment.author ]].",
+                        SALUTATION: "{{name.title ? name.title : (name.gender === 'w' ? 'Ms.' : 'Mr.')}} " +
                                       "{{name.first}} {{name.last}}",
                     });
                     JasminePromise.flush();
@@ -1004,8 +1002,8 @@ describe("TranslateService", function () {
                 it("provides the object under getter for params", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "NEW_COMMENT": "New comment from [[ SALUTATION : = comment.author ]].",
-                        "SALUTATION": "{{title ? title : (gender === 'w' ? 'Mrs.' : 'Mr.')}} " +
+                        NEW_COMMENT: "New comment from [[ SALUTATION : = comment.author ]].",
+                        SALUTATION: "{{title ? title : (gender === 'w' ? 'Mrs.' : 'Mr.')}} " +
                         "{{first}} {{last}}",
                     });
                     JasminePromise.flush();
@@ -1028,8 +1026,8 @@ describe("TranslateService", function () {
                 it("accepts only objects for params", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "A": "[[ T : = a ]]",
-                        "T": "Hello {{who}}!",
+                        A: "[[ T : = a ]]",
+                        T: "Hello {{who}}!",
                     });
                     JasminePromise.flush();
                     spyOn(TranslateLogHandler, "error").and.callFake(() => {});
@@ -1046,8 +1044,8 @@ describe("TranslateService", function () {
                 it("accepts only first parameter without key", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "A": "[[ T : b , = a ]]",
-                        "T": "Hello {{who}}!",
+                        A: "[[ T : b , = a ]]",
+                        T: "Hello {{who}}!",
                     });
                     JasminePromise.flush();
                     spyOn(TranslateLogHandler, "error").and.callFake(() => {});
@@ -1067,8 +1065,8 @@ describe("TranslateService", function () {
                 it("second parameter got added to the object", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
-                        "TEST":      "[[ REFERENCE: = text, person = world ]]",
-                        "REFERENCE": "{{hello}} {{person}}!",
+                        REFERENCE: "{{hello}} {{person}}!",
+                        TEST:      "[[ REFERENCE: = text, person = world ]]",
                     });
                     JasminePromise.flush();
 
