@@ -73,8 +73,7 @@
     System.import('@angular/core/testing'),
     System.import('@angular/platform-browser-dynamic/testing')
   ]).then(function (modules) {
-    var testing = modules[0];
-    var testingBrowser = modules[1];
+    var testing = modules[0], testingBrowser = modules[1];
 
     testing.TestBed.initTestEnvironment(
       testingBrowser.BrowserDynamicTestingModule,
