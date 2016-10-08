@@ -1,4 +1,8 @@
-System.registerDynamic("angular2-translator/TranslateLoaderJson", ["./TranslateLoader", "@angular/core", "@angular/http"], true, function ($__require, exports, module) {
+!function(e){function r(e,r,o){return 4===arguments.length?t.apply(this,arguments):void n(e,{declarative:!0,deps:r,declare:o})}function t(e,r,t,o){n(e,{declarative:!1,deps:r,executingRequire:t,execute:o})}function n(e,r){r.name=e,e in v||(v[e]=r),r.normalizedDeps=r.deps}function o(e,r){if(r[e.groupIndex]=r[e.groupIndex]||[],-1==g.call(r[e.groupIndex],e)){r[e.groupIndex].push(e);for(var t=0,n=e.normalizedDeps.length;n>t;t++){var a=e.normalizedDeps[t],u=v[a];if(u&&!u.evaluated){var d=e.groupIndex+(u.declarative!=e.declarative);if(void 0===u.groupIndex||u.groupIndex<d){if(void 0!==u.groupIndex&&(r[u.groupIndex].splice(g.call(r[u.groupIndex],u),1),0==r[u.groupIndex].length))throw new TypeError("Mixed dependency cycle detected");u.groupIndex=d}o(u,r)}}}}function a(e){var r=v[e];r.groupIndex=0;var t=[];o(r,t);for(var n=!!r.declarative==t.length%2,a=t.length-1;a>=0;a--){for(var u=t[a],i=0;i<u.length;i++){var s=u[i];n?d(s):l(s)}n=!n}}function u(e){return y[e]||(y[e]={name:e,dependencies:[],exports:{},importers:[]})}function d(r){if(!r.module){var t=r.module=u(r.name),n=r.module.exports,o=r.declare.call(e,function(e,r){if(t.locked=!0,"object"==typeof e)for(var o in e)n[o]=e[o];else n[e]=r;for(var a=0,u=t.importers.length;u>a;a++){var d=t.importers[a];if(!d.locked)for(var i=0;i<d.dependencies.length;++i)d.dependencies[i]===t&&d.setters[i](n)}return t.locked=!1,r},{id:r.name});t.setters=o.setters,t.execute=o.execute;for(var a=0,i=r.normalizedDeps.length;i>a;a++){var l,s=r.normalizedDeps[a],c=v[s],f=y[s];f?l=f.exports:c&&!c.declarative?l=c.esModule:c?(d(c),f=c.module,l=f.exports):l=p(s),f&&f.importers?(f.importers.push(t),t.dependencies.push(f)):t.dependencies.push(null),t.setters[a]&&t.setters[a](l)}}}function i(e){var r,t=v[e];if(t)t.declarative?f(e,[]):t.evaluated||l(t),r=t.module.exports;else if(r=p(e),!r)throw new Error("Unable to load dependency "+e+".");return(!t||t.declarative)&&r&&r.__useDefault?r["default"]:r}function l(r){if(!r.module){var t={},n=r.module={exports:t,id:r.name};if(!r.executingRequire)for(var o=0,a=r.normalizedDeps.length;a>o;o++){var u=r.normalizedDeps[o],d=v[u];d&&l(d)}r.evaluated=!0;var c=r.execute.call(e,function(e){for(var t=0,n=r.deps.length;n>t;t++)if(r.deps[t]==e)return i(r.normalizedDeps[t]);throw new TypeError("Module "+e+" not declared as a dependency.")},t,n);void 0!==typeof c&&(n.exports=c),t=n.exports,t&&t.__esModule?r.esModule=t:r.esModule=s(t)}}function s(r){var t={};if(("object"==typeof r||"function"==typeof r)&&r!==e)if(m)for(var n in r)"default"!==n&&c(t,r,n);else{var o=r&&r.hasOwnProperty;for(var n in r)"default"===n||o&&!r.hasOwnProperty(n)||(t[n]=r[n])}return t["default"]=r,x(t,"__useDefault",{value:!0}),t}function c(e,r,t){try{var n;(n=Object.getOwnPropertyDescriptor(r,t))&&x(e,t,n)}catch(o){return e[t]=r[t],!1}}function f(r,t){var n=v[r];if(n&&!n.evaluated&&n.declarative){t.push(r);for(var o=0,a=n.normalizedDeps.length;a>o;o++){var u=n.normalizedDeps[o];-1==g.call(t,u)&&(v[u]?f(u,t):p(u))}n.evaluated||(n.evaluated=!0,n.module.execute.call(e))}}function p(e){if(I[e])return I[e];if("@node/"==e.substr(0,6))return I[e]=s(D(e.substr(6)));var r=v[e];if(!r)throw"Module "+e+" not present.";return a(e),f(e,[]),v[e]=void 0,r.declarative&&x(r.module.exports,"__esModule",{value:!0}),I[e]=r.declarative?r.module.exports:r.esModule}var v={},g=Array.prototype.indexOf||function(e){for(var r=0,t=this.length;t>r;r++)if(this[r]===e)return r;return-1},m=!0;try{Object.getOwnPropertyDescriptor({a:0},"a")}catch(h){m=!1}var x;!function(){try{Object.defineProperty({},"a",{})&&(x=Object.defineProperty)}catch(e){x=function(e,r,t){try{e[r]=t.value||t.get.call(e)}catch(n){}}}}();var y={},D="undefined"!=typeof System&&System._nodeRequire||"undefined"!=typeof require&&require.resolve&&"undefined"!=typeof process&&require,I={"@empty":{}};return function(e,n,o,a){return function(u){u(function(u){for(var d={_nodeRequire:D,register:r,registerDynamic:t,get:p,set:function(e,r){I[e]=r},newModule:function(e){return e}},i=0;i<n.length;i++)(function(e,r){r&&r.__esModule?I[e]=r:I[e]=s(r)})(n[i],arguments[i]);a(d);var l=p(e[0]);if(e.length>1)for(var i=1;i<e.length;i++)p(e[i]);return o?l["default"]:l})}}}("undefined"!=typeof self?self:global)
+
+(["1"], ["4","5","9","a"], true, function($__System) {
+var require = this.require, exports = this.exports, module = this.module;
+$__System.registerDynamic("2", ["3", "4", "5"], true, function ($__require, exports, module) {
     "use strict";
 
     var define,
@@ -26,9 +30,9 @@ System.registerDynamic("angular2-translator/TranslateLoaderJson", ["./TranslateL
             decorator(target, key, paramIndex);
         };
     };
-    var TranslateLoader_1 = $__require("./TranslateLoader");
-    var core_1 = $__require("@angular/core");
-    var http_1 = $__require("@angular/http");
+    var TranslateLoader_1 = $__require("3");
+    var core_1 = $__require("4");
+    var http_1 = $__require("5");
     var TranslateLoaderJsonConfig = function () {
         // @todo maybe we will change it to a destructed parameter like we did for TranslateConfig
         function TranslateLoaderJsonConfig(path, extension) {
@@ -83,7 +87,7 @@ System.registerDynamic("angular2-translator/TranslateLoaderJson", ["./TranslateL
 
     return module.exports;
 });
-System.registerDynamic("angular2-translator/TranslatePipe", ["./TranslateService", "@angular/core"], true, function ($__require, exports, module) {
+$__System.registerDynamic("6", ["7", "4"], true, function ($__require, exports, module) {
     "use strict";
 
     var define,
@@ -104,8 +108,8 @@ System.registerDynamic("angular2-translator/TranslatePipe", ["./TranslateService
             decorator(target, key, paramIndex);
         };
     };
-    var TranslateService_1 = $__require("./TranslateService");
-    var core_1 = $__require("@angular/core");
+    var TranslateService_1 = $__require("7");
+    var core_1 = $__require("4");
     var TranslatePipe = function () {
         function TranslatePipe(translate) {
             var _this = this;
@@ -180,7 +184,7 @@ System.registerDynamic("angular2-translator/TranslatePipe", ["./TranslateService
 
     return module.exports;
 });
-System.registerDynamic("angular2-translator/TranslateConfig", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("8", [], true, function ($__require, exports, module) {
     "use strict";
 
     var define,
@@ -274,7 +278,7 @@ System.registerDynamic("angular2-translator/TranslateConfig", [], true, function
 
     return module.exports;
 });
-System.registerDynamic("angular2-translator/TranslateLoader", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("3", [], true, function ($__require, exports, module) {
     "use strict";
 
     var define,
@@ -289,7 +293,7 @@ System.registerDynamic("angular2-translator/TranslateLoader", [], true, function
 
     return module.exports;
 });
-System.registerDynamic("angular2-translator/TranslateService", ["./TranslateConfig", "./TranslateLoader", "@angular/core", "rxjs/Observable", "rxjs/add/operator/share"], true, function ($__require, exports, module) {
+$__System.registerDynamic("7", ["8", "3", "4", "9", "a"], true, function ($__require, exports, module) {
     "use strict";
 
     var define,
@@ -310,11 +314,11 @@ System.registerDynamic("angular2-translator/TranslateService", ["./TranslateConf
             decorator(target, key, paramIndex);
         };
     };
-    var TranslateConfig_1 = $__require("./TranslateConfig");
-    var TranslateLoader_1 = $__require("./TranslateLoader");
-    var core_1 = $__require("@angular/core");
-    var Observable_1 = $__require("rxjs/Observable");
-    $__require("rxjs/add/operator/share");
+    var TranslateConfig_1 = $__require("8");
+    var TranslateLoader_1 = $__require("3");
+    var core_1 = $__require("4");
+    var Observable_1 = $__require("9");
+    $__require("a");
     exports.TranslateLogHandler = {
         debug: function () {},
         error: function (message) {
@@ -743,7 +747,7 @@ System.registerDynamic("angular2-translator/TranslateService", ["./TranslateConf
 
     return module.exports;
 });
-System.registerDynamic("angular2-translator/TranslateComponent", ["./TranslateService", "@angular/core"], true, function ($__require, exports, module) {
+$__System.registerDynamic("b", ["7", "4"], true, function ($__require, exports, module) {
     "use strict";
 
     var define,
@@ -764,8 +768,8 @@ System.registerDynamic("angular2-translator/TranslateComponent", ["./TranslateSe
             decorator(target, key, paramIndex);
         };
     };
-    var TranslateService_1 = $__require("./TranslateService");
-    var core_1 = $__require("@angular/core");
+    var TranslateService_1 = $__require("7");
+    var core_1 = $__require("4");
     var TranslateComponent = function () {
         function TranslateComponent(translate) {
             var _this = this;
@@ -808,7 +812,6 @@ System.registerDynamic("angular2-translator/TranslateComponent", ["./TranslateSe
         __decorate([core_1.Input("translate"), __metadata('design:type', String), __metadata('design:paramtypes', [String])], TranslateComponent.prototype, "key", null);
         __decorate([core_1.Input("translateParams"), __metadata('design:type', Object), __metadata('design:paramtypes', [Object])], TranslateComponent.prototype, "params", null);
         TranslateComponent = __decorate([core_1.Component({
-            inputs: ["translate", "translateParams"],
             selector: "[translate]",
             template: "{{translation}}"
         }), __param(0, core_1.Inject(TranslateService_1.TranslateService)), __metadata('design:paramtypes', [TranslateService_1.TranslateService])], TranslateComponent);
@@ -819,7 +822,7 @@ System.registerDynamic("angular2-translator/TranslateComponent", ["./TranslateSe
 
     return module.exports;
 });
-System.registerDynamic("angular2-translator", ["./angular2-translator/TranslateConfig", "./angular2-translator/TranslateLoader", "./angular2-translator/TranslateLoaderJson", "./angular2-translator/TranslateService", "@angular/core", "@angular/http", "./angular2-translator/TranslatePipe", "./angular2-translator/TranslateComponent"], true, function ($__require, exports, module) {
+$__System.registerDynamic("1", ["8", "3", "2", "7", "4", "5", "6", "b"], true, function ($__require, exports, module) {
     "use strict";
 
     var define,
@@ -838,18 +841,18 @@ System.registerDynamic("angular2-translator", ["./angular2-translator/TranslateC
     function __export(m) {
         for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
     }
-    var TranslateConfig_1 = $__require("./angular2-translator/TranslateConfig");
-    var TranslateLoader_1 = $__require("./angular2-translator/TranslateLoader");
-    var TranslateLoaderJson_1 = $__require("./angular2-translator/TranslateLoaderJson");
-    var TranslateService_1 = $__require("./angular2-translator/TranslateService");
-    var core_1 = $__require("@angular/core");
-    var http_1 = $__require("@angular/http");
-    __export($__require("./angular2-translator/TranslateService"));
-    __export($__require("./angular2-translator/TranslatePipe"));
-    __export($__require("./angular2-translator/TranslateComponent"));
-    __export($__require("./angular2-translator/TranslateConfig"));
-    __export($__require("./angular2-translator/TranslateLoader"));
-    __export($__require("./angular2-translator/TranslateLoaderJson"));
+    var TranslateConfig_1 = $__require("8");
+    var TranslateLoader_1 = $__require("3");
+    var TranslateLoaderJson_1 = $__require("2");
+    var TranslateService_1 = $__require("7");
+    var core_1 = $__require("4");
+    var http_1 = $__require("5");
+    __export($__require("7"));
+    __export($__require("6"));
+    __export($__require("b"));
+    __export($__require("8"));
+    __export($__require("3"));
+    __export($__require("2"));
     var TranslatorModule = function () {
         function TranslatorModule() {}
         TranslatorModule = __decorate([core_1.NgModule({
@@ -863,4 +866,13 @@ System.registerDynamic("angular2-translator", ["./angular2-translator/TranslateC
     
 
     return module.exports;
+});
+})
+(function(factory) {
+  if (typeof define == 'function' && define.amd)
+    define(["@angular/core","@angular/http","rxjs/Observable","rxjs/add/operator/share"], factory);
+  else if (typeof module == 'object' && module.exports && typeof require == 'function')
+    module.exports = factory(require("@angular/core"), require("@angular/http"), require("rxjs/Observable"), require("rxjs/add/operator/share"));
+  else
+    throw new Error("Module must be loaded as AMD or CommonJS");
 });

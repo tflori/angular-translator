@@ -3,7 +3,6 @@ import {TranslateService}         from "./TranslateService";
 import {Component, Inject, Input} from "@angular/core";
 
 @Component({
-    inputs: [ "translate", "translateParams" ],
     selector: "[translate]",
     template: "{{translation}}",
 })
