@@ -1,6 +1,6 @@
 {
   "name": "angular2-translator",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "A translate-service, translate-pipe and translate-component for angular2",
   "repository": {
     "type": "git",
@@ -24,7 +24,6 @@
   "bugs": {
     "url": "http://gitlab.w00tserver.org/tflori/angular2-translator/issues"
   },
-  "main": "./angular2-translator.js",
   "typescript": {
     "main": "./angular2-translator.ts"
   },
