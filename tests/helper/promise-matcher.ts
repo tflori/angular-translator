@@ -76,7 +76,13 @@ export class JasminePromise {
         return new JasminePromise((resolve) => resolve.apply(null, args));
     }
 
-    public static initialize() {}
+    public static initialize() {
+        for (let k in this.NativePromise) {
+            if (k.indexOf("__zone_symbol") > -1 && this.NativePromise.hasOwnProperty(k)) {
+                this[k] = this.NativePromise[k];
+            }
+        }
+    }
 
     public static flush() {
         try {

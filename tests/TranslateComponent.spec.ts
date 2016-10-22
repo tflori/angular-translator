@@ -8,10 +8,9 @@ import {
 } from "../angular2-translator";
 
 import {JasmineHelper}                  from "./helper/JasmineHelper";
-import {JasminePromise, PromiseMatcher} from "./helper/promise-matcher";
 import {TranslateLoaderMock}            from "./helper/TranslateLoaderMock";
 import {ReflectiveInjector}             from "@angular/core";
-import {fakeAsync}                      from "@angular/core/testing";
+import {fakeAsync, flushMicrotasks}     from "@angular/core/testing";
 
 describe("TranslateComponent", function() {
     beforeEach(function() {
@@ -37,7 +36,6 @@ describe("TranslateComponent", function() {
         let translateComponent: TranslateComponent;
 
         beforeEach(function() {
-            PromiseMatcher.install();
             let injector = ReflectiveInjector.resolveAndCreate([
                 TRANSLATE_PROVIDERS,
                 { provide: TranslateLoader, useValue: new TranslateLoaderMock() },
@@ -50,8 +48,6 @@ describe("TranslateComponent", function() {
             translateComponent = new TranslateComponent(translate);
             spyOn(translate, "translate").and.returnValue(Promise.resolve("This is a text"));
         });
-
-        afterEach(PromiseMatcher.uninstall);
 
         it("starts translation when key got set", function() {
             translateComponent.key = "TEXT";
@@ -96,7 +92,7 @@ describe("TranslateComponent", function() {
         it("stores translation when promise got resolved", fakeAsync(function() {
             translateComponent.key = "TEXT";
 
-            JasminePromise.flush();
+            flushMicrotasks();
 
             expect(translateComponent.translation).toBe("This is a text");
         }));

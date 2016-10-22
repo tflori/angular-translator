@@ -16,7 +16,4 @@ test:
     - npm install
     - npm run tslint
     - npm run jslint
-    # dirty hack because of https://github.com/angular/zone.js/issues/399
-    - sed -i "s/this._uncaughtPromiseErrors = Promise\[Zone\['__symbol__'\]('uncaughtPromiseErrors')\];/this._uncaughtPromiseErrors = Promise[Zone['__symbol__'\]('uncaughtPromiseErrors')] || [];/g" node_modules/zone.js/dist/fake-async-test.js
-    - npm test
-    - npm run prepublish
+    - npm test -- --browsers Chrome

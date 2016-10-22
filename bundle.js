@@ -28,7 +28,10 @@ var builder = new Builder({
 
 builder
   .buildStatic('angular2-translator', path.resolve(__dirname, 'bundles/', name + '.js'), {
-    format: 'umd'
+    format: 'umd',
+    minify: true,
+    sourceMaps: true,
+    sourceMapContents: true
   })
   .then(function () {
     console.log('Build complete.');

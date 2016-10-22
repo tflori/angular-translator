@@ -75,6 +75,6 @@ module.exports = function (config) {
         ]
       }
     },
-    browsers: [ 'smallerChrome' ]
+    browsers: [ 'smallerChrome', 'Firefox' ]
   });
 };

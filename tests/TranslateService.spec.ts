@@ -440,22 +440,6 @@ describe("TranslateService", function () {
                 spyOn(loader, "load").and.returnValue(new Promise<Object>((resolve) => {
                     loaderPromiseResolve = resolve;
                 }));
-
-                // loaderPromiseResolve({
-                //     BROKEN: 'This "{{notExisting.func()}}" is empty string',
-                //     CALL: "You don\'t know {{privateVar}} but [[HACK:givenVar]]",
-                //     GREETING: "Hello [[SALUTATION:name=user]]!",
-                //     HACK: "{{privateVar}}{{givenVar}}",
-                //     HACKED: "Context: {{context}}",
-                //     INTERPOLATION: "The sum from 1+2 is {{1+2}}",
-                //     SALUTATION: "{{name.title ? name.title + ' ' : (name.gender === 'w' ? 'Ms.' : 'Mr.')}}" +
-                //                 "{{name.first}} {{name.last}}",
-                //     TEXT: "This is a text",
-                //     VARIABLES_OUT: "Hello {{name.first}} {{name.title ? name.title + ' ' : ''}}{{name.last}}",
-                //     VARIABLES_TEST: "This {{count > 5 ? 'is interesting' : 'is boring'}}",
-                //     WELCOME: "Welcome{{lastLogin ? ' back' : ''}} [[SALUTATION:name]]!" +
-                //              "{{lastLogin ? ' Your last login was on ' + lastLogin : ''}}",
-                // });
             }));
 
             it("returns keys if language is not loaded", function() {
@@ -512,6 +496,20 @@ describe("TranslateService", function () {
                 let translation = translate.instant("BROKEN");
 
                 expect(translation).toBe('This "" is empty string');
+            }));
+
+            it("does not throw if variable is not existent", fakeAsync(function() {
+                translate.waitForTranslation();
+                loaderPromiseResolve({
+                    PROP: "{{another.one}}",
+                    VAR: "{{something}}",
+                });
+                JasminePromise.flush();
+                spyOn(translate.logHandler, "error");
+
+                translate.instant(["VAR", "PROP"]);
+
+                expect(translate.logHandler.error).not.toHaveBeenCalled();
             }));
 
             describe("referenced translations", function() {
@@ -1091,7 +1089,7 @@ describe("TranslateService", function () {
             it("shows error when parsing throws error", fakeAsync(function() {
                 translate.waitForTranslation();
                 loaderPromiseResolve({
-                    BROKEN: 'This "{{notExisting.func()}}" is empty string',
+                    BROKEN: 'This "{{throw}}" is empty string',
                 });
                 JasminePromise.flush();
                 spyOn(translate.logHandler, "error").and.callFake(() => {});
@@ -1099,7 +1097,7 @@ describe("TranslateService", function () {
                 translate.instant("BROKEN");
 
                 expect(translate.logHandler.error)
-                    .toHaveBeenCalledWith("Parsing error for expression \'{{notExisting.func()}}\'");
+                    .toHaveBeenCalledWith("Parsing error for expression \'{{throw}}\'");
 
             }));
 

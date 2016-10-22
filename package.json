@@ -1,6 +1,6 @@
 {
   "name": "angular2-translator",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "A translate-service, translate-pipe and translate-component for angular2",
   "repository": {
     "type": "git",
@@ -10,8 +10,9 @@
     "test": "typings install && tsc && karma start",
     "tslint": "tslint -c tslint.json --exclude=\"**/*.d.ts\" --exclude=\"node_modules/**/*.ts\" \"**/*.ts\"",
     "jslint": "jslint --nomen --indent 2 -- bundle.js karma.conf.js karma-test-shim.js",
-    "test-watch": "typings install && tsc && karma start --no-single-run --auto-watch",
-    "prepublish": "typings install && tsc && node bundle.js"
+    "start": "typings install && concurrently \"tsc -w\" \"karma start --no-single-run --auto-watch\"",
+    "prepublish": "typings install && tsc && node bundle.js",
+    "tsc": "typings install && tsc"
   },
   "keywords": [
     "angular2",
@@ -49,6 +50,7 @@
     "@angular/platform-browser": "~2.0.1",
     "@angular/platform-browser-dynamic": "~2.0.1",
     "@angular/router": "~3.0.1",
+    "concurrently": "3.1.0",
     "es6-shim": "0.35.1",
     "jasmine-core": "2.4.1",
     "jslint": "^0.10.3",
@@ -63,8 +65,8 @@
     "systemjs": "0.19.39",
     "systemjs-builder": "0.15.32",
     "tslint": "^3.14.0",
+    "typescript": "^2.0.3",
     "typings": "^1.4.0",
-    "zone.js": "^0.6.25",
-    "typescript": "^2.0.3"
+    "zone.js": "^0.6.25"
   }
 }

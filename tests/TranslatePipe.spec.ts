@@ -8,10 +8,9 @@ import {
 } from "../angular2-translator";
 
 import {JasmineHelper}                  from "./helper/JasmineHelper";
-import {JasminePromise, PromiseMatcher} from "./helper/promise-matcher";
 import {TranslateLoaderMock}            from "./helper/TranslateLoaderMock";
 import {ReflectiveInjector}             from "@angular/core";
-import {fakeAsync}                      from "@angular/core/testing";
+import {fakeAsync, flushMicrotasks}     from "@angular/core/testing";
 
 describe("TranslatePipe", function() {
     it("is defined", function () {
@@ -37,7 +36,6 @@ describe("TranslatePipe", function() {
         let translatePipe: TranslatePipe;
 
         beforeEach(function() {
-            PromiseMatcher.install();
             TranslateLogHandler.error = () => {};
             let injector = ReflectiveInjector.resolveAndCreate([
                 TRANSLATE_PROVIDERS,
@@ -51,8 +49,6 @@ describe("TranslatePipe", function() {
             translatePipe = new TranslatePipe(translate);
             spyOn(translate, "translate").and.returnValue(Promise.resolve("This is a text"));
         });
-
-        afterEach(PromiseMatcher.uninstall);
 
         it("returns an empty string", function() {
             let translation = translatePipe.transform("TEXT");
@@ -94,7 +90,7 @@ describe("TranslatePipe", function() {
         it("returns translation when promise got resolved", fakeAsync(function() {
             translatePipe.transform("TEXT");
 
-            JasminePromise.flush();
+            flushMicrotasks();
             let translation = translatePipe.transform("TEXT");
 
             expect(translation).toBe("This is a text");

@@ -193,7 +193,9 @@ export class TranslateService {
                 try {
                     return this._parse(expression, params) || "";
                 } catch (e) {
-                    this.logHandler.error("Parsing error for expression '" + sub + "'");
+                    if (e && e.message && e.message.indexOf("is not defined") === -1) {
+                        this.logHandler.error("Parsing error for expression '" + sub + "'");
+                    }
                     return "";
                 }
             });
