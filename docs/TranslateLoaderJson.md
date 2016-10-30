@@ -44,18 +44,12 @@ Directory structure:
 
 main.ts:
 ```javascript
-import {MyApp} from './myApp';
-import {bootstrap} from 'angular2/platform/browser';
-import {provide} from 'angular2/core';
-import {HTTP_PROVIDERS} from 'angular2/http';
-import {TRANSLATE_PROVIDERS, TranslateLoaderJsonConfig, TranslateConfig} from 'angular2-translator';
+import {TranslateLoaderJsonConfig, TranslatorModule} from "angular2-translator";
 
-bootstrap(MyApp, [
-  HTTP_PROVIDERS,
-  TRANSLATE_PROVIDERS,
-  provide(TranslateConfig, {useValue: new TranslateConfig({
-    providedLangs: ['de','en','fr']  
-  })}),
-  provide(TranslateLoaderJsonConfig, {useValue: new TranslateLoaderJsonConfig('app/localization', '-lang.json')})
-]);
+@NgModule({
+    imports: [ TranslatorModule ],
+    providers: [
+      { provide: TranslateLoaderJsonConfig, useValue: new TranslateLoaderJsonConfig('app/localization', '-lang.json') },
+    ]
+})
 ```

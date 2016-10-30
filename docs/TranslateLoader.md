@@ -26,7 +26,7 @@ is a complete example how this could look like:
 
 ```ts
 import {Injectable} from "@angular/core";
-import {TranslateLoader} from "./TranslateLoader";
+import {TranslateLoader} from "angular2-translator";
 
 @Injectable()
 export class TranslateLoaderStatic extends TranslateLoader {
@@ -63,18 +63,20 @@ export class TranslateLoaderStatic extends TranslateLoader {
 To use this loader in your application you have to provide it for your application. Here is an example how your
 bootstrap can look like:
 ```ts
-import {bootstrap} from '@angular/platform/browser';
-import {provide} from '@angular/core';
-import {TRANSLATE_PROVIDERS, TranslateConfig} from 'angular2-translator';
-import {AppComponent} from './app.component';
-import {TranslateLoaderStatic} from './TranslateLoaderStatic';
+import {TranslateConfig, TranslateLoader, TranslatorModule} from "angular2-translator";
 
-bootstrap(AppComponent, [
-    TRANSLATE_PROVIDERS,
-    provide(TranslateConfig, {useValue: new TranslateConfig({
-        defaultLang: 'en',
-        providedLangs: ['en', 'de', 'fr', 'ru']
-    })}),
-    provide(TranslateLoader, {useClass: TranslateLoaderStatic})
-]);
+import {TranslateLoaderStatic} from "./TranslateLoaderStatic";
+
+@NgModule({
+    imports: [ TranslatorModule ],
+    providers: [
+      { provide: TranslateConfig, useValue: new TranslateConfig({
+        defaultLang: "de",
+        providedLangs: [ "de", "en" ],
+        detectLanguageOnStart: false
+      })},
+      { provide: TranslateLoader, useClass: TranslateLoaderStatic },
+    ]
+})
+export class AppModule {}
 ```

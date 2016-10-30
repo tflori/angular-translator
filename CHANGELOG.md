@@ -1,5 +1,13 @@
 # Change Log
 
+## Version 1.2.4
+* compatibility to Angular 2.0
+* fixed the bundle
+* less verbose with undefined variables
+* added TranslateComponent and TranslatePipe to module exports
+* updated README and docs (solves #12)
+* long time no update here... (solves #11)
+
 ## Version 1.0.5 -> 1.1.0
 * added code coverage tests
 * improved translation references by adding named parameters (solves #10)

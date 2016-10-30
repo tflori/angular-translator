@@ -49,19 +49,17 @@ expect(translateConfig.langProvided('en-US')).toBe('EN/usa');
 
 This example shows how you usually use the TranslateConfig class:
 ```ts
-import {bootstrap}    from 'angular2/platform/browser';
-import {provide} from 'angular2/core';
-import {HTTP_PROVIDERS} from 'angular2/http';
-import {TranslateConfig, TRANSLATE_PROVIDERS} from 'angular2-translator';
-import {MyApp} from './MyApp.component';
+import {TranslateConfig, TranslatorModule} from "angular2-translator";
 
-bootstrap(MyApp, [
-  HTTP_PROVIDERS,
-  TRANSLATE_PROVIDERS,
-  provide(TranslateConfig, {useValue: new TranslateConfig({
-    defaultLang: 'de',
-    providedLangs: ['de', 'en', 'fr', 'es'],
-    detectLanguageOnStart: true
-  })})
-]);
+@NgModule({
+    imports: [ TranslatorModule ],
+    providers: [
+      { provide: TranslateConfig, useValue: new TranslateConfig({
+        defaultLang: "de",
+        providedLangs: [ "de", "en" ],
+        detectLanguageOnStart: false
+      })},
+    ]
+})
+export class AppModule {}
 ```

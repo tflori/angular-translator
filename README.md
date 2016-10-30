@@ -49,19 +49,17 @@ translations (to make the files readable and better structured).
 ## How to use
 
 Simple basic usage:
-```javascript
-import {Component} from 'angular2/core';
-import {TranslateService, TranslatePipe, TranslateComponent} from 'angular2-translator';
+```ts
+import {Component} from "angular2/core";
+import {TranslateService, TranslatePipe, TranslateComponent} from "angular2-translator";
 
 @Component({
-    selector: 'my-app',
-    template: '{TEXT|translate} is the same as <span translate="TEXT"></span>',
-    pipes: [TranslatePipe],
-    directives: [TranslateComponent]
+    selector: "my-app",
+    template: "{TEXT|translate} is the same as <span translate=\"TEXT\"></span>"
 })
 export class AppComponent {
     constructor(translate: TranslateService) {
-        translate.translate('TEXT').then(
+        translate.translate("TEXT").then(
           (translation) => console.log(translation)
         );
     }
@@ -79,20 +77,34 @@ First you need to install the package. The easiest way is to install it via npm:
 npm install --save angular2-translator
 ```
 
-Then you need to load the bundle in your .html-file. Example:
+Then you need to tell systemjs where to load angular2-translator:
+```js
+System.config({
+    map: {
+        'angular2-translator':       'npm:angular2-translator/bundles/angular2-translator.js'
+    }
+});
+```
+ 
+Or you load the file directly:
 ```html
 <script type="text/javascript" src="node_modules/angular2-translator/bundles/angular2-translator.js"></script>
 ```
 
-And the only thing left is to load the providers it in your main file:
-```javascript
-import {HTTP_PROVIDERS} from 'angular2/http';
-import {TRANSLATE_PROVIDERS} from 'angular2-translator';
+Now you have to set up your NgModule to use the `TranslatorModule` and may be configure it:
+```ts
+import {TranslateConfig, TranslatorModule} from "angular2-translator";
 
-bootstrap(MyApp, [
-  HTTP_PROVIDERS,
-  TRANSLATE_PROVIDERS
-]);
+@NgModule({
+    imports: [ TranslatorModule ],
+    providers: [
+      { provide: TranslateConfig, useValue: new TranslateConfig({
+        defaultLang: "de",
+        providedLangs: [ "de", "en" ],
+      })},
+    ]
+})
+export class AppModule {}
 ```
 
 ### Manually
