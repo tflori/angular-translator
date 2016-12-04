@@ -1,5 +1,7 @@
 # Angular2 Translator
 
+[![npm version](https://badge.fury.io/js/angular2-translator.svg)](https://badge.fury.io/js/angular2-translator)
+
 `angular2-translator` is a simple translation service for angular2 applications. It should support all necessary
 features for translation, like interpolation, references to other translations and so on.
 
