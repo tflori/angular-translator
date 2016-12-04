@@ -1,5 +1,10 @@
 # Change Log
 
+## Version 1.2.5
+* `TranslateLoaderJson` rejects when http throws (solves #14)
+* update dependencies to match newest angular 2 version
+* added ts files to npm package
+
 ## Version 1.2.4
 * compatibility to Angular 2.0
 * fixed the bundle

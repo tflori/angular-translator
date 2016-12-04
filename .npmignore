@@ -1,7 +1,7 @@
 /angular2-translator/*
-!/angular2-translator/*.d.ts
+!/angular2-translator/*.ts
 /angular2-translator.*
-!/angular2-translator.d.ts
+!/angular2-translator.ts
 
 /coverage/
 /typings/

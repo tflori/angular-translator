@@ -269,7 +269,7 @@ export class TranslateService {
      * @returns {string}
      * @private
      */
-    private _referencedError(sub: string, unexpected: string, expected?: string, pos?: string): string {
+    private _referencedError(sub: string, unexpected: string, expected?: string, pos?: number): string {
         let msg = "Parse error unexpected " + unexpected;
 
         if (pos !== undefined) {
