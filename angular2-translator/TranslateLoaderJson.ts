@@ -51,8 +51,11 @@ export class TranslateLoaderJson extends TranslateLoader {
                             }
                             resolve(translations);
                         } else {
-                            reject("Language file could not be loaded (StatusCode: " + response.status + ")");
+                            reject("StatusCode: " + response.status + "");
                         }
+                    },
+                    (reason: Error) => {
+                        reject(reason.message);
                     }
                 );
         });

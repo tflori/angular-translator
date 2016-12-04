@@ -135,7 +135,15 @@ describe("TranslateLoaderJson", function () {
                 statusText: "Internal Server Error",
             })));
 
-            expect(promise).toBeRejected();
+            expect(promise).toBeRejectedWith("StatusCode: 500");
+        });
+
+        it("rejects when connection throws", function() {
+            let promise = loader.load("en");
+
+            connection.mockError(new Error("Some reason"));
+
+            expect(promise).toBeRejectedWith("Some reason");
         });
 
         it("combines arrays to a string", function() {
