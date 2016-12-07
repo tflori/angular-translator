@@ -8,6 +8,7 @@
 features for translation, like interpolation, references to other translations and so on.
 
 ## Features
+
 ### Interpolation
 
 It supports interpolation so you can:

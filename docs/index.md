@@ -3,6 +3,7 @@ layout: default
 title: Introduction
 permalink: /
 ---
+{% raw %}
 # Angular2 Translator
 
 [![Build Status](https://travis-ci.org/tflori/angular2-translator.svg?branch=master)](https://travis-ci.org/tflori/angular2-translator)
@@ -13,6 +14,7 @@ permalink: /
 features for translation, like interpolation, references to other translations and so on.
 
 ## Features
+
 ### Interpolation
 
 It supports interpolation so you can:
@@ -138,3 +140,4 @@ You can [make translations dynamic](dynamize.html) by giving parameter that can 
 Configure [TranslateLogHandler](TranslateLogHandler.html) to get informations about missing translations and other problems in your translations.
 
 Create your own [TranslateLoader](TranslateLoader.html) that fits your needs.
+{% endraw %}
