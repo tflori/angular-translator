@@ -15,6 +15,7 @@ every dirtycheck.
 ## Usage
 
 Here are some examples how we can use it:
+
 ```html
 <h5>Simple translation of words or phrases</h5>
 <p>{% raw %}{{'HELLO WORLD'|translate}}{% endraw %}</p><!-- pipes we only suggest for this simple usage -->
