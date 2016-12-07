@@ -1,21 +1,21 @@
 /*jslint node: true */
 "use strict";
 
-const coverageReporter = [
-    { type: 'text-summary' },
+var coverageReporter = [
+  { type: 'text-summary' },
 ];
-const reporters = [
-    'spec',
-    'coverage',
+var reporters = [
+  'spec',
+  'coverage',
 ];
 
 if (process.env.TRAVIS) {
-    console.log('On Travis sending coveralls');
-    coverageReporter.push( { type : 'lcov', dir : 'coverage' } );
-    reporters.push('coveralls');
+  console.log('On Travis sending coveralls');
+  coverageReporter.push({ type : 'lcov', dir : 'coverage' });
+  reporters.push('coveralls');
 } else {
-    console.log('Not on Travis so not sending coveralls');
-    coverageReporter.push( { type : 'html', dir : 'coverage', 'subdir' : '.' } );
+  console.log('Not on Travis so not sending coveralls');
+  coverageReporter.push({ type : 'html', dir : 'coverage', 'subdir' : '.' });
 }
 
 module.exports = function (config) {
