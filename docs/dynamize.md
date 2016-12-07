@@ -70,6 +70,7 @@ course language related.
 ## Provide parameters
 
 Parameters have to be stored in an object. That is easy when you using javascript:
+
 ```ts
 this.user = {name:'Thomas', lastLogin: moment('2016-03-06 22:13:31')};
 translateService.translate('USER_LOGGED_IN', {name:this.user.name,lastLogin:this.user.lastLogin.fromNow()})
@@ -77,11 +78,13 @@ translateService.translate('USER_LOGGED_IN', {name:this.user.name,lastLogin:this
 
 For [TranslateComponent](docs/TranslateComponent.md) there is a second attribute `translateParams`. To pass variables
 you need to write in brackets:
+
 ```html
 <p translate="USER_LOGGED_IN" [translateParams]="{name:user.name,lastLogin:user.lastLogin.fromNow()}"></p>
 ```
 
 It begins to get really bad for pipes - that is the drawback why we suggest to use the component for complicated things:
+
 ```html
 <p>{% raw %}{{'USER_LOGGED_IN'|translate:'{name:\'' + user.name + '\',lastLogin:\'' + user.lastLogin.fromNow() + '\'}'}}{% endraw %}</p>
 ```
@@ -90,6 +93,7 @@ Because pipes only accept predefined objects or string parameters we parse this 
 and is not readable. It also looks like logic in your view.
 
 Another - some bit more realistic - example for usage of pipes:
+
 ```html
 <p>{% raw %}{{'USER_LOGGED_IN'|translate:user}}{% endraw %}</p>
 ```
@@ -97,11 +101,13 @@ Another - some bit more realistic - example for usage of pipes:
 This works only if you define lastLogin in user as string, or use a method of moment in you translation.
  
 Define as string:
+
 ```ts
 this.user = {name:'Thomas', lastLogin: moment('2016-03-06 22:13.31').format('LLL')}
 ```
 
 Use method for formatting in translation:
+
 ```json
 {
   "USER_LOGGED_IN": "[[GREET:name]], your last login was on {% raw %}{{lastLogin.format('LLL')}}{% endraw %}"

@@ -55,7 +55,7 @@ translations (to make the files readable and better structured).
 
 Simple basic usage:
 
-```js
+```ts
 import {Component} from "angular2/core";
 import {TranslateService, TranslatePipe, TranslateComponent} from "angular2-translator";
 
