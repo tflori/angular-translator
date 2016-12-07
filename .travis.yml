@@ -1,7 +1,5 @@
 language: node_js
 node_js:
-  - "5.12.0"
-  - "6.9.2"
   - "stable"
 
 cache:
@@ -19,7 +17,7 @@ before_script:
 
 script:
   - npm run prepublish
-  - git diff --quiet || echo "bundle out of date" && exit 1
+  - git diff --exit-code bundles || echo "bundles out of date" && exit 1
   - npm run tslint
   - npm run jslint
   - npm test
