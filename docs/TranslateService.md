@@ -24,7 +24,7 @@ of strings. It returns false if none of the languages is provided. Direct matche
 over lazy matches.
 
 Example:
-```ts
+```js
 translateConfig.providedLangs = ['en/us', 'de/de', 'de/at'];
 
 expect(translateService.detectLang(['de-AT'])).toBe('de/at');
@@ -37,7 +37,7 @@ resolved once language got loaded.
 If loader rejects the promise rejects too with the given reason.
 
 Example:
-```ts
+```js
 translateService.waitForTranslation().then(() => {
   this.translation = translateService.instant('TEXT');
 });
@@ -53,7 +53,7 @@ does not exist.
 If keys is an array you get an array with the same order back.
 
 Example:
-```ts
+```js
 translateService.translate(['STATUS_OPEN', 'STATUS_CLOSED']).then((translations) => {
   this.translations['open'] = translations[0];
   this.translations['closed'] = translations[1];
@@ -68,7 +68,7 @@ got loaded.
 > We suggest to wait for translation before using it.
 
 Example:
-```ts
+```js
 translateService.waitForTranslation().then(() => {
   this.translations = {
     statuses: {

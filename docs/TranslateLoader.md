@@ -29,7 +29,7 @@ object that holds the translations. This could look like this JSON example:
 Maybe you want to send only one javascript file for performance reasons and the translations should be included. Here
 is a complete example how this could look like:
 
-```ts
+```js
 import {Injectable} from "@angular/core";
 import {TranslateLoader} from "angular2-translator";
 
@@ -67,7 +67,7 @@ export class TranslateLoaderStatic extends TranslateLoader {
 
 To use this loader in your application you have to provide it for your application. Here is an example how your
 bootstrap can look like:
-```ts
+```js
 import {TranslateConfig, TranslateLoader, TranslatorModule} from "angular2-translator";
 
 import {TranslateLoaderStatic} from "./TranslateLoaderStatic";

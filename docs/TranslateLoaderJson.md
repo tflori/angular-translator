@@ -26,7 +26,7 @@ To keep order in your translation file your can use arrays for translations. Exa
 To configure TranslateLoaderJson you can create your own TranslateLoaderJsonConfig and provide it.
 
 Configurable is the base path where translation files are served and the extension that is used.
-```javascript
+```js
 class TranslateLoaderJsonConfig {
   constructor(path: string, extension: string) {}
 }
@@ -48,7 +48,7 @@ Directory structure:
 ```
 
 main.ts:
-```javascript
+```js
 import {TranslateLoaderJsonConfig, TranslatorModule} from "angular2-translator";
 
 @NgModule({

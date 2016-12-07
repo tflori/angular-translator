@@ -3,7 +3,6 @@ layout: default
 title: TranslatePipe
 permalink: /TranslatePipe.html
 ---
-{% raw %}
 # TranslatePipe
 
 The TranslatePipe is the easiest way for translation but has a major drawback. To give pipes data you need to prepare
@@ -18,34 +17,34 @@ every dirtycheck.
 Here are some examples how we can use it:
 ```html
 <h5>Simple translation of words or phrases</h5>
-<p>{{'HELLO WORLD'|translate}}</p><!-- pipes we only suggest for this simple usage -->
+<p>{% raw %}{{'HELLO WORLD'|translate}}{% endraw %}</p><!-- pipes we only suggest for this simple usage -->
 
 <h5>Translate a variable</h5>
-<p>{{status|translate}}</p><!-- assume status contains 'PENDING' or 'DONE' or something translatable -->
+<p>{% raw %}{{status|translate}}{% endraw %}</p><!-- assume status contains 'PENDING' or 'DONE' or something translatable -->
 
 <h5>Translate with variable</h5>
-<p>{{'LAST LOGIN'|translate:logindate}}</p><!-- assume logindate contains a Date object -->
+<p>{% raw %}{{'LAST LOGIN'|translate:logindate}}{% endraw %}</p><!-- assume logindate contains a Date object -->
 
 <h5>Translate with defined parameters</h5>
-<p>{{'GREET'|translate:'{firstName:\''+user.firstName+'\',lastName:\''+user.lastName+'\'}'}}</p><!-- most unreadable case -->
+<p>{% raw %}{{'GREET'|translate:'{firstName:\''+user.firstName+'\',lastName:\''+user.lastName+'\'}'}}{% endraw %}</p><!-- most unreadable case -->
 ```
 
 ## Better translate before
 
 For the most usecases we suggest you to translate before in the component. Here are the examples again:
-```ts
+```js
 import {Component} from '@angular/core';
 import {TranslateService} from 'angular2-translator';
 
 @Component({
   selector: 'my-component',
-  template: `
+  template: '
     <p>{{translatedStatus}}</p>
     
     <p>{{lastLogin}}</p>
     
     <p>{{greeting}}</p>
-  `
+  '
 })
 export class MyComponent {
   constructor(translate: TranslateService) {
@@ -68,4 +67,3 @@ export class MyComponent {
   }
 }
 ```
-{% endraw %}

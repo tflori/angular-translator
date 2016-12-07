@@ -3,7 +3,6 @@ layout: default
 title: Introduction
 permalink: /
 ---
-{% raw %}
 # Angular2 Translator
 
 [![Build Status](https://travis-ci.org/tflori/angular2-translator.svg?branch=master)](https://travis-ci.org/tflori/angular2-translator)
@@ -19,6 +18,7 @@ features for translation, like interpolation, references to other translations a
 
 It supports interpolation so you can:
 
+{% raw %}
 - output variables in your translations  
   `"HELLO":"Hello {{name}}!"`
 - calculate in your translations  
@@ -27,15 +27,17 @@ It supports interpolation so you can:
   `"MESSAGES":"You have {{count}} new message{{count != 1 ? 's' : ''}}`
 - execute functions in your translations  
   `"LAST_LOGIN":"Your last login was on {{lastLogin.format('MM/DD/YYYY')}}`
+{% endraw %}
   
 ### Refer to other translations
 
 By referring to other translations you can make it easy to have everywhere the same text without copy and paste.
+
 ```json
 {
-  "GREETING": "Hello {{name}}!",
+  "GREETING": "Hello {% raw %}{{name}}{% endraw %}!",
   "REGISTERED": "[[GREETING:name]] Thanks for registering at this service.",
-  "LOGIN_CONFIRM": "[[GREETING:name]] Your last login was on {{lastLogin.format('L')}}."
+  "LOGIN_CONFIRM": "[[GREETING:name]] Your last login was on {% raw %}{{lastLogin.format('L')}}{% endraw %}."
 }
 ```
 
@@ -52,7 +54,8 @@ translations (to make the files readable and better structured).
 ## How to use
 
 Simple basic usage:
-```ts
+
+```js
 import {Component} from "angular2/core";
 import {TranslateService, TranslatePipe, TranslateComponent} from "angular2-translator";
 
@@ -73,11 +76,13 @@ export class AppComponent {
 
 ### Via npm
 First you need to install the package. The easiest way is to install it via npm:
+
 ```bash
 npm install --save angular2-translator
 ```
 
 Then you need to tell systemjs where to load angular2-translator:
+
 ```js
 System.config({
     map: {
@@ -87,12 +92,14 @@ System.config({
 ```
  
 Or you load the file directly:
+
 ```html
 <script type="text/javascript" src="node_modules/angular2-translator/bundles/angular2-translator.js"></script>
 ```
 
 Now you have to set up your NgModule to use the `TranslatorModule` and may be configure it:
-```ts
+
+```js
 import {TranslateConfig, TranslatorModule} from "angular2-translator";
 
 @NgModule({
@@ -140,4 +147,3 @@ You can [make translations dynamic](dynamize.html) by giving parameter that can 
 Configure [TranslateLogHandler](TranslateLogHandler.html) to get informations about missing translations and other problems in your translations.
 
 Create your own [TranslateLoader](TranslateLoader.html) that fits your needs.
-{% endraw %}

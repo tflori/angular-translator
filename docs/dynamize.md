@@ -3,7 +3,6 @@ layout: default
 title: Dynamic Translations
 permalink: /dynamize.html
 ---
-{% raw %}
 # Make your translations dynamic
 
 On every way (Component, Pipe and Service) you can give the translation params to make it dynamic. These params
@@ -15,7 +14,7 @@ This is a simple example with a count to show how it works.
 
 Your translation file:
 ```json
-{ "NEW_MESSAGES": "You have {{count}} new message{{count == 1 ? '' : 's'}}" }
+{ "NEW_MESSAGES": "You have {% raw %}{{count}}{% endraw %} new message{% raw %}{{count == 1 ? '' : 's'}}{% endraw %}" }
 ```
 
 In your component you can use it like this:
@@ -26,7 +25,7 @@ translateService.translate('NEW_MESSAGES', {count: 42}).then((translation) => th
 In your template are two ways to use it:
 ```html
 <h5>pipe example</h5>
-<p>{{'NEW_MESSAGES'|translate:'{count:42}'}}</p>
+<p>{% raw %}{{'NEW_MESSAGES'|translate:'{count:42}'}}{% endraw %}</p>
 
 <h5>component example</h5>
 <p translate="NEW_MESSAGES" [translateParams]="{count:42}"></p>
@@ -54,9 +53,9 @@ can contain dots which means that you refer to the `object.key` and pass only ke
 ```json
 {
   "HELLO": "Hello",
-  "GREET": "[[ HELLO ]] {{name}}",
-  "USER_LOGGED_IN": "[[GREET:name]], your last login was on {{lastLogin}}",
-  "SALUTATION": "{{title ? title : (gender == 'w' ? 'Mrs.' : 'Mr.')}} {{firstName}} {{lastName}}",
+  "GREET": "[[ HELLO ]] {% raw %}{{name}}{% endraw %}",
+  "USER_LOGGED_IN": "[[GREET:name]], your last login was on {% raw %}{{lastLogin}}{% endraw %}",
+  "SALUTATION": "{% raw %}{{title ? title : (gender == 'w' ? 'Mrs.' : 'Mr.')}} {{firstName}} {{lastName}}{% endraw %}",
   "WELCOME": "Welcome [[ SALUTATION : title=user.title, gender=user.gender, firstName=user.firstName, lastName=user.lastName ]]"
 }
 ```
@@ -84,7 +83,7 @@ you need to write in brackets:
 
 It begins to get really bad for pipes - that is the drawback why we suggest to use the component for complicated things:
 ```html
-<p>{{'USER_LOGGED_IN'|translate:'{name:\'' + user.name + '\',lastLogin:\'' + user.lastLogin.fromNow() + '\'}'}}</p>
+<p>{% raw %}{{'USER_LOGGED_IN'|translate:'{name:\'' + user.name + '\',lastLogin:\'' + user.lastLogin.fromNow() + '\'}'}}{% endraw %}</p>
 ```
 
 Because pipes only accept predefined objects or string parameters we parse this parameter if it is string. That costs
@@ -92,7 +91,7 @@ and is not readable. It also looks like logic in your view.
 
 Another - some bit more realistic - example for usage of pipes:
 ```html
-<p>{{'USER_LOGGED_IN'|translate:user}}</p>
+<p>{% raw %}{{'USER_LOGGED_IN'|translate:user}}{% endraw %}</p>
 ```
 
 This works only if you define lastLogin in user as string, or use a method of moment in you translation.
@@ -105,7 +104,7 @@ this.user = {name:'Thomas', lastLogin: moment('2016-03-06 22:13.31').format('LLL
 Use method for formatting in translation:
 ```json
 {
-  "USER_LOGGED_IN": "[[GREET:name]], your last login was on {{lastLogin.format('LLL')}}"
+  "USER_LOGGED_IN": "[[GREET:name]], your last login was on {% raw %}{{lastLogin.format('LLL')}}{% endraw %}"
 }
 ```
 
@@ -118,4 +117,3 @@ Both examples in the view have by logic a higher cpu usage:
 To have it under your control we suggest to use `TranslateService.translate()` or `TranslateService.instant()`. You can
 then subscribe to `TranslateService.languageChanged` to change your translation when the language got changed. Also you
 will know when your values have changed.
-{% raw %}
