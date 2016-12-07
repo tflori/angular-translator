@@ -1,6 +1,7 @@
 # Angular2 Translator
 
-[![build status](https://gitlab.w00tserver.org:617/tflori/angular2-translator/badges/master/build.svg)](https://gitlab.w00tserver.org:617/tflori/angular2-translator/commits/master)
+[![Build Status](https://travis-ci.org/tflori/angular2-translator.svg?branch=master)](https://travis-ci.org/tflori/angular2-translator)
+[![Coverage Status](https://coveralls.io/repos/github/tflori/angular2-translator/badge.svg?branch=master)](https://coveralls.io/github/tflori/angular2-translator?branch=master)
 [![npm version](https://badge.fury.io/js/angular2-translator.svg)](https://badge.fury.io/js/angular2-translator)
 
 `angular2-translator` is a simple translation service for angular2 applications. It should support all necessary

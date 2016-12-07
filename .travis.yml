@@ -1,0 +1,25 @@
+language: node_js
+node_js:
+  - "5.12.0"
+  - "6.9.2"
+  - "stable"
+
+cache:
+  directories:
+    - node_modules
+
+matrix:
+  fast_finish: true
+
+before_script:
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+  - npm install
+  - npm install karma-coveralls
+
+script:
+  - npm run prepublish
+  - git diff --quiet || echo "bundle out of date" && exit 1
+  - npm run tslint
+  - npm run jslint
+  - npm test

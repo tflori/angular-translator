@@ -9,7 +9,6 @@
 /.idea/
 
 .gitignore
-.gitlab-ci.yml
 .editorconfig
 karma-test-shim.js
 karma.conf.js

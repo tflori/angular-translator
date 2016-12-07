@@ -1,5 +1,9 @@
 # Change Log
 
+## Version 1.2.6
+* moved project to github and travis-ci
+* updated readme
+
 ## Version 1.2.5
 * `TranslateLoaderJson` rejects when http throws (solves #14)
 * update dependencies to match newest angular 2 version
