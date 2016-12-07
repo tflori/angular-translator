@@ -28,7 +28,7 @@ To configure TranslateLoaderJson you can create your own TranslateLoaderJsonConf
 
 Configurable is the base path where translation files are served and the extension that is used.
 
-```js
+```ts
 class TranslateLoaderJsonConfig {
   constructor(path: string, extension: string) {}
 }
@@ -52,7 +52,7 @@ Directory structure:
 
 main.ts:
 
-```js
+```ts
 import {TranslateLoaderJsonConfig, TranslatorModule} from "angular2-translator";
 
 @NgModule({

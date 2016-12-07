@@ -99,7 +99,7 @@ Or you load the file directly:
 
 Now you have to set up your NgModule to use the `TranslatorModule` and may be configure it:
 
-```js
+```ts
 import {TranslateConfig, TranslatorModule} from "angular2-translator";
 
 @NgModule({
@@ -116,10 +116,12 @@ export class AppModule {}
 
 ### Manually
 You also can clone the repository and symlink the project folder or what ever:
+
 ```bash
 git clone https://gitlab.w00tserver.org:617/tflori/angular2-translator
 ln -s angular2-translator MyApp/libs/angular2-translator
 ```
+
 > You should know what you do and don't follow this guide for installation.
 
 ## The Classes

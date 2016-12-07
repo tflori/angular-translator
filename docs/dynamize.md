@@ -13,16 +13,19 @@ can then be used in your translations.
 This is a simple example with a count to show how it works.
 
 Your translation file:
+
 ```json
 { "NEW_MESSAGES": "You have {% raw %}{{count}}{% endraw %} new message{% raw %}{{count == 1 ? '' : 's'}}{% endraw %}" }
 ```
 
 In your component you can use it like this:
+
 ```ts
 translateService.translate('NEW_MESSAGES', {count: 42}).then((translation) => this.translation = translation);
 ```
 
 In your template are two ways to use it:
+
 ```html
 <h5>pipe example</h5>
 <p>{% raw %}{{'NEW_MESSAGES'|translate:'{count:42}'}}{% endraw %}</p>
@@ -50,6 +53,7 @@ can contain dots which means that you refer to the `object.key` and pass only ke
 - the submitted params can only contain `[A-Za-z0-9_]`
 
 ### Example
+
 ```json
 {
   "HELLO": "Hello",

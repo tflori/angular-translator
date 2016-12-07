@@ -18,6 +18,7 @@ load every language provided there.
 The loader has to return a `Promise`. This promise can also be rejected if something went wrong and
 the language could not be loaded (please provide a meaningful reason). The `Promise` then have to be fulfilled with an
 object that holds the translations. This could look like this JSON example:
+
 ```json
 {
   "HELLO WORLD": "Привет мир!"
@@ -29,7 +30,7 @@ object that holds the translations. This could look like this JSON example:
 Maybe you want to send only one javascript file for performance reasons and the translations should be included. Here
 is a complete example how this could look like:
 
-```js
+```ts
 import {Injectable} from "@angular/core";
 import {TranslateLoader} from "angular2-translator";
 
@@ -67,7 +68,8 @@ export class TranslateLoaderStatic extends TranslateLoader {
 
 To use this loader in your application you have to provide it for your application. Here is an example how your
 bootstrap can look like:
-```js
+
+```ts
 import {TranslateConfig, TranslateLoader, TranslatorModule} from "angular2-translator";
 
 import {TranslateLoaderStatic} from "./TranslateLoaderStatic";

@@ -40,7 +40,8 @@ Because the setter for TranslateServer.lang is checking if language is provided 
 languages matches against this regular expression too. Otherwise you will never be able to switch to this language.
 
 Example:
-```js
+
+```ts
 import {TranslateConfig} from 'angular2-translator';
 
 var translateConfig = new TranslateConfig({
@@ -53,7 +54,8 @@ expect(translateConfig.langProvided('en-US')).toBe('EN/usa');
 ## Example
 
 This example shows how you usually use the TranslateConfig class:
-```js
+
+```ts
 import {TranslateConfig, TranslatorModule} from "angular2-translator";
 
 @NgModule({
