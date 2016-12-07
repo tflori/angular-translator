@@ -1,3 +1,8 @@
+---
+layout: default
+title: TranslateComponent
+permalink: /TranslateComponent.html
+---
 # TranslateComponent
 
 This is a angular2 component for the selector `[translate]`. It is a component and has a template that is not

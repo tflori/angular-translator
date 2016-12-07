@@ -1,3 +1,8 @@
+---
+layout: default
+title: TranslateLoader
+permalink: /TranslateLoader.html
+---
 # TranslateLoader
 
 This abstract class has to be used to define a new `TranslateLoader`. A `TranslateLoader` has to define a method `load` 

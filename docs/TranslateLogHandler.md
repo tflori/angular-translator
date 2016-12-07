@@ -1,3 +1,8 @@
+---
+layout: default
+title: TranslateLogHandler
+permalink: /TranslateLogHandler.html
+---
 # TranslateLogHandler
 
 This is a very simple interface to log infos, errors and debug informations. The default provided object that

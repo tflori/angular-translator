@@ -1,3 +1,8 @@
+---
+layout: default
+title: TranslateConfig
+permalink: /TranslateConfig.html
+---
 # TranslateConfig
 
 The TranslateConfig is a dependency for TranslateService. As the name suggests it gives a configuration for the TranslateService.

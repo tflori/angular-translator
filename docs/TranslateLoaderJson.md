@@ -1,3 +1,8 @@
+---
+layout: default
+title: TranslateLoaderJson
+permalink: /TranslateLoaderJson.html
+---
 # TranslateLoaderJson
 
 The TranslateLoaderJson loads one json file for each language via angular2/http.

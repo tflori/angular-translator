@@ -1,3 +1,8 @@
+---
+layout: default
+title: TranslateService
+permalink: /TranslateService.html
+---
 # TranslateService
 
 The TranslateService holds the core functionality for this module. It is not only for translation also

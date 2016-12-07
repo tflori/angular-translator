@@ -1,4 +1,10 @@
-# Dynamize your translation with params
+---
+layout: default
+title: Dynamic Translations
+permalink: /dynamize.html
+---
+{% raw %}
+# Make your translations dynamic
 
 On every way (Component, Pipe and Service) you can give the translation params to make it dynamic. These params
 can then be used in your translations.
@@ -112,3 +118,4 @@ Both examples in the view have by logic a higher cpu usage:
 To have it under your control we suggest to use `TranslateService.translate()` or `TranslateService.instant()`. You can
 then subscribe to `TranslateService.languageChanged` to change your translation when the language got changed. Also you
 will know when your values have changed.
+{% raw %}

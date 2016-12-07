@@ -1,3 +1,9 @@
+---
+layout: default
+title: TranslatePipe
+permalink: /TranslatePipe.html
+---
+{% raw %}
 # TranslatePipe
 
 The TranslatePipe is the easiest way for translation but has a major drawback. To give pipes data you need to prepare
@@ -62,3 +68,4 @@ export class MyComponent {
   }
 }
 ```
+{% endraw %}
