@@ -41,11 +41,11 @@ import {TranslateService} from 'angular2-translator';
 @Component({
   selector: 'my-component',
   template: '
-    <p>{{translatedStatus}}</p>
+    <p>{% raw %}{{translatedStatus}}{% endraw %}</p>
     
-    <p>{{lastLogin}}</p>
+    <p>{% raw %}{{lastLogin}}{% endraw %}</p>
     
-    <p>{{greeting}}</p>
+    <p>{% raw %}{{greeting}}{% endraw %}</p>
   '
 })
 export class MyComponent {
