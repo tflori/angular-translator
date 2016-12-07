@@ -70,6 +70,7 @@ export class AppComponent {
     }
 }
 ```
+To learn more have a look at [the documentation](https://tflori.github.io/angular2-translator/).
 
 ## How to install
 
