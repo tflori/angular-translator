@@ -4,7 +4,7 @@
   "description": "A translate-service, translate-pipe and translate-component for angular2",
   "repository": {
     "type": "git",
-    "url": "git://gitlab.w00tserver.org/tflori/angular2-translator.git"
+    "url": "https://github.com/tflori/angular2-translator.git"
   },
   "scripts": {
     "test": "typings install && tsc && karma start",
@@ -22,13 +22,13 @@
   "author": "Thomas Flori",
   "license": "MIT",
   "bugs": {
-    "url": "http://gitlab.w00tserver.org/tflori/angular2-translator/issues"
+    "url": "https://github.com/tflori/angular2-translator/issues"
   },
   "typescript": {
     "main": "./angular2-translator.ts"
   },
   "typings": "./angular2-translator.d.ts",
-  "homepage": "http://gitlab.w00tserver.org/tflori/angular2-translator",
+  "homepage": "https://github.com/tflori/angular2-translator",
   "peerDependencies": {
     "@angular/common": "^2.0.1",
     "@angular/compiler": "^2.0.1",

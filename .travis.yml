@@ -16,7 +16,6 @@ before_script:
   - npm install karma-coveralls
 
 script:
-  - npm run prepublish
   - git diff --exit-code bundles || echo "bundles out of date" && exit 1
   - npm run tslint
   - npm run jslint
