@@ -21,7 +21,7 @@ It supports interpolation so you can:
 - execute functions in your translations  
   `"LAST_LOGIN":"Your last login was on {{lastLogin.format('MM/DD/YYYY')}}`
   
-[* dynamic translations](https://gitlab.w00tserver.org:617/tflori/angular2-translator/blob/master/docs/dynamize.md)
+[* dynamic translations](https://tflori.github.io/angular2-translator/dynamize.html)
   
 ### Refer to other translations
 
@@ -34,21 +34,21 @@ By referring to other translations you can make it easy to have everywhere the s
 }
 ```
 
-[* dynamic translations](https://gitlab.w00tserver.org:617/tflori/angular2-translator/blob/master/docs/dynamize.md)
+[* dynamic translations](https://tflori.github.io/angular2-translator/dynamize.html)
 
 ### Different loaders
 
 This module supports different loaders. Currently each loader has to load all translations for the app. You can write
 your own loader or use the only one we have developed for you - the JSON loader.
 
-[* TranslateLoader](https://gitlab.w00tserver.org:617/tflori/angular2-translator/blob/master/docs/TranslateLoader.md)
+[* TranslateLoader](https://tflori.github.io/angular2-translator/TranslateLoader.html)
 
 #### JSON loader
 
 It is a very basic loader that loads your JSON translation files. A translation can be an array to allow multiline
 translations (to make the files readable and better structured).
 
-[* TranslateLoaderJson](https://gitlab.w00tserver.org:617/tflori/angular2-translator/blob/master/docs/TranslateLoaderJson.md)
+[* TranslateLoaderJson](https://tflori.github.io/angular2-translator/TranslateLoaderJson.html)
 
 ## How to use
 
@@ -69,9 +69,6 @@ export class AppComponent {
     }
 }
 ```
-
-To learn more have a look at 
-[the documentation](https://gitlab.w00tserver.org:617/tflori/angular2-translator/blob/master/docs/index.md)
 
 ## How to install
 
