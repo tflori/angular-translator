@@ -1,6 +1,6 @@
 {
   "name": "angular2-translator",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "description": "A translate-service, translate-pipe and translate-component for angular2",
   "repository": {
     "type": "git",
@@ -30,25 +30,18 @@
   "typings": "./angular2-translator.d.ts",
   "homepage": "https://github.com/tflori/angular2-translator",
   "peerDependencies": {
-    "@angular/common": "^2.0.1",
-    "@angular/compiler": "^2.0.1",
-    "@angular/core": "^2.0.1",
-    "@angular/http": "^2.0.1",
-    "@angular/platform-browser": "^2.0.1",
-    "@angular/platform-browser-dynamic": "^2.0.1",
-    "@angular/router": "^3.0.1",
-    "rxjs": "5.0.0-beta.12",
-    "zone.js": "^0.6.25",
-    "reflect-metadata": "^0.1.8"
+    "@angular/common": "2.*",
+    "@angular/compiler": "2.*",
+    "@angular/core": "2.*",
+    "@angular/http": "2.*"
   },
   "devDependencies": {
-    "@angular/common": "^2.0.1",
-    "@angular/compiler": "^2.0.1",
-    "@angular/core": "^2.0.1",
-    "@angular/http": "^2.0.1",
-    "@angular/platform-browser": "^2.0.1",
-    "@angular/platform-browser-dynamic": "^2.0.1",
-    "@angular/router": "^3.0.1",
+    "@angular/common": "2.*",
+    "@angular/compiler": "2.*",
+    "@angular/core": "2.*",
+    "@angular/http": "2.*",
+    "@angular/platform-browser": "2.*",
+    "@angular/platform-browser-dynamic": "2.*",
     "concurrently": "3.1.0",
     "es6-shim": "0.35.1",
     "jasmine-core": "2.4.1",
@@ -60,12 +53,12 @@
     "karma-jasmine": "1.0.2",
     "karma-spec-reporter": "0.0.26",
     "reflect-metadata": "^0.1.8",
-    "rxjs": "5.0.0-beta.12",
+    "rxjs": "^5.0",
     "systemjs": "0.19.39",
     "systemjs-builder": "0.15.32",
     "tslint": "^3.14.0",
-    "typescript": "^2.0.3",
-    "typings": "^1.4.0",
-    "zone.js": "^0.6.25"
+    "typescript": "^2.1",
+    "typings": "^2.1",
+    "zone.js": "^0.7"
   }
 }
