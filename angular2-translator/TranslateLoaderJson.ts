@@ -53,10 +53,6 @@ export class TranslateLoaderJson extends TranslateLoader {
     private flattenTranslations(translations: any, data: any, prefix: string = "") {
         let key;
         for (key in data) {
-            if (!data.hasOwnProperty(key)) {
-                continue;
-            }
-
             if (Array.isArray(data[key])) {
                 translations[prefix + key] = data[key].filter(v => typeof v === "string").join("");
             } else if (typeof data[key] === "object") {
