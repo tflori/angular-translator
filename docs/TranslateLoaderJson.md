@@ -11,7 +11,7 @@ You have to add `HTTP_PROVIDERS` to your bootstrap to make it work.
 
 ## Multiline translations
 
-To keep order in your translation file your can use arrays for translations. Example:
+To keep order in your translation file you can use arrays for translations. Example:
 
 ```json
 {
@@ -21,6 +21,32 @@ To keep order in your translation file your can use arrays for translations. Exa
   ]
 }
 ```
+
+## Nested translation tables
+
+For more structure in your translation file we allow objects. Please note that they are merged to one dimension.
+
+```json
+{
+  "app": {
+    "loginText": "Please login before continuing!",
+    "componentA": {
+      "TEXT": "something else"
+    }
+  }
+}
+```
+
+The translation table becomes:
+
+```json
+{
+  "app.loginText": "Please login before continuing!",
+  "app.componentA.TEXT": "something else"
+}
+```
+
+So you can access them with `translate('app.loginText')`.
 
 ## TranslateLoaderJsonConfig
 
