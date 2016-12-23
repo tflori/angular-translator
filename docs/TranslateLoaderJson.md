@@ -46,7 +46,18 @@ The translation table becomes:
 }
 ```
 
-So you can access them with `translate('app.loginText')`.
+So you can access them with `translate('app.loginText')`. You need to refer to translations with full key too:
+
+```json
+{
+  "app": {
+    "A": "This gets \"something else\": [[ TEXT ]]",
+    "B": "This gets \"something\" [[ app.TEXT ]]",
+    "TEXT": "something"
+  },
+  "TEXT": "something else"
+}
+```
 
 ## TranslateLoaderJsonConfig
 
