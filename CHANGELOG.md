@@ -1,5 +1,8 @@
 # Change Log
 
+## Version 1.3.0
+* allow nested translation tables (solves #4)
+
 ## Version 1.2.6
 * moved project to github and travis-ci
 * updated readme
