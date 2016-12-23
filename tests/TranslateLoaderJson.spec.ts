@@ -165,6 +165,27 @@ describe("TranslateLoaderJson", function () {
             });
         });
 
+        it("merges translations to one dimension", function() {
+            let promise = loader.load("en");
+
+            connection.mockRespond(new Response(new ResponseOptions({
+                body: JSON.stringify({
+                    app: {
+                        componentA: {
+                            TEXT: "something else",
+                        },
+                        loginText: "Please login before continuing!",
+                    },
+                }),
+                status: 200,
+            })));
+
+            expect(promise).toBeResolvedWith({
+                "app.componentA.TEXT": "something else",
+                "app.loginText": "Please login before continuing!",
+            });
+        });
+
         it("filters non string values", function() {
             let promise = loader.load("en");
 
