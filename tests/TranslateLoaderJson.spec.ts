@@ -165,7 +165,155 @@ describe("TranslateLoaderJson", function () {
             });
         });
 
-        it("filters non string values", function() {
+        it("allows nested objects", function () {
+            let promise = loader.load("en");
+            let nestedObj: any = {
+                TEXT: {
+                    NESTED: "This is a text"
+                }
+            };
+
+            connection.mockRespond(new Response(new ResponseOptions({
+                body: JSON.stringify(nestedObj),
+                status: 200,
+            })));
+
+            expect(promise).toBeResolvedWith(nestedObj);
+        });
+
+        it("allows multiple nested objects", function () {
+            let promise = loader.load("en");
+            let nestedObj: any = {
+                TEXT: {
+                    NESTED: "This is a text",
+                    SECONDNEST: {
+                        TEXT: "Second text"
+                    }
+                }
+            };
+
+            connection.mockRespond(new Response(new ResponseOptions({
+                body: JSON.stringify(nestedObj),
+                status: 200,
+            })));
+
+            expect(promise).toBeResolvedWith(nestedObj);
+        });
+
+        it("combines arrays to a string while returning nested objects", function () {
+            let promise = loader.load("en");
+            let nestedObj: any = {
+                COOKIE_INFORMATION: [
+                    "We are using cookies to adjust our website to the needs of our customers. ",
+                    "By using our websites you agree to store cookies on your computer, tablet or smartphone.",
+                ],
+                TEXT: {
+                    NESTED: "This is a text"
+                }
+            };
+
+            connection.mockRespond(new Response(new ResponseOptions({
+                body: JSON.stringify(nestedObj),
+                status: 200,
+            })));
+
+            expect(promise).toBeResolvedWith({
+                COOKIE_INFORMATION: "We are using cookies to adjust our website to the needs of our customers. " +
+                "By using our websites you agree to store cookies on your computer, tablet or smartphone.",
+                TEXT: {
+                    NESTED: "This is a text"
+                }
+            });
+        });
+
+        it("returns nested objects and combines arrays when the object comes first", function () {
+            let promise = loader.load("en");
+            let nestedObj: any = {
+                TEXT: {
+                    NESTED: "This is a text"
+                },
+                COOKIE_INFORMATION: [
+                    "We are using cookies to adjust our website to the needs of our customers. ",
+                    "By using our websites you agree to store cookies on your computer, tablet or smartphone.",
+                ]
+            };
+
+            connection.mockRespond(new Response(new ResponseOptions({
+                body: JSON.stringify(nestedObj),
+                status: 200,
+            })));
+
+            expect(promise).toBeResolvedWith({
+                TEXT: {
+                    NESTED: "This is a text"
+                },
+                COOKIE_INFORMATION: "We are using cookies to adjust our website to the needs of our customers. " +
+                "By using our websites you agree to store cookies on your computer, tablet or smartphone."
+            });
+        });
+
+        it("allows nested objects with lower case keys and with camel case", function () {
+            let promise = loader.load("en");
+            let nestedObj: any = {
+                text: {
+                    nestedText: "This is a text"
+                }
+            };
+
+            connection.mockRespond(new Response(new ResponseOptions({
+                body: JSON.stringify(nestedObj),
+                status: 200,
+            })));
+
+            expect(promise).toBeResolvedWith(nestedObj);
+        });
+
+        it("filters non string values within nested object", function () {
+            let promise = loader.load("en");
+            let nestedObj: any = {
+                TEXT: {
+                    NESTED: "This is a text",
+                    ANSWER: 42
+                }
+            };
+
+            connection.mockRespond(new Response(new ResponseOptions({
+                body: JSON.stringify(nestedObj),
+                status: 200,
+            })));
+
+            expect(promise).toBeResolvedWith({
+                TEXT: {
+                    NESTED: "This is a text"
+                }
+            });
+        });
+
+        it("combines arrays to a string while beeing in nested objects", function () {
+            let promise = loader.load("en");
+            let nestedObj: any = {
+                TEXT: {
+                    COOKIE_INFORMATION: [
+                        "We are using cookies to adjust our website to the needs of our customers. ",
+                        "By using our websites you agree to store cookies on your computer, tablet or smartphone.",
+                    ]
+                }
+            };
+
+            connection.mockRespond(new Response(new ResponseOptions({
+                body: JSON.stringify(nestedObj),
+                status: 200,
+            })));
+
+            expect(promise).toBeResolvedWith({
+                TEXT: {
+                    COOKIE_INFORMATION: "We are using cookies to adjust our website to the needs of our customers. " +
+                    "By using our websites you agree to store cookies on your computer, tablet or smartphone."
+                }
+            });
+        });
+
+        it("filters non string values", function () {
             let promise = loader.load("en");
 
             connection.mockRespond(new Response(new ResponseOptions({

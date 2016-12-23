@@ -22,6 +22,24 @@ To keep order in your translation file your can use arrays for translations. Exa
 }
 ```
 
+## Filters
+
+For convenience this loader will automatically filter out every translation key, which is not ether a object, array or string.
+
+Multiple nestings are allowed. For example:
+
+```json
+{
+  "TEXT": {
+    "NESTED": "This is a text"
+  },
+  "COOKIE_INFORMATION": [
+    "We are using cookies to adjust our website to the needs of our customers. ",
+    "By using our websites you agree to store cookies on your computer, tablet or smartphone.",
+  ]
+}
+```
+
 ## TranslateLoaderJsonConfig
 
 To configure TranslateLoaderJson you can create your own TranslateLoaderJsonConfig and provide it.
