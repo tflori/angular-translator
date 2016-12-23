@@ -22,6 +22,43 @@ To keep order in your translation file your can use arrays for translations. Exa
 }
 ```
 
+## Nested translation tables
+
+For more structure in your translation file we allow objects. Please note that they are merged to one dimension.
+
+```json
+{
+  "app": {
+    "loginText": "Please login before continuing!",
+    "componentA": {
+      "TEXT": "something else"
+    }
+  }
+}
+```
+
+The translation table becomes:
+
+```json
+{
+  "app.loginText": "Please login before continuing!",
+  "app.componentA.TEXT": "something else"
+}
+```
+
+So you can access them with `translate('app.loginText')`. You need to refer to translations with full key too:
+
+```json
+{
+  "app": {
+    "A": "This gets \"something else\": [[ TEXT ]]",
+    "B": "This gets \"something\" [[ app.TEXT ]]",
+    "TEXT": "something"
+  },
+  "TEXT": "something else"
+}
+```
+
 ## TranslateLoaderJsonConfig
 
 To configure TranslateLoaderJson you can create your own TranslateLoaderJsonConfig and provide it.

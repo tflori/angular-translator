@@ -3,7 +3,7 @@ import {Inject, Injectable} from "@angular/core";
 import {Http}               from "@angular/http";
 
 export class TranslateLoaderJsonConfig {
-    public path: string      = "i18n/";
+    public path: string = "i18n/";
     public extension: string = ".json";
 
     // @todo maybe we will change it to a destructed parameter like we did for TranslateConfig
@@ -36,19 +36,8 @@ export class TranslateLoaderJson extends TranslateLoader {
                 .subscribe(
                     (response) => {
                         if (response.status === 200) {
-                            let translations = response.json();
-                            let key;
-                            for (key in translations) {
-                                if (Array.isArray(translations[key])) {
-
-                                    translations[key] = translations[key]
-                                        .filter((v) => typeof v === "string")
-                                        .join("");
-
-                                } else if (typeof translations[key] !== "string") {
-                                    delete translations[key];
-                                }
-                            }
+                            let translations = {};
+                            this.flattenTranslations(translations, response.json());
                             resolve(translations);
                         } else {
                             reject("StatusCode: " + response.status + "");
@@ -59,5 +48,17 @@ export class TranslateLoaderJson extends TranslateLoader {
                     }
                 );
         });
+    }
+
+    private flattenTranslations(translations: any, data: any, prefix: string = "") {
+        for (let key in data) {
+            if (Array.isArray(data[key])) {
+                translations[prefix + key] = data[key].filter(v => typeof v === "string").join("");
+            } else if (typeof data[key] === "object") {
+                this.flattenTranslations(translations, data[key], prefix + key + ".");
+            } else if (typeof data[key] === "string") {
+                translations[prefix + key] = data[key];
+            }
+        }
     }
 }
