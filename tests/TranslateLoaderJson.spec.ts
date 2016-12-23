@@ -47,8 +47,8 @@ describe("TranslateLoaderJson", function () {
     describe("constructor", function () {
         it("requires a TranslateLoaderJsonConfig", function () {
             TestBed.configureTestingModule({
-                imports: [ HttpModule ],
-                providers: [ TranslateLoaderJson ],
+                imports: [HttpModule],
+                providers: [TranslateLoaderJson],
             });
 
             let action = function () {
@@ -66,16 +66,16 @@ describe("TranslateLoaderJson", function () {
 
         beforeEach(function () {
             TestBed.configureTestingModule({
-                imports: [ HttpModule ],
+                imports: [HttpModule],
                 providers: [
-                    { provide: XHRBackend, useClass: MockBackend },
-                    { provide: TranslateLoaderJsonConfig, useValue: new TranslateLoaderJsonConfig() },
+                    {provide: XHRBackend, useClass: MockBackend},
+                    {provide: TranslateLoaderJsonConfig, useValue: new TranslateLoaderJsonConfig()},
                     TranslateLoaderJson,
                 ],
             });
 
-            backend               = TestBed.get(XHRBackend);
-            loader                = TestBed.get(TranslateLoaderJson);
+            backend = TestBed.get(XHRBackend);
+            loader = TestBed.get(TranslateLoaderJson);
             backend.connections.subscribe((c: MockConnection) => connection = c);
 
             PromiseMatcher.install();
@@ -105,29 +105,29 @@ describe("TranslateLoaderJson", function () {
             expect(request.method).toBe(RequestMethod.Get);
         });
 
-        it("resolves when connection responds", function() {
+        it("resolves when connection responds", function () {
             let promise = loader.load("en");
 
             connection.mockRespond(new Response(new ResponseOptions({
-                body: JSON.stringify({ TEXT: "This is a text" }),
+                body: JSON.stringify({TEXT: "This is a text"}),
                 status: 200,
             })));
 
             expect(promise).toBeResolved();
         });
 
-        it("transforms result to object", function() {
+        it("transforms result to object", function () {
             let promise = loader.load("en");
 
             connection.mockRespond(new Response(new ResponseOptions({
-                body: JSON.stringify({ TEXT: "This is a text" }),
+                body: JSON.stringify({TEXT: "This is a text"}),
                 status: 200,
             })));
 
-            expect(promise).toBeResolvedWith({ TEXT: "This is a text" });
+            expect(promise).toBeResolvedWith({TEXT: "This is a text"});
         });
 
-        it("rejectes when connection fails", function() {
+        it("rejectes when connection fails", function () {
             let promise = loader.load("en");
 
             connection.mockRespond(new Response(new ResponseOptions({
@@ -138,7 +138,7 @@ describe("TranslateLoaderJson", function () {
             expect(promise).toBeRejectedWith("StatusCode: 500");
         });
 
-        it("rejects when connection throws", function() {
+        it("rejects when connection throws", function () {
             let promise = loader.load("en");
 
             connection.mockError(new Error("Some reason"));
@@ -146,7 +146,7 @@ describe("TranslateLoaderJson", function () {
             expect(promise).toBeRejectedWith("Some reason");
         });
 
-        it("combines arrays to a string", function() {
+        it("combines arrays to a string", function () {
             let promise = loader.load("en");
 
             connection.mockRespond(new Response(new ResponseOptions({
@@ -169,8 +169,8 @@ describe("TranslateLoaderJson", function () {
             let promise = loader.load("en");
             let nestedObj: any = {
                 TEXT: {
-                    NESTED: "This is a text"
-                }
+                    NESTED: "This is a text",
+                },
             };
 
             connection.mockRespond(new Response(new ResponseOptions({
@@ -178,7 +178,7 @@ describe("TranslateLoaderJson", function () {
                 status: 200,
             })));
 
-            expect(promise).toBeResolvedWith(nestedObj);
+            expect(promise).toBeResolvedWith({"TEXT.NESTED": "This is a text"});
         });
 
         it("allows multiple nested objects", function () {
@@ -187,9 +187,9 @@ describe("TranslateLoaderJson", function () {
                 TEXT: {
                     NESTED: "This is a text",
                     SECONDNEST: {
-                        TEXT: "Second text"
-                    }
-                }
+                        TEXT: "Second text",
+                    },
+                },
             };
 
             connection.mockRespond(new Response(new ResponseOptions({
@@ -197,7 +197,7 @@ describe("TranslateLoaderJson", function () {
                 status: 200,
             })));
 
-            expect(promise).toBeResolvedWith(nestedObj);
+            expect(promise).toBeResolvedWith({"TEXT.NESTED": "This is a text", "TEXT.SECONDNEST.TEXT": "Second text"});
         });
 
         it("combines arrays to a string while returning nested objects", function () {
@@ -208,8 +208,8 @@ describe("TranslateLoaderJson", function () {
                     "By using our websites you agree to store cookies on your computer, tablet or smartphone.",
                 ],
                 TEXT: {
-                    NESTED: "This is a text"
-                }
+                    NESTED: "This is a text",
+                },
             };
 
             connection.mockRespond(new Response(new ResponseOptions({
@@ -218,37 +218,9 @@ describe("TranslateLoaderJson", function () {
             })));
 
             expect(promise).toBeResolvedWith({
-                COOKIE_INFORMATION: "We are using cookies to adjust our website to the needs of our customers. " +
-                "By using our websites you agree to store cookies on your computer, tablet or smartphone.",
-                TEXT: {
-                    NESTED: "This is a text"
-                }
-            });
-        });
-
-        it("returns nested objects and combines arrays when the object comes first", function () {
-            let promise = loader.load("en");
-            let nestedObj: any = {
-                TEXT: {
-                    NESTED: "This is a text"
-                },
-                COOKIE_INFORMATION: [
-                    "We are using cookies to adjust our website to the needs of our customers. ",
-                    "By using our websites you agree to store cookies on your computer, tablet or smartphone.",
-                ]
-            };
-
-            connection.mockRespond(new Response(new ResponseOptions({
-                body: JSON.stringify(nestedObj),
-                status: 200,
-            })));
-
-            expect(promise).toBeResolvedWith({
-                TEXT: {
-                    NESTED: "This is a text"
-                },
-                COOKIE_INFORMATION: "We are using cookies to adjust our website to the needs of our customers. " +
-                "By using our websites you agree to store cookies on your computer, tablet or smartphone."
+                COOKIE_INFORMATION: "We are using cookies to adjust our website to " +
+                "the needs of our customers. By using our websites you agree to store cookies on your computer, " +
+                "tablet or smartphone.", "TEXT.NESTED": "This is a text",
             });
         });
 
@@ -256,8 +228,8 @@ describe("TranslateLoaderJson", function () {
             let promise = loader.load("en");
             let nestedObj: any = {
                 text: {
-                    nestedText: "This is a text"
-                }
+                    nestedText: "This is a text",
+                },
             };
 
             connection.mockRespond(new Response(new ResponseOptions({
@@ -265,16 +237,16 @@ describe("TranslateLoaderJson", function () {
                 status: 200,
             })));
 
-            expect(promise).toBeResolvedWith(nestedObj);
+            expect(promise).toBeResolvedWith({"text.nestedText": "This is a text"});
         });
 
         it("filters non string values within nested object", function () {
             let promise = loader.load("en");
             let nestedObj: any = {
                 TEXT: {
+                    ANSWER: 42,
                     NESTED: "This is a text",
-                    ANSWER: 42
-                }
+                },
             };
 
             connection.mockRespond(new Response(new ResponseOptions({
@@ -282,11 +254,7 @@ describe("TranslateLoaderJson", function () {
                 status: 200,
             })));
 
-            expect(promise).toBeResolvedWith({
-                TEXT: {
-                    NESTED: "This is a text"
-                }
-            });
+            expect(promise).toBeResolvedWith({"TEXT.NESTED": "This is a text"});
         });
 
         it("combines arrays to a string while beeing in nested objects", function () {
@@ -296,8 +264,8 @@ describe("TranslateLoaderJson", function () {
                     COOKIE_INFORMATION: [
                         "We are using cookies to adjust our website to the needs of our customers. ",
                         "By using our websites you agree to store cookies on your computer, tablet or smartphone.",
-                    ]
-                }
+                    ],
+                },
             };
 
             connection.mockRespond(new Response(new ResponseOptions({
@@ -306,10 +274,30 @@ describe("TranslateLoaderJson", function () {
             })));
 
             expect(promise).toBeResolvedWith({
-                TEXT: {
-                    COOKIE_INFORMATION: "We are using cookies to adjust our website to the needs of our customers. " +
-                    "By using our websites you agree to store cookies on your computer, tablet or smartphone."
-                }
+                "TEXT.COOKIE_INFORMATION": "We are using cookies to adjust our website " +
+                "to the needs of our customers. By using our websites you agree to store cookies on your " +
+                "computer, tablet or smartphone.",
+            });
+        });
+
+        it("merges translations to one dimension", function () {
+            let promise = loader.load("en");
+
+            connection.mockRespond(new Response(new ResponseOptions({
+                body: JSON.stringify({
+                    app: {
+                        componentA: {
+                            TEXT: "something else",
+                        },
+                        loginText: "Please login before continuing!",
+                    },
+                }),
+                status: 200,
+            })));
+
+            expect(promise).toBeResolvedWith({
+                "app.componentA.TEXT": "something else",
+                "app.loginText": "Please login before continuing!",
             });
         });
 

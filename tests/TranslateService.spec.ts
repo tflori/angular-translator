@@ -584,6 +584,20 @@ describe("TranslateService", function () {
                     );
                 }));
 
+                it("allows dots in key", fakeAsync(function() {
+                    translate.waitForTranslation();
+                    loaderPromiseResolve({
+                        HELLO: "Hello [[ app.WORLD ]]!",
+                        "app.WORLD": "World",
+                    });
+                    JasminePromise.flush();
+                    spyOn(translate.logHandler, "error").and.callFake(() => {});
+
+                    let translation = translate.instant("HELLO");
+
+                    expect(translation).toBe("Hello World!");
+                }));
+
                 it("key is finish after space character", fakeAsync(function() {
                     translate.waitForTranslation();
                     loaderPromiseResolve({

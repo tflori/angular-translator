@@ -36,8 +36,8 @@ export class TranslateLoaderJson extends TranslateLoader {
                 .subscribe(
                     (response) => {
                         if (response.status === 200) {
-                            let translations = response.json();
-                            translations = this.filter(translations);
+                            let translations = {};
+                            this.flattenTranslations(translations, response.json());
                             resolve(translations);
                         } else {
                             reject("StatusCode: " + response.status + "");
@@ -50,18 +50,15 @@ export class TranslateLoaderJson extends TranslateLoader {
         });
     }
 
-    private filter(translations): any {
-        for (let key in translations) {
-            if (typeof translations[key] == "object" && translations[key] !== null && !Array.isArray(translations[key])) {
-                this.filter(translations[key]);
-            } else if (Array.isArray(translations[key])) {
-                translations[key] = translations[key]
-                    .filter((v) => typeof v === "string")
-                    .join("");
-            } else if (typeof translations[key] !== "string") {
-                delete translations[key];
+    private flattenTranslations(translations: any, data: any, prefix: string = "") {
+        for (let key in data) {
+            if (Array.isArray(data[key])) {
+                translations[prefix + key] = data[key].filter(v => typeof v === "string").join("");
+            } else if (typeof data[key] === "object") {
+                this.flattenTranslations(translations, data[key], prefix + key + ".");
+            } else if (typeof data[key] === "string") {
+                translations[prefix + key] = data[key];
             }
         }
-        return translations;
     }
 }

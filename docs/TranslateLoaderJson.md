@@ -22,21 +22,40 @@ To keep order in your translation file your can use arrays for translations. Exa
 }
 ```
 
-## Filters
+## Nested translation tables
 
-For convenience this loader will automatically filter out every translation key, which is not ether a object, array or string.
-
-Multiple nestings are allowed. For example:
+For more structure in your translation file we allow objects. Please note that they are merged to one dimension.
 
 ```json
 {
-  "TEXT": {
-    "NESTED": "This is a text"
+  "app": {
+    "loginText": "Please login before continuing!",
+    "componentA": {
+      "TEXT": "something else"
+    }
+  }
+}
+```
+
+The translation table becomes:
+
+```json
+{
+  "app.loginText": "Please login before continuing!",
+  "app.componentA.TEXT": "something else"
+}
+```
+
+So you can access them with `translate('app.loginText')`. You need to refer to translations with full key too:
+
+```json
+{
+  "app": {
+    "A": "This gets \"something else\": [[ TEXT ]]",
+    "B": "This gets \"something\" [[ app.TEXT ]]",
+    "TEXT": "something"
   },
-  "COOKIE_INFORMATION": [
-    "We are using cookies to adjust our website to the needs of our customers. ",
-    "By using our websites you agree to store cookies on your computer, tablet or smartphone.",
-  ]
+  "TEXT": "something else"
 }
 ```
 
