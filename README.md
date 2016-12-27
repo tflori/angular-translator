@@ -18,9 +18,9 @@ It supports interpolation so you can:
 - calculate in your translations  
   `"ANSWER":"The answer is {{7*6}}"`
 - pluralize in your translations  
-  `"MESSAGES":"You have {{count}} new message{{count != 1 ? 's' : ''}}`
+  `"MESSAGES":"You have {{count}} new message{{count != 1 ? 's' : ''}}"`
 - execute functions in your translations  
-  `"LAST_LOGIN":"Your last login was on {{lastLogin.format('MM/DD/YYYY')}}`
+  `"LAST_LOGIN":"Your last login was on {{lastLogin.format('MM/DD/YYYY')}}"`
   
 [* dynamic translations](https://tflori.github.io/angular2-translator/dynamize.html)
   
