@@ -56,12 +56,10 @@ export class TranslateLoaderStatic extends TranslateLoader {
     }
 
     public load(lang:string):Promise<Object> {
-        return new Promise((resolve, reject) => {
-            if (this.translations[lang]) {
-                resolve(this.translations[lang];
-            }
-            reject('Language unknown');
-        });
+        if (!this.translations[lang]) {
+            Promise.reject("Language unknown");
+        }
+        return Promise.resolve(this.translations[lang]);
     }
 }
 ```
@@ -79,7 +77,7 @@ import {TranslateLoaderStatic} from "./TranslateLoaderStatic";
     providers: [
       { provide: TranslateConfig, useValue: new TranslateConfig({
         defaultLang: "de",
-        providedLangs: [ "de", "en" ],
+        providedLangs: [ "de", "en", "fr", "ru" ],
         detectLanguageOnStart: false
       })},
       { provide: TranslateLoader, useClass: TranslateLoaderStatic },
