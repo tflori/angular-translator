@@ -52,14 +52,14 @@ module.exports = function (config) {
     },
 
     reporters: [
-        'spec',
-        'coverage',
+      'spec',
+      'coverage',
     ],
 
     coverageReporter: {
       dir: 'coverage/',
       reporters: [
-          { type: 'json', subdir: 'unmapped-json' }
+        { type: 'json', subdir: 'unmapped-json' }
       ]
     },
 
@@ -76,7 +76,6 @@ module.exports = function (config) {
           "--window-size=1024,768"
         ]
       }
-    },
-    browsers: [ 'smallerChrome', 'Firefox' ]
+    }
   });
 };

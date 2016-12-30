@@ -15,5 +15,5 @@ before_script:
 script:
   - npm run tslint
   - npm run jslint
-  - npm test -- --browsers Firefox
+  - npm test
   - npm run coveralls

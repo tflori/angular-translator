@@ -7,7 +7,7 @@
     "url": "https://github.com/tflori/angular2-translator.git"
   },
   "scripts": {
-    "test": "typings install && tsc && karma start && npm run map-coverage",
+    "test": "typings install && tsc && karma start --browsers Firefox && npm run map-coverage",
     "tslint": "tslint -c tslint.json --exclude=\"**/*.d.ts\" --exclude=\"node_modules/**/*.ts\" \"**/*.ts\"",
     "jslint": "jslint --nomen --indent 2 -- bundle.js karma.conf.js karma-test-shim.js",
     "start": "typings install && concurrently \"tsc -w\" \"karma start --no-single-run --auto-watch\"",
