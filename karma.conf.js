@@ -1,23 +1,6 @@
 /*jslint node: true */
 "use strict";
 
-var coverageReporter = [
-  { type: 'text-summary' },
-];
-var reporters = [
-  'spec',
-  'coverage',
-];
-
-if (process.env.TRAVIS) {
-  console.log('On Travis sending coveralls');
-  coverageReporter.push({ type : 'lcov', dir : 'coverage' });
-  reporters.push('coveralls');
-} else {
-  console.log('Not on Travis so not sending coveralls');
-  coverageReporter.push({ type : 'html', dir : 'coverage', 'subdir' : '.' });
-}
-
 module.exports = function (config) {
   config.set({
     basePath: '',
@@ -68,10 +51,16 @@ module.exports = function (config) {
       'angular2-translator/**/*.js': 'coverage'
     },
 
-    reporters: reporters,
+    reporters: [
+        'spec',
+        'coverage',
+    ],
 
     coverageReporter: {
-      reporters: coverageReporter
+      dir: 'coverage/',
+      reporters: [
+          { type: 'json', subdir: 'unmapped-json' }
+      ]
     },
 
     port: 9876,

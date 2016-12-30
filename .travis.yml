@@ -14,9 +14,10 @@ before_script:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
   - npm install
-  - npm install karma-coveralls
+  - npm install coveralls
 
 script:
   - npm run tslint
   - npm run jslint
   - npm test -- --browsers Firefox
+  - npm run coveralls
