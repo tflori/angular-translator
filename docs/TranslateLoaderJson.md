@@ -16,7 +16,7 @@ To keep order in your translation file your can use arrays for translations. Exa
 ```json
 {
   "COOKIE_INFORMATION": [
-    "We are using cookies, to adjust our website to the needs of our customers.",
+    "We are using cookies, to adjust our website to the needs of our customers. ",
     "By using our websites you agree to store cookies on your computer, tablet or smartphone."
   ]
 }
