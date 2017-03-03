@@ -47,16 +47,16 @@ export class TranslateConfig {
      */
     public langProvided(lang: string, strict: boolean = false): string|boolean {
         let provided: string|boolean = false;
-        let p;
+        let p: number;
 
-        let normalizeLang = function (languageString) {
+        let normalizeLang = function (languageString: string) {
             let regExp = /^([A-Za-z]{2})(?:[\.\-_\/]?([A-Za-z]{2}))?$/;
             if (!languageString.match(regExp)) {
                 return "";
             }
             return languageString.replace(
                 regExp,
-                function (substring, language, country = "") {
+                function (substring: string, language: string, country: string = "") {
                     language    = language.toLowerCase();
                     country     = country.toUpperCase();
                     return country ? language + "-" + country : language;

@@ -50,7 +50,7 @@ export class TranslateService {
         }
 
         this.languageChanged = new Observable<string>(
-            observer => this._languageChangedObserver = observer
+            (observer: any) => this._languageChangedObserver = observer
         ).share();
     }
 
@@ -173,7 +173,7 @@ export class TranslateService {
             }
         }
 
-        let result = [];
+        let result: string[] = [];
         let i = keys.length;
         let t: string;
         while (i--) {
@@ -239,7 +239,7 @@ export class TranslateService {
      */
     private _parse(expression: string, __context: any): string {
         let func: string[] = [];
-        let varName;
+        let varName: string;
         func.push("(function() {");
         if (Array.isArray(__context)) {
             this.logHandler.error("Parameters can not be an array.");
@@ -315,12 +315,12 @@ export class TranslateService {
      * @private
      */
     private _translateReferenced(sub: string, expression: string, params: Object, lang: string): string {
-        let j;
+        let j: number;
         let state = "wait_key";
-        let key;
+        let key: string;
         let translateParams = {};
-        let paramKey;
-        let getter;
+        let paramKey: string;
+        let getter: string;
 
         let transferParam = (useGetter = true) => {
             if (useGetter && !paramKey) {
