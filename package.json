@@ -1,6 +1,6 @@
 {
   "name": "angular2-translator",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "A translate-service, translate-pipe and translate-component for angular2",
   "repository": {
     "type": "git",
@@ -11,7 +11,7 @@
     "tslint": "tslint -c tslint.json --exclude=\"**/*.d.ts\" --exclude=\"node_modules/**/*.ts\" \"**/*.ts\"",
     "jslint": "jslint --nomen --indent 2 -- bundle.js karma.conf.js karma-test-shim.js",
     "start": "typings install && concurrently \"tsc -w\" \"karma start --no-single-run --auto-watch\"",
-    "prepublish": "typings install && tsc && node bundle.js",
+    "prepublish": "typings install && tsc && node bundle.js && sed -i -e 's/-1===\\([a-z]\\).indexOf(\\([a-z]\\))/-1===\\1.indexOf(\\2)||!\\2.linkRecord/' bundles/angular2-translator.js",
     "map-coverage": "remap-istanbul -i coverage/unmapped-json/coverage-final.json -o coverage/report-html -t html && remap-istanbul -i coverage/unmapped-json/coverage-final.json -o coverage/lcov.info -t lcovonly && remap-istanbul -i coverage/unmapped-json/coverage-final.json -o coverage/report.json -t json && remap-istanbul -i coverage/unmapped-json/coverage-final.json -t text-summary -o coverage/report-summary.txt && cat coverage/report-summary.txt && echo ''",
     "coveralls": "cat coverage/lcov.info | coveralls",
     "tsc": "typings install && tsc"
@@ -57,8 +57,8 @@
     "reflect-metadata": "^0.1.8",
     "remap-istanbul": "^0.8.4",
     "rxjs": "^5.0",
-    "systemjs": "0.19.39",
-    "systemjs-builder": "0.15.32",
+    "systemjs": "^0.20",
+    "systemjs-builder": "^0.16",
     "tslint": "^3.14.0",
     "typescript": "^2.1",
     "typings": "^2.1",
