@@ -21,7 +21,17 @@
     "translate",
     "i18n"
   ],
-  "author": "Thomas Flori",
+  "author": {
+    "name": "Thomas Flori",
+    "email": "thflori@gmail.com",
+    "url": "https://github.com/tflori"
+  },
+  "contributors": [
+    {
+      "name": "Marc Bornträger",
+      "url": "https://github.com/BorntraegerMarc"
+    }
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/tflori/angular2-translator/issues"
