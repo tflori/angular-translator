@@ -5,7 +5,7 @@ import {
     TranslateLoader,
     TranslateLogHandler,
     TranslateService,
-} from "../angular2-translator";
+} from "../index";
 
 import {JasmineHelper}                  from "./helper/JasmineHelper";
 import {TranslateLoaderMock}            from "./helper/TranslateLoaderMock";

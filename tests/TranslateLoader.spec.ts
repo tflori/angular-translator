@@ -1,4 +1,4 @@
-import {TranslateLoader} from "../angular2-translator/TranslateLoader";
+import {TranslateLoader} from "../index";
 
 describe("TranslateLoader", function() {
     it("is defined", function() {

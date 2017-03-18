@@ -75,12 +75,48 @@ To learn more have a look at [the documentation](https://tflori.github.io/angula
 ## How to install
 
 ### Via npm
+
 First you need to install the package. The easiest way is to install it via npm:
+
 ```bash
 npm install --save angular2-translator
 ```
 
-Then you need to tell systemjs where to load angular2-translator:
+### Manually
+
+You also can clone the repository and symlink the project folder or what ever:
+
+```bash
+git clone https://gitlab.w00tserver.org:617/tflori/angular2-translator
+ln -s angular2-translator MyApp/libs/angular2-translator
+```
+
+> You should know what you do and don't follow this guide for installation.
+
+## How to use
+
+You have to set up your `NgModule` to import the `TranslatorModule` and may be configure it:
+
+```ts
+import {TranslateConfig, TranslatorModule} from "angular2-translator";
+
+export function factoryTranslateConfig() {
+  return new TranslateConfig({});
+};
+
+@NgModule({
+    imports: [ TranslatorModule ],
+    providers: [
+      { provide: TranslateConfig, useFactory: factoryTranslateConfig }
+    ]
+})
+export class AppModule {}
+```
+
+### Using SystemJs
+
+When you are using SystemJs you need to configure where to load angular2-translator:
+
 ```js
 System.config({
     map: {
@@ -90,30 +126,7 @@ System.config({
 ```
  
 Or you load the file directly:
+
 ```html
 <script type="text/javascript" src="node_modules/angular2-translator/bundles/angular2-translator.js"></script>
 ```
-
-Now you have to set up your NgModule to use the `TranslatorModule` and may be configure it:
-```ts
-import {TranslateConfig, TranslatorModule} from "angular2-translator";
-
-@NgModule({
-    imports: [ TranslatorModule ],
-    providers: [
-      { provide: TranslateConfig, useValue: new TranslateConfig({
-        defaultLang: "de",
-        providedLangs: [ "de", "en" ],
-      })},
-    ]
-})
-export class AppModule {}
-```
-
-### Manually
-You also can clone the repository and symlink the project folder or what ever:
-```bash
-git clone https://gitlab.w00tserver.org:617/tflori/angular2-translator
-ln -s angular2-translator MyApp/libs/angular2-translator
-```
-> You should know what you do and don't follow this guide for installation.

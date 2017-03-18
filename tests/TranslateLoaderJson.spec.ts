@@ -1,7 +1,7 @@
 import {
     TranslateLoaderJson,
     TranslateLoaderJsonConfig,
-} from "../angular2-translator";
+} from "../index";
 
 import {JasmineHelper}               from "./helper/JasmineHelper";
 import {PromiseMatcher}              from "./helper/promise-matcher";

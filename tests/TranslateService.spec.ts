@@ -4,7 +4,7 @@ import {
     TranslateLogHandler,
     TranslateService,
     TranslatorModule,
-} from "../angular2-translator";
+} from "../index";
 
 import {JasmineHelper}                  from "./helper/JasmineHelper";
 import {JasminePromise, PromiseMatcher} from "./helper/promise-matcher";

@@ -1,19 +1,12 @@
-import {TranslateComponent}                             from "./angular2-translator/TranslateComponent";
-import {TranslateConfig}                                from "./angular2-translator/TranslateConfig";
-import {TranslateLoader}                                from "./angular2-translator/TranslateLoader";
-import {TranslateLoaderJson, TranslateLoaderJsonConfig} from "./angular2-translator/TranslateLoaderJson";
-import {TranslatePipe}                                  from "./angular2-translator/TranslatePipe";
-import {TranslateLogHandler, TranslateService}          from "./angular2-translator/TranslateService";
+import {TranslateComponent}                             from "./TranslateComponent";
+import {TranslateConfig}                                from "./TranslateConfig";
+import {TranslateLoader}                                from "./TranslateLoader";
+import {TranslateLoaderJson, TranslateLoaderJsonConfig} from "./TranslateLoaderJson";
+import {TranslatePipe}                                  from "./TranslatePipe";
+import {TranslateLogHandler, TranslateService}          from "./TranslateService";
 
 import {NgModule}                                       from "@angular/core";
 import {HttpModule}                                     from "@angular/http";
-
-export * from "./angular2-translator/TranslateService";
-export * from "./angular2-translator/TranslatePipe";
-export * from "./angular2-translator/TranslateComponent";
-export * from "./angular2-translator/TranslateConfig";
-export * from "./angular2-translator/TranslateLoader";
-export * from "./angular2-translator/TranslateLoaderJson";
 
 @NgModule({
     declarations: [

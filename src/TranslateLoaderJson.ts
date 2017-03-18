@@ -3,7 +3,7 @@ import {Inject, Injectable} from "@angular/core";
 import {Http}               from "@angular/http";
 
 export class TranslateLoaderJsonConfig {
-    public path: string = "i18n/";
+    public path: string = "assets/i18n/";
     public extension: string = ".json";
 
     // @todo maybe we will change it to a destructed parameter like we did for TranslateConfig

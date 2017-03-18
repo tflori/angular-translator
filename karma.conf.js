@@ -29,8 +29,8 @@ module.exports = function (config) {
       {pattern: 'node_modules/@angular/**/*.js', included: false, watched: false},
 
       // sources
-      { pattern: 'angular2-translator.js', included: false, watched: true},
-      { pattern: 'angular2-translator/**/*.js', included: false, watched: true},
+      { pattern: 'index.js', included: false, watched: false},
+      { pattern: 'src/**/*.js', included: false, watched: true},
 
       // helper
       { pattern: 'tests/helper/**/*.js', included: false, watched: true},
@@ -47,8 +47,7 @@ module.exports = function (config) {
     ],
 
     preprocessors: {
-      'angular2-translator.js': 'coverage',
-      'angular2-translator/**/*.js': 'coverage'
+      'src/**/*.js': 'coverage'
     },
 
     reporters: [
