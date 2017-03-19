@@ -1,5 +1,11 @@
 # Change Log
 
+## Version 1.4.0
+* supporting angular cli (solves #9)
+  * changed structure to use index.ts
+  * changed documentation
+  * changed default path for `TranslateLoaderJson`
+
 ## Version 1.3.0
 * allow nested translation tables (solves #4)
 
