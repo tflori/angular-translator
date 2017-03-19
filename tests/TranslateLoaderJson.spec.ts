@@ -27,7 +27,7 @@ describe("TranslateLoaderJsonConfig", function () {
     it("defines default path and extension", function () {
         let config = new TranslateLoaderJsonConfig();
 
-        expect(config.path).toBe("i18n/");
+        expect(config.path).toBe("assets/i18n/");
         expect(config.extension).toBe(".json");
     });
 
@@ -101,7 +101,7 @@ describe("TranslateLoaderJson", function () {
 
             expect(backend.createConnection).toHaveBeenCalled();
             let request = JasmineHelper.calls(backend.createConnection).mostRecent().args[0];
-            expect(request.url).toBe("i18n/en.json");
+            expect(request.url).toBe("assets/i18n/en.json");
             expect(request.method).toBe(RequestMethod.Get);
         });
 
