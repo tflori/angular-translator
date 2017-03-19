@@ -11,12 +11,45 @@ implements this interface uses console.error() to log errors. The other two func
 ## Declartion
 
 ```ts
-interface TranslateLogHandler {
+export interface ITranslateLogHandler {
     error(message:string):void;
     info(message:string):void;
     debug(message:string):void;
 }
 ```
+
+The default TranslateLogHandler is:
+
+```ts
+export const TranslateLogHandler = <ITranslateLogHandler> {
+    debug: () => {},
+    error: (message) => console && console.error && console.error(message),
+    info: () => {},
+};
+```
+
+To overwrite this you can just write this in your app module:
+ ```ts
+import {TranslateLogHandler, ITranslateLogHandler, TranslatorModule} from "angular2-translator";
+
+export function translateLogFactory() {
+    return <ITranslateLogHandler> {
+        debug: () => {},
+        error: (message) => console && console.error && console.error(message),
+        info: () => {},
+    };
+}
+
+@NgModule({
+    imports: [ TranslatorModule ],
+    providers: [
+      { provide: TranslateLogHandler, useFactory: translateLogFactory},
+    ]
+})
+export class AppModule {}
+```
+
+> Unfortunately this leads to an error message for `ng serve` and `ng build`. Here is [the bug report](https://github.com/angular/angular/issues/15287).
 
 ## Error messages
 Currently there are just 4 error messages:

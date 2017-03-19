@@ -23,12 +23,15 @@ export class TranslateConfig {
 
             if (navigator.languages instanceof Array) {
                 return Array.prototype.slice.call(navigator.languages);
-            } else if (typeof navigator.languages === "string") {
-                return [String(navigator.languages)];
-            } else if (typeof navigator.language === "string") {
-                return [navigator.language];
             } else {
-                return [];
+                return [
+                    navigator.languages ||
+                    navigator.language ||
+                    navigator.browserLanguage ||
+                    navigator.userLanguage,
+                ].filter((v) => {
+                    return typeof v === "string";
+                });
             }
         })();
     }

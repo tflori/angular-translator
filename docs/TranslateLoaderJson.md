@@ -71,7 +71,10 @@ class TranslateLoaderJsonConfig {
 }
 ```
 
-Default values are `path = 'i18n'` and `extension = '.json'` .
+Default values are `path = 'assets/i18n'` and `extension = '.json'` .
+
+> **CAUTION:** the default values changed from version 1.4. Before the default path was `i18n` - so you either change
+> this in your config or move the files.
 
 ### Example with customized path and extension:
 Directory structure:
@@ -90,12 +93,28 @@ Directory structure:
 main.ts:
 
 ```ts
-import {TranslateLoaderJsonConfig, TranslatorModule} from "angular2-translator";
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { TranslateLoaderJsonConfig, TranslatorModule } from "angular2-translator";
+
+import { AppComponent } from './app.component';
+
+export function translateLoaderConfigFactory() {
+    return new TranslateLoaderJsonConfig('app/localization', '-lang.json')
+}
 
 @NgModule({
-    imports: [ TranslatorModule ],
-    providers: [
-      { provide: TranslateLoaderJsonConfig, useValue: new TranslateLoaderJsonConfig('app/localization', '-lang.json') },
-    ]
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    TranslatorModule,
+  ],
+  providers: [
+      { provide: TranslateLoaderJsonConfig, useFactory: translateLoaderConfigFactory },
+  ],
+  bootstrap: [AppComponent]
 })
+export class AppModule { }
 ```

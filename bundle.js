@@ -27,7 +27,7 @@ var builder = new Builder({
 });
 
 builder
-  .buildStatic('angular2-translator', path.resolve(__dirname, 'bundles/', name + '.js'), {
+  .buildStatic('index', path.resolve(__dirname, 'bundles/', name + '.js'), {
     format: 'umd',
     minify: true,
     sourceMaps: true,

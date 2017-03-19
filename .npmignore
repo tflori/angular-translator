@@ -1,8 +1,8 @@
-/angular2-translator/*
-!/angular2-translator/*.ts
-/angular2-translator.*
-!/angular2-translator.ts
-!/angular2-translator.d.ts
+/src/*
+!/src/*.ts
+/index.*
+!/index.ts
+!/index.d.ts
 
 /coverage/
 /typings/

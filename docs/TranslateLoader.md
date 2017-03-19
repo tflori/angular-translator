@@ -36,7 +36,7 @@ import {TranslateLoader} from "angular2-translator";
 
 @Injectable()
 export class TranslateLoaderStatic extends TranslateLoader {
-    private translations:object = {
+    private translations:Object = {
         en: {
             "HELLO WORLD": "Hello World!"
         },
@@ -68,20 +68,34 @@ To use this loader in your application you have to provide it for your applicati
 bootstrap can look like:
 
 ```ts
-import {TranslateConfig, TranslateLoader, TranslatorModule} from "angular2-translator";
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { TranslateConfig, TranslateLoader, TranslatorModule } from "angular2-translator";
 
-import {TranslateLoaderStatic} from "./TranslateLoaderStatic";
+import { AppComponent } from './app.component';
+import { TranslateLoaderStatic } from "./TranslateLoaderStatic"
+
+export function translateConfigFactory() {
+  return new TranslateConfig({
+    defaultLang: "ru",
+    providedLangs: [ "de", "en", "fr", "ru" ],
+    detectLanguageOnStart: false
+  });
+}
 
 @NgModule({
-    imports: [ TranslatorModule ],
-    providers: [
-      { provide: TranslateConfig, useValue: new TranslateConfig({
-        defaultLang: "de",
-        providedLangs: [ "de", "en", "fr", "ru" ],
-        detectLanguageOnStart: false
-      })},
-      { provide: TranslateLoader, useClass: TranslateLoaderStatic },
-    ]
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    TranslatorModule,
+  ],
+  providers: [
+    { provide: TranslateConfig, useFactory: translateConfigFactory },
+    { provide: TranslateLoader, useClass: TranslateLoaderStatic },
+  ],
+  bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }
 ```

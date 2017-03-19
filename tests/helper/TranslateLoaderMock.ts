@@ -1,4 +1,4 @@
-import {TranslateLoader} from "../../angular2-translator/TranslateLoader";
+import {TranslateLoader} from "../../src/TranslateLoader";
 
 export class TranslateLoaderMock extends TranslateLoader {
     private _provided: Object = {};
