@@ -108,18 +108,20 @@ describe("TranslateService", function () {
                 providedLangs: [ "en", "de" ],
             });
             translateConfig.navigatorLanguages = ["de-DE", "de", "en-US", "en"];
-            spyOn(TranslateLogHandler, "info");
+            let logHandler = new TranslateLogHandler();
+            spyOn(logHandler, "info");
 
             TestBed.configureTestingModule({
                 imports: [TranslatorModule],
                 providers: [
                     { provide: TranslateConfig, useValue: translateConfig },
+                    { provide: TranslateLogHandler, useValue: logHandler },
                 ],
             });
 
             TestBed.get(TranslateService);
 
-            expect(TranslateLogHandler.info).toHaveBeenCalledWith("Language de got detected");
+            expect(logHandler.info).toHaveBeenCalledWith("Language de got detected");
         });
     });
 

@@ -13,9 +13,6 @@ import {ReflectiveInjector}             from "@angular/core";
 import {fakeAsync, flushMicrotasks}     from "@angular/core/testing";
 
 describe("TranslateComponent", function() {
-    beforeEach(function() {
-        TranslateLogHandler.error = () => {};
-    });
 
     describe("constructor", function() {
         it("requires a TranslateService", function () {
@@ -34,6 +31,7 @@ describe("TranslateComponent", function() {
     describe("instance", function() {
         let translate: TranslateService;
         let translateComponent: TranslateComponent;
+        let logHandler: TranslateLogHandler;
 
         beforeEach(function() {
             let injector = ReflectiveInjector.resolveAndCreate([
@@ -42,11 +40,15 @@ describe("TranslateComponent", function() {
                 { provide: TranslateConfig, useValue: new TranslateConfig( {
                     providedLangs: [ "en", "de" ],
                 } ) },
+                { provide: TranslateLogHandler, useValue: new TranslateLogHandler() },
             ]);
 
             translate = injector.get(TranslateService);
             translateComponent = new TranslateComponent(translate);
+            logHandler = injector.get(TranslateLogHandler);
+
             spyOn(translate, "translate").and.returnValue(Promise.resolve("This is a text"));
+            spyOn(logHandler, "error");
         });
 
         it("starts translation when key got set", function() {
@@ -107,11 +109,9 @@ describe("TranslateComponent", function() {
         });
 
         it("shows error if params are not object", function() {
-            spyOn(TranslateLogHandler, "error");
-
             translateComponent.params = "foo";
 
-            expect(TranslateLogHandler.error).toHaveBeenCalledWith("Params have to be an object");
+            expect(logHandler.error).toHaveBeenCalledWith("Params have to be an object");
         });
     });
 });

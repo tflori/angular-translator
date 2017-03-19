@@ -5,51 +5,45 @@ permalink: /TranslateLogHandler.html
 ---
 # TranslateLogHandler
 
-This is a very simple interface to log infos, errors and debug informations. The default provided object that
-implements this interface uses console.error() to log errors. The other two functions have no operations.
-
-## Declartion
-
-```ts
-export interface ITranslateLogHandler {
-    error(message:string):void;
-    info(message:string):void;
-    debug(message:string):void;
-}
-```
-
-The default TranslateLogHandler is:
-
-```ts
-export const TranslateLogHandler = <ITranslateLogHandler> {
-    debug: () => {},
-    error: (message) => console && console.error && console.error(message),
-    info: () => {},
-};
-```
+This is a very simple class to log infos, errors and debug informations. The default provided class used just writes
+errors to `console.error`. The other two functions have no operations. If you want to send errors to a logger
+and or output info or debug messages you have to extend this class:
 
 To overwrite this you can just write this in your app module:
  ```ts
-import {TranslateLogHandler, ITranslateLogHandler, TranslatorModule} from "angular2-translator";
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { HttpModule } from '@angular/http';
+import { TranslateLogHandler, TranslatorModule } from 'angular2-translator';
 
-export function translateLogFactory() {
-    return <ITranslateLogHandler> {
-        debug: () => {},
-        error: (message) => console && console.error && console.error(message),
-        info: () => {},
-    };
+import { AppComponent } from './app.component';
+
+export class AppTranslateLogHandler extends TranslateLogHandler {
+  public info(message: string) {
+    if (console && console.log) {
+      console.log(message);
+    }
+  }
 }
 
 @NgModule({
-    imports: [ TranslatorModule ],
-    providers: [
-      { provide: TranslateLogHandler, useFactory: translateLogFactory},
-    ]
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    HttpModule,
+    TranslatorModule
+  ],
+  providers: [
+    { provide: TranslateLogHandler, useClass: AppTranslateLogHandler }
+  ],
+  bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }
 ```
-
-> Unfortunately this leads to an error message for `ng serve` and `ng build`. Here is [the bug report](https://github.com/angular/angular/issues/15287).
 
 ## Error messages
 Currently there are just 4 error messages:

@@ -1,5 +1,6 @@
-import {TranslateConfig} from "./TranslateConfig";
-import {TranslateLoader} from "./TranslateLoader";
+import {TranslateConfig}     from "./TranslateConfig";
+import {TranslateLoader}     from "./TranslateLoader";
+import {TranslateLogHandler} from "./TranslateLogHandler";
 
 import {Inject, Injectable} from "@angular/core";
 import {Observable}         from "rxjs/Observable";
@@ -7,22 +8,10 @@ import {Observer}           from "rxjs/Observer";
 
 import "rxjs/add/operator/share";
 
-export interface ITranslateLogHandler {
-    error(message: string): void;
-    info(message: string): void;
-    debug(message: string): void;
-}
-
-export const TranslateLogHandler = <ITranslateLogHandler> {
-    debug: () => {},
-    error: (message) => console && console.error && console.error(message),
-    info: () => {},
-};
-
 @Injectable()
 export class TranslateService {
     public languageChanged: Observable<string>;
-    public logHandler: ITranslateLogHandler;
+    public logHandler: TranslateLogHandler;
 
     private _config: TranslateConfig;
     private _loader: TranslateLoader;
@@ -34,7 +23,7 @@ export class TranslateService {
 
     constructor(@Inject(TranslateConfig) config: TranslateConfig,
                 @Inject(TranslateLoader) loader: TranslateLoader,
-                @Inject(TranslateLogHandler) logHandler: ITranslateLogHandler) {
+                @Inject(TranslateLogHandler) logHandler: TranslateLogHandler) {
         this._config = config;
         this._loader = loader;
         this.logHandler = logHandler;

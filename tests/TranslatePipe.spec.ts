@@ -34,20 +34,24 @@ describe("TranslatePipe", function() {
     describe("transform", function() {
         let translate: TranslateService;
         let translatePipe: TranslatePipe;
+        let logHandler: TranslateLogHandler;
 
         beforeEach(function() {
-            TranslateLogHandler.error = () => {};
             let injector = ReflectiveInjector.resolveAndCreate([
                 TRANSLATE_PROVIDERS,
                 { provide: TranslateLoader, useValue: new TranslateLoaderMock() },
                 { provide: TranslateConfig, useValue: new TranslateConfig( {
                     providedLangs: [ "en", "de" ],
                 } ) },
+                { provide: TranslateLogHandler, useValue: new TranslateLogHandler() },
             ]);
 
             translate = injector.get(TranslateService);
             translatePipe = new TranslatePipe(translate);
+            logHandler = injector.get(TranslateLogHandler);
+
             spyOn(translate, "translate").and.returnValue(Promise.resolve("This is a text"));
+            spyOn(logHandler, "error");
         });
 
         it("returns an empty string", function() {
@@ -123,11 +127,9 @@ describe("TranslatePipe", function() {
         });
 
         it("shows error if params could not be parsed", function() {
-            spyOn(TranslateLogHandler, "error");
-
             translatePipe.transform("TEXT", ["{baefa}"]);
 
-            expect(TranslateLogHandler.error).toHaveBeenCalledWith("'{baefa}' could not be parsed to object");
+            expect(logHandler.error).toHaveBeenCalledWith("'{baefa}' could not be parsed to object");
         });
     });
 });

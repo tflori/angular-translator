@@ -1,5 +1,8 @@
 # Change Log
 
+## Version 1.4.1
+* refactored TranslateLogHandler as class
+
 ## Version 1.4.0
 * supporting angular cli (solves #9)
   * changed structure to use index.ts

@@ -3,7 +3,8 @@ import {TranslateConfig}                                from "./TranslateConfig"
 import {TranslateLoader}                                from "./TranslateLoader";
 import {TranslateLoaderJson, TranslateLoaderJsonConfig} from "./TranslateLoaderJson";
 import {TranslatePipe}                                  from "./TranslatePipe";
-import {TranslateLogHandler, TranslateService}          from "./TranslateService";
+import {TranslateLogHandler}                            from "./TranslateLogHandler";
+import {TranslateService}                               from "./TranslateService";
 
 import {NgModule}                                       from "@angular/core";
 import {HttpModule}                                     from "@angular/http";
@@ -22,7 +23,7 @@ import {HttpModule}                                     from "@angular/http";
         { provide: TranslateConfig, useValue: new TranslateConfig({}) },
         { provide: TranslateLoaderJsonConfig, useValue: new TranslateLoaderJsonConfig() },
         { provide: TranslateLoader, useClass: TranslateLoaderJson },
-        { provide: TranslateLogHandler, useValue: TranslateLogHandler },
+        { provide: TranslateLogHandler, useClass: TranslateLogHandler },
         TranslateService,
     ],
 })
