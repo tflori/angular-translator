@@ -27,6 +27,7 @@ It supports interpolation so you can:
 ### Refer to other translations
 
 By referring to other translations you can make it easy to have everywhere the same text without copy and paste.
+
 ```json
 {
   "GREETING": "Hello {{name}}!",
@@ -54,6 +55,7 @@ translations (to make the files readable and better structured).
 ## How to use
 
 Simple basic usage:
+
 ```ts
 import {Component} from "angular2/core";
 import {TranslateService, TranslatePipe, TranslateComponent} from "angular2-translator";
@@ -70,6 +72,7 @@ export class AppComponent {
     }
 }
 ```
+
 To learn more have a look at [the documentation](https://tflori.github.io/angular2-translator/).
 
 ## How to install
@@ -87,7 +90,7 @@ npm install --save angular2-translator
 You also can clone the repository and symlink the project folder or what ever:
 
 ```bash
-git clone https://gitlab.w00tserver.org:617/tflori/angular2-translator
+git clone https://github.com/tflori/angular2-translator.git
 ln -s angular2-translator MyApp/libs/angular2-translator
 ```
 
@@ -98,19 +101,34 @@ ln -s angular2-translator MyApp/libs/angular2-translator
 You have to set up your `NgModule` to import the `TranslatorModule` and may be configure it:
 
 ```ts
-import {TranslateConfig, TranslatorModule} from "angular2-translator";
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { TranslateConfig, TranslatorModule } from "angular2-translator";
 
-export function factoryTranslateConfig() {
-  return new TranslateConfig({});
-};
+import { AppComponent } from './app.component';
+
+export function translateConfigFactory() {
+    return new TranslateConfig({
+        defaultLang: "de",
+        providedLangs: [ "de", "en" ],
+        detectLanguageOnStart: false
+    });
+}
 
 @NgModule({
-    imports: [ TranslatorModule ],
-    providers: [
-      { provide: TranslateConfig, useFactory: factoryTranslateConfig }
-    ]
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    TranslatorModule,
+  ],
+  providers: [
+    { provide: TranslateConfig, useFactory: translateConfigFactory},
+  ],
+  bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }
 ```
 
 ### Using SystemJs
@@ -125,7 +143,7 @@ System.config({
 });
 ```
  
-Or you load the file directly:
+Or load the file directly:
 
 ```html
 <script type="text/javascript" src="node_modules/angular2-translator/bundles/angular2-translator.js"></script>

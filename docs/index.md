@@ -24,9 +24,9 @@ It supports interpolation so you can:
 - calculate in your translations  
   `"ANSWER":"The answer is {{7*6}}"`
 - pluralize in your translations  
-  `"MESSAGES":"You have {{count}} new message{{count != 1 ? 's' : ''}}`
+  `"MESSAGES":"You have {{count}} new message{{count != 1 ? 's' : ''}}"`
 - execute functions in your translations  
-  `"LAST_LOGIN":"Your last login was on {{lastLogin.format('MM/DD/YYYY')}}`
+  `"LAST_LOGIN":"Your last login was on {{lastLogin.format('MM/DD/YYYY')}}"`
 {% endraw %}
   
 ### Refer to other translations
@@ -75,13 +75,62 @@ export class AppComponent {
 ## How to install
 
 ### Via npm
+
 First you need to install the package. The easiest way is to install it via npm:
 
 ```bash
 npm install --save angular2-translator
 ```
 
-Then you need to tell systemjs where to load angular2-translator:
+### Manually
+
+You also can clone the repository and symlink the project folder or what ever:
+
+```bash
+git clone https://github.com/tflori/angular2-translator.git
+ln -s angular2-translator MyApp/libs/angular2-translator
+```
+
+> You should know what you do and don't follow this guide for installation.
+
+## How to use
+
+You have to set up your `NgModule` to import the `TranslatorModule` and may be configure it:
+
+```ts
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { TranslateConfig, TranslatorModule } from "angular2-translator";
+
+import { AppComponent } from './app.component';
+
+export function translateConfigFactory() {
+    return new TranslateConfig({
+        defaultLang: "de",
+        providedLangs: [ "de", "en" ],
+        detectLanguageOnStart: false
+    });
+}
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    TranslatorModule,
+  ],
+  providers: [
+    { provide: TranslateConfig, useFactory: translateConfigFactory},
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+### Using SystemJs
+
+When you are using SystemJs you need to configure where to load angular2-translator:
 
 ```js
 System.config({
@@ -91,38 +140,12 @@ System.config({
 });
 ```
  
-Or you load the file directly:
+Or load the file directly:
 
 ```html
 <script type="text/javascript" src="node_modules/angular2-translator/bundles/angular2-translator.js"></script>
 ```
 
-Now you have to set up your NgModule to use the `TranslatorModule` and may be configure it:
-
-```ts
-import {TranslateConfig, TranslatorModule} from "angular2-translator";
-
-@NgModule({
-    imports: [ TranslatorModule ],
-    providers: [
-      { provide: TranslateConfig, useValue: new TranslateConfig({
-        defaultLang: "de",
-        providedLangs: [ "de", "en" ],
-      })},
-    ]
-})
-export class AppModule {}
-```
-
-### Manually
-You also can clone the repository and symlink the project folder or what ever:
-
-```bash
-git clone https://gitlab.w00tserver.org:617/tflori/angular2-translator
-ln -s angular2-translator MyApp/libs/angular2-translator
-```
-
-> You should know what you do and don't follow this guide for installation.
 
 ## The Classes
 
