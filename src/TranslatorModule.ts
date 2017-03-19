@@ -2,8 +2,8 @@ import {TranslateComponent}                             from "./TranslateCompone
 import {TranslateConfig}                                from "./TranslateConfig";
 import {TranslateLoader}                                from "./TranslateLoader";
 import {TranslateLoaderJson, TranslateLoaderJsonConfig} from "./TranslateLoaderJson";
-import {TranslatePipe}                                  from "./TranslatePipe";
 import {TranslateLogHandler}                            from "./TranslateLogHandler";
+import {TranslatePipe}                                  from "./TranslatePipe";
 import {TranslateService}                               from "./TranslateService";
 
 import {NgModule}                                       from "@angular/core";
