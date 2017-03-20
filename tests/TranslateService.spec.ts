@@ -1,14 +1,19 @@
 import {
     TranslateConfig,
     TranslateLoader,
+    TranslateLoaderJson,
     TranslateLogHandler,
     TranslateService,
     TranslatorModule,
 } from "../index";
 
+import {
+    TranslateLoaderMock,
+    TranslateLogHandlerMock,
+} from "./helper/TranslatorMocks";
+
 import {JasmineHelper}                  from "./helper/JasmineHelper";
 import {JasminePromise, PromiseMatcher} from "./helper/promise-matcher";
-import {TranslateLoaderMock}            from "./helper/TranslateLoaderMock";
 import {ReflectiveInjector}             from "@angular/core";
 import {TestBed, fakeAsync}             from "@angular/core/testing";
 import {Observable}                     from "rxjs/Observable";
@@ -22,45 +27,41 @@ describe("TranslateService", function () {
         it("requires a TranslateConfig", function () {
             let injector = ReflectiveInjector.resolveAndCreate([
                 TranslateService,
+                { provide: TranslateLogHandler, useClass: TranslateLogHandlerMock },
             ]);
 
             let action = function () {
-                injector.get(TranslateService);
+                try {
+                    injector.get(TranslateService);
+                } catch (e) {
+                    expect(e.message).toBe(
+                        "No provider for TranslateConfig! (TranslateService -> TranslateConfig)"
+                    );
+                    throw e;
+                }
             };
-
-            // let providerError = new NoProviderError(injector, ReflectiveKey.get(TranslateConfig));
-            // providerError.addKey(injector, ReflectiveKey.get(TranslateService));
-            expect(action).toThrow();
-        });
-
-        it("requires a TranslateLoader", function () {
-            let injector = ReflectiveInjector.resolveAndCreate([
-                TranslateService,
-                { provide: TranslateConfig, useValue: new TranslateConfig({}) },
-            ]);
-
-            let action = function () {
-                injector.get(TranslateService);
-            };
-
-            // let providerError = new NoProviderError(injector, ReflectiveKey.get(TranslateLoader));
-            // providerError.addKey(injector, ReflectiveKey.get(TranslateService));
             expect(action).toThrow();
         });
 
         it("requires an TranslateLogHandler", function() {
             let injector = ReflectiveInjector.resolveAndCreate([
                 TranslateService,
-                { provide: TranslateConfig, useValue: new TranslateConfig({}) },
-                { provide: TranslateLoader, useValue: new TranslateLoaderMock() },
+                TranslateLoaderMock,
+                { provide: TranslateConfig, useValue: new TranslateConfig({
+                    loader: TranslateLoaderMock,
+                }) },
             ]);
 
             let action = function () {
-                injector.get(TranslateService);
+                try {
+                    injector.get(TranslateService);
+                } catch (e) {
+                    expect(e.message).toBe(
+                        "No provider for TranslateLogHandler! (TranslateService -> TranslateLogHandler)"
+                    );
+                    throw e;
+                }
             };
-
-            // let providerError = new NoProviderError(injector, ReflectiveKey.get(TranslateLogHandler));
-            // providerError.addKey(injector, ReflectiveKey.get(TranslateService));
             expect(action).toThrow();
         });
 
@@ -142,7 +143,7 @@ describe("TranslateService", function () {
             });
 
             translate = TestBed.get(TranslateService);
-            loader    = TestBed.get(TranslateLoader);
+            loader    = TestBed.get(TranslateLoaderJson);
             translate.logHandler.error = (msg) => { console.error(msg); };
             PromiseMatcher.install();
         });
