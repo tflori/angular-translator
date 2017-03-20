@@ -12,13 +12,13 @@ import {TranslateLoaderMock}            from "./helper/TranslateLoaderMock";
 import {ReflectiveInjector}             from "@angular/core";
 import {fakeAsync, flushMicrotasks}     from "@angular/core/testing";
 
-describe("TranslatePipe", function() {
-    it("is defined", function () {
+describe("TranslatePipe", () => {
+    it("is defined", () => {
         expect(TranslatePipe).toBeDefined();
     });
 
-    describe("constructor", function() {
-        it("requires a TranslateService", function () {
+    describe("constructor", () => {
+        it("requires a TranslateService", () => {
             let injector = ReflectiveInjector.resolveAndCreate([ TranslatePipe ]);
 
             let action = function () {
@@ -31,7 +31,7 @@ describe("TranslatePipe", function() {
         });
     });
 
-    describe("transform", function() {
+    describe("transform", () => {
         let translate: TranslateService;
         let translatePipe: TranslatePipe;
         let logHandler: TranslateLogHandler;
