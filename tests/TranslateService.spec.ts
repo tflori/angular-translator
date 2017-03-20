@@ -43,7 +43,7 @@ describe("TranslateService", function () {
             expect(action).toThrow();
         });
 
-        it("requires an TranslateLogHandler", function() {
+        it("requires an TranslateLogHandler", () => {
             let injector = ReflectiveInjector.resolveAndCreate([
                 TranslateService,
                 TranslateLoaderMock,
@@ -86,7 +86,7 @@ describe("TranslateService", function () {
             expect(translate.lang).toBe("en");
         });
 
-        it("detects language automatically on start", function() {
+        it("detects language automatically on start", () => {
             let translateConfig = new TranslateConfig({
                 providedLangs: [ "en", "de" ],
             });
@@ -104,7 +104,26 @@ describe("TranslateService", function () {
             expect(translate.lang).toBe("de");
         });
 
-        it("informs about detected language", function() {
+        it("does not detect language on start by configuration", () => {
+            let translateConfig = new TranslateConfig({
+                detectLanguageOnStart: false,
+                providedLangs: [ "en", "de" ],
+            });
+            translateConfig.navigatorLanguages = ["de-DE", "de", "en-US", "en"];
+
+            TestBed.configureTestingModule({
+                imports: [TranslatorModule],
+                providers: [
+                    { provide: TranslateConfig, useValue: translateConfig },
+                ],
+            });
+
+            let translate: TranslateService = TestBed.get(TranslateService);
+
+            expect(translate.lang).toBe("en");
+        });
+
+        it("informs about detected language", () => {
             let translateConfig = new TranslateConfig({
                 providedLangs: [ "en", "de" ],
             });
@@ -132,8 +151,9 @@ describe("TranslateService", function () {
         let loader: TranslateLoader;
 
         beforeEach(function () {
-            translateConfig.providedLangs = ["en"];
+            translateConfig.providedLangs = ["en", "de"];
             translateConfig.defaultLang = "en";
+            translateConfig.detectLanguageOnStart = false;
 
             TestBed.configureTestingModule({
                 imports: [TranslatorModule],
@@ -148,7 +168,7 @@ describe("TranslateService", function () {
             PromiseMatcher.install();
         });
 
-        afterEach(function() {
+        afterEach(() => {
             PromiseMatcher.uninstall();
         });
 
@@ -190,6 +210,15 @@ describe("TranslateService", function () {
 
                 expect(detectedLang).toBe("de-AT");
             });
+
+            it("stops when language got found", function() {
+                translateConfig.providedLangs = [ "de-DE", "en-US" ];
+                spyOn(translateConfig, "langProvided").and.callThrough();
+
+                translate.detectLang(["de", "en"]);
+
+                expect(translateConfig.langProvided).not.toHaveBeenCalledWith("en");
+            });
         });
 
         describe("change language", function () {
@@ -212,18 +241,18 @@ describe("TranslateService", function () {
             it("throws error if language is not provided", function () {
                 translateConfig.providedLangs = ["de/de"];
 
-                let action = function() {
+                let action = () => {
                     translate.lang = "de";
                 };
 
                 expect(action).toThrow(new Error("Language not provided"));
             });
 
-            it("has an observable", function() {
+            it("has an observable", () => {
                 expect(translate.languageChanged instanceof Observable).toBe(true);
             });
 
-            it("gives the next value to the observable", function() {
+            it("gives the next value to the observable", () => {
                 translateConfig.providedLangs = ["en", "de"];
                 let newLang: string;
                 translate.languageChanged.subscribe(function(nextLang) {
@@ -236,7 +265,7 @@ describe("TranslateService", function () {
                 expect(newLang).toBe("de");
             });
 
-            it("informs about language change", function() {
+            it("informs about language change", () => {
                 spyOn(translate.logHandler, "info");
                 translateConfig.providedLangs = [ "de/de" ];
 
@@ -250,7 +279,7 @@ describe("TranslateService", function () {
             let loaderPromiseResolve: Function;
             let loaderPromiseReject: Function;
 
-            beforeEach(function() {
+            beforeEach(() => {
                 spyOn(loader, "load").and.returnValue(new Promise<Object>((resolve, reject) => {
                     loaderPromiseResolve = resolve;
                     loaderPromiseReject = reject;
@@ -269,7 +298,7 @@ describe("TranslateService", function () {
                 expect(loader.load).toHaveBeenCalledWith("en");
             });
 
-            it("resolves when loader resolves", fakeAsync(function() {
+            it("resolves when loader resolves", fakeAsync(() => {
                 let promise = translate.waitForTranslation();
 
                 loaderPromiseResolve({ TEXT: "This is a text" });
@@ -278,7 +307,7 @@ describe("TranslateService", function () {
                 expect(promise).toBeResolved();
             }));
 
-            it("rejects when loader rejects", fakeAsync(function() {
+            it("rejects when loader rejects", fakeAsync(() => {
                 translate.logHandler.error = () => {};
                 let promise = translate.waitForTranslation();
 
@@ -288,14 +317,14 @@ describe("TranslateService", function () {
                 expect(promise).toBeRejected();
             }));
 
-            it("loads a language only once", function() {
+            it("loads a language only once", () => {
                 translate.waitForTranslation();
                 translate.waitForTranslation();
 
                 expect(JasmineHelper.calls(loader.load).count()).toBe(1);
             });
 
-            it("returns the already resolved promise", fakeAsync(function() {
+            it("returns the already resolved promise", fakeAsync(() => {
                 let firstPromise = translate.waitForTranslation();
                 loaderPromiseResolve({ TEXT: "This is a text" });
                 JasminePromise.flush();
@@ -306,7 +335,7 @@ describe("TranslateService", function () {
                 expect(secondPromise).toBe(firstPromise);
             }));
 
-            it("loads given language", function() {
+            it("loads given language", () => {
                 translateConfig.providedLangs = ["en", "de"];
 
                 translate.waitForTranslation("de");
@@ -314,7 +343,7 @@ describe("TranslateService", function () {
                 expect(loader.load).toHaveBeenCalledWith("de");
             });
 
-            it("checks if the language is provided", function() {
+            it("checks if the language is provided", () => {
                 spyOn(translateConfig, "langProvided");
 
                 translate.waitForTranslation("de");
@@ -322,13 +351,13 @@ describe("TranslateService", function () {
                 expect(translateConfig.langProvided).toHaveBeenCalledWith("de", true);
             });
 
-            it("rejects if the language is not provided", function() {
-                let promise = translate.waitForTranslation("de");
+            it("rejects if the language is not provided", () => {
+                let promise = translate.waitForTranslation("ru");
 
-                expect(promise).toBeRejectedWith("Language not provided");
+                expect(promise).toBeRejectedWith("Language ru not provided");
             });
 
-            it("informs about loaded language", fakeAsync(function() {
+            it("informs about loaded language", fakeAsync(() => {
                 spyOn(translate.logHandler, "info");
 
                 translate.waitForTranslation();
@@ -338,7 +367,7 @@ describe("TranslateService", function () {
                 expect(translate.logHandler.info).toHaveBeenCalledWith("Language en got loaded");
             }));
 
-            it("shows error when language could not be loaded", fakeAsync(function() {
+            it("shows error when language could not be loaded", fakeAsync(() => {
                 spyOn(translate.logHandler, "error").and.callFake(() => {});
 
                 translate.waitForTranslation();
@@ -350,24 +379,24 @@ describe("TranslateService", function () {
             }));
         });
 
-        describe("translate", function() {
+        describe("translate", () => {
             let loaderPromiseResolve: Function;
             let loaderPromiseReject: Function;
 
-            beforeEach(function() {
+            beforeEach(() => {
                 spyOn(loader, "load").and.returnValue(new Promise<Object>((resolve, reject) => {
                     loaderPromiseResolve = resolve;
                     loaderPromiseReject = reject;
                 }));
             });
 
-            it("loads the current language", function() {
+            it("loads the current language", () => {
                 translate.translate("TEXT");
 
                 expect(loader.load).toHaveBeenCalledWith("en");
             });
 
-            it("loads the given language", function() {
+            it("loads the given language", () => {
                 translateConfig.providedLangs = ["en", "de"];
 
                 translate.translate("TEXT", {}, "de");
@@ -375,7 +404,7 @@ describe("TranslateService", function () {
                 expect(loader.load).toHaveBeenCalledWith("de");
             });
 
-            it("checks if the language is provided", function() {
+            it("checks if the language is provided", () => {
                 spyOn(translateConfig, "langProvided");
 
                 translate.translate("TEXT", {}, "de");
@@ -384,7 +413,7 @@ describe("TranslateService", function () {
             });
 
             // current language got checked before
-            it("does not check current language", function() {
+            it("does not check current language", () => {
                 spyOn(translateConfig, "langProvided");
 
                 translate.translate("TEXT");
@@ -392,20 +421,20 @@ describe("TranslateService", function () {
                 expect(translateConfig.langProvided).not.toHaveBeenCalled();
             });
 
-            it("loads a language only once", function() {
+            it("loads a language only once", () => {
                 translate.translate("TEXT");
                 translate.translate("OTHER_TEXT");
 
                 expect(JasmineHelper.calls(loader.load).count()).toBe(1);
             });
 
-            it("resolves keys if language is not provided", function() {
-                let promise = translate.translate("TEXT", {}, "de");
+            it("resolves keys if language is not provided", () => {
+                let promise = translate.translate("TEXT", {}, "ru");
 
                 expect(promise).toBeResolvedWith("TEXT");
             });
 
-            it("resolves keys if laguage could not be loaded", fakeAsync(function() {
+            it("resolves keys if laguage could not be loaded", fakeAsync(() => {
                 translate.logHandler.error = () => {};
                 let promise                = translate.translate(["TEXT", "OTHER_TEXT"]);
 
@@ -415,7 +444,7 @@ describe("TranslateService", function () {
                 expect(promise).toBeResolvedWith(["TEXT", "OTHER_TEXT"]);
             }));
 
-            it("uses instant to translate after loader resolves", fakeAsync(function() {
+            it("uses instant to translate after loader resolves", fakeAsync(() => {
                 spyOn(translate, "instant");
                 translate.translate("TEXT");
 
@@ -425,7 +454,7 @@ describe("TranslateService", function () {
                 expect(translate.instant).toHaveBeenCalledWith("TEXT", {}, translate.lang);
             }));
 
-            it("resolves with the return value from instant", fakeAsync(function() {
+            it("resolves with the return value from instant", fakeAsync(() => {
                 spyOn(translate, "instant").and.returnValue("This is a text");
                 let promise = translate.translate("TEXT");
 
@@ -435,32 +464,50 @@ describe("TranslateService", function () {
             }));
         });
 
-        describe("instant", function() {
+        describe("instant", () => {
             // noinspection JSUnusedLocalSymbols
             let loaderPromiseResolve: Function = (t: Object) => {};
 
-            beforeEach(fakeAsync(function() {
-                spyOn(loader, "load").and.returnValue(new Promise<Object>((resolve) => {
-                    loaderPromiseResolve = resolve;
-                }));
+            beforeEach(fakeAsync(() => {
+                spyOn(loader, "load").and.callFake(() => {
+                    return new Promise<Object>((resolve) => {
+                        loaderPromiseResolve = resolve;
+                    });
+                });
             }));
 
-            it("returns keys if language is not loaded", function() {
-                let translation = translate.instant("TEXT", {}, "de");
+            it("returns keys if language is not provided", () => {
+                spyOn(translate.logHandler, "error");
+
+                let translation = translate.instant("TEXT", {}, "ru");
 
                 expect(translation).toBe("TEXT");
+                expect(translate.logHandler.error).toHaveBeenCalledWith("Language ru not provided");
             });
 
-            it("returns keys if translation not found", function() {
+            it("returns keys if translation not found", fakeAsync(() => {
                 translate.waitForTranslation();
                 loaderPromiseResolve({});
+                JasminePromise.flush();
 
                 let translations = translate.instant(["SOME_TEXT", "OTHER_TEXT"]);
 
                 expect(translations).toEqual(["SOME_TEXT", "OTHER_TEXT"]);
-            });
+            }));
 
-            it("returns interpolated text", fakeAsync(function() {
+            it("translates in different language", fakeAsync(() => {
+                translate.waitForTranslation("de");
+                loaderPromiseResolve({
+                    HELLO_WORLD: "Hallo Welt!",
+                });
+                JasminePromise.flush();
+
+                let translations = translate.instant("HELLO_WORLD", {}, "de");
+
+                expect(translations).toEqual("Hallo Welt!");
+            }));
+
+            it("returns interpolated text", fakeAsync(() => {
                 translate.waitForTranslation();
                 loaderPromiseResolve({
                     INTERPOLATION: "The sum from 1+2 is {{1+2}}",
@@ -488,7 +535,7 @@ describe("TranslateService", function () {
                 ]);
             }));
 
-            it("catches parse errors in translations", fakeAsync(function() {
+            it("catches parse errors in translations", fakeAsync(() => {
                 translate.waitForTranslation();
                 loaderPromiseResolve({
                     BROKEN: 'This "{{notExisting.func()}}" is empty string',
@@ -501,7 +548,7 @@ describe("TranslateService", function () {
                 expect(translation).toBe('This "" is empty string');
             }));
 
-            it("does not throw if variable is not existent", fakeAsync(function() {
+            it("does not throw if variable is not existent", fakeAsync(() => {
                 translate.waitForTranslation();
                 loaderPromiseResolve({
                     PROP: "{{another.one}}",
@@ -515,8 +562,8 @@ describe("TranslateService", function () {
                 expect(translate.logHandler.error).not.toHaveBeenCalled();
             }));
 
-            describe("referenced translations", function() {
-                it("removes valid translation references", fakeAsync(function() {
+            describe("referenced translations", () => {
+                it("removes valid translation references", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         WELCOME: "Welcome [[]]!",
@@ -529,7 +576,7 @@ describe("TranslateService", function () {
                     expect(translation).toBe("Welcome !");
                 }));
 
-                it("logs an error if reference has no key", fakeAsync(function() {
+                it("logs an error if reference has no key", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         HELLO: "Hello [[:]]!",
@@ -555,7 +602,7 @@ describe("TranslateService", function () {
                     );
                 }));
 
-                it("reads the key after opening brackets", fakeAsync(function() {
+                it("reads the key after opening brackets", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         WELCOME: "Welcome [[A]]!",
@@ -571,7 +618,7 @@ describe("TranslateService", function () {
                     );
                 }));
 
-                it("ignores spaces before key", fakeAsync(function() {
+                it("ignores spaces before key", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         WELCOME: "Welcome [[ \t\n]]!",
@@ -587,7 +634,7 @@ describe("TranslateService", function () {
                     );
                 }));
 
-                it("allows dots in key", fakeAsync(function() {
+                it("allows dots in key", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         HELLO: "Hello [[ app.WORLD ]]!",
@@ -601,7 +648,7 @@ describe("TranslateService", function () {
                     expect(translation).toBe("Hello World!");
                 }));
 
-                it("key is finish after space character", fakeAsync(function() {
+                it("key is finish after space character", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         WELCOME: "Welcome [[ A B ]]!",
@@ -617,7 +664,23 @@ describe("TranslateService", function () {
                     );
                 }));
 
-                it("key can have more than one character", fakeAsync(function() {
+                it("ignores other spaces before colon", fakeAsync(() => {
+                    translate.waitForTranslation();
+                    loaderPromiseResolve({
+                        WELCOME: "Welcome [[ A  B ]]!",
+                    });
+                    JasminePromise.flush();
+                    spyOn(translate.logHandler, "error").and.callFake(() => {});
+
+                    let translation = translate.instant("WELCOME");
+
+                    expect(translation).toBe("Welcome !");
+                    expect(translate.logHandler.error).toHaveBeenCalledWith(
+                        "Parse error unexpected character at pos 7 expected colon or end in '[[ A  B ]]'"
+                    );
+                }));
+
+                it("key can have more than one character", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         WELCOME: "Welcome [[ ABC ]]!",
@@ -630,7 +693,7 @@ describe("TranslateService", function () {
                     expect(translation).toBe("Welcome ABC!");
                 }));
 
-                it("expects a parameter after colon", fakeAsync(function() {
+                it("expects a parameter after colon", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         A: "[[ T :. ]]",
@@ -646,7 +709,7 @@ describe("TranslateService", function () {
                     );
                 }));
 
-                it("ignores spaces after colon", fakeAsync(function() {
+                it("ignores spaces after colon", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         A: "[[ T : ]]",
@@ -662,7 +725,7 @@ describe("TranslateService", function () {
                     );
                 }));
 
-                it("key can not have comma, equal sign, or colon", fakeAsync(function() {
+                it("key can not have comma, equal sign, or colon", fakeAsync(() => {
                     // for key is allowed [A-Za-z0-9_.-] not [,=:]
                     translate.waitForTranslation();
                     loaderPromiseResolve({
@@ -696,7 +759,7 @@ describe("TranslateService", function () {
                     );
                 }));
 
-                it("waits for parameters after colon", fakeAsync(function() {
+                it("waits for parameters after colon", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         A: "[[ T : ]]!",
@@ -711,7 +774,7 @@ describe("TranslateService", function () {
                     );
                 }));
 
-                it("reads the parameter key passes this parameter to referenced translation", fakeAsync(function() {
+                it("reads the parameter key passes this parameter to referenced translation", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         A: "[[ T : a]]",
@@ -724,7 +787,7 @@ describe("TranslateService", function () {
                     expect(translation).toBe("Hello world!");
                 }));
 
-                it("transports only variables defined to subtranslations", fakeAsync(function() {
+                it("transports only variables defined to subtranslations", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         CALL: "You don\'t know {{privateVar}} but [[HACK:givenVar]]",
@@ -741,7 +804,7 @@ describe("TranslateService", function () {
                     expect(translation).toBe("You don\'t know private but given");
                 }));
 
-                it("throws an error for illegal parameter characters", fakeAsync(function() {
+                it("throws an error for illegal parameter characters", fakeAsync(() => {
                     // for parameter is allowed [A-Za-z0-9_] not [.,=:-]
                     let translations = {
                         A: "[[ T : a.]]",
@@ -783,7 +846,7 @@ describe("TranslateService", function () {
                     }
                 }));
 
-                it("stops param reading after space", fakeAsync(function() {
+                it("stops param reading after space", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         A: "[[ T : foo bar ]]!",
@@ -799,7 +862,7 @@ describe("TranslateService", function () {
                     );
                 }));
 
-                it("expects comma after reading param key", fakeAsync(function() {
+                it("expects comma after reading param key", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         A: "[[ T : a , ]]",
@@ -815,7 +878,7 @@ describe("TranslateService", function () {
                     );
                 }));
 
-                it("waits for a getter after equal sign", fakeAsync(function() {
+                it("waits for a getter after equal sign", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         A: "[[ T : foo =]]!",
@@ -831,7 +894,7 @@ describe("TranslateService", function () {
                     );
                 }));
 
-                it("transports variables under different names", fakeAsync(function() {
+                it("transports variables under different names", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         GREETING:   "Hello [[SALUTATION:name=u]]!",
@@ -852,7 +915,7 @@ describe("TranslateService", function () {
                     expect(translation).toBe("Hello Dr. Jane Doe!");
                 }));
 
-                it("throws error if getter begins with illegal character", fakeAsync(function() {
+                it("throws error if getter begins with illegal character", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         A: "[[ T : foo ==]]",
@@ -868,7 +931,7 @@ describe("TranslateService", function () {
                     );
                 }));
 
-                it("ignores space in front of getter", fakeAsync(function() {
+                it("ignores space in front of getter", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         A: "[[ T : foo = ]]",
@@ -884,7 +947,7 @@ describe("TranslateService", function () {
                     );
                 }));
 
-                it("continues reading getter", fakeAsync(function() {
+                it("continues reading getter", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         A: "[[ T : foo = ab]]",
@@ -897,7 +960,7 @@ describe("TranslateService", function () {
                     expect(translation).toBe("Hello world!");
                 }));
 
-                it("throws error if getter contains illegal character", fakeAsync(function() {
+                it("throws error if getter contains illegal character", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         A: "[[ T : foo = a=]]",
@@ -913,7 +976,7 @@ describe("TranslateService", function () {
                     );
                 }));
 
-                it("stops reading getter after space", fakeAsync(function() {
+                it("stops reading getter after space", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         A: "[[ T : foo = a a]]",
@@ -929,7 +992,7 @@ describe("TranslateService", function () {
                     );
                 }));
 
-                it("waits for next parameter after comma", fakeAsync(function() {
+                it("waits for next parameter after comma", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         A: "[[ T : foo = a ,]]",
@@ -955,7 +1018,7 @@ describe("TranslateService", function () {
                     );
                 }));
 
-                it("ignores spaces after reading getter", fakeAsync(function() {
+                it("ignores spaces after reading getter", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         A: "[[ T : foo = ab  ]]",
@@ -968,7 +1031,7 @@ describe("TranslateService", function () {
                     expect(translation).toBe("Hello world!");
                 }));
 
-                it("transports multiple parameters", fakeAsync(function() {
+                it("transports multiple parameters", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         A: "[[ T : h,a  ]]",
@@ -991,7 +1054,7 @@ describe("TranslateService", function () {
                     expect(translations[3]).toBe("Hello D!");
                 }));
 
-                it("gets deep objects", fakeAsync(function() {
+                it("gets deep objects", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         NEW_COMMENT: "New comment from [[ SALUTATION : name = comment.author ]].",
@@ -1014,7 +1077,7 @@ describe("TranslateService", function () {
                     expect(translation).toBe("New comment from Mr. John Doe.");
                 }));
 
-                it("provides the object under getter for params", fakeAsync(function() {
+                it("provides the object under getter for params", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         NEW_COMMENT: "New comment from [[ SALUTATION : = comment.author ]].",
@@ -1038,7 +1101,7 @@ describe("TranslateService", function () {
                     expect(translation).toBe("New comment from Mrs. Jane Doe.");
                 }));
 
-                it("accepts only objects for params", fakeAsync(function() {
+                it("accepts only objects for params", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         A: "[[ T : = a ]]",
@@ -1056,7 +1119,7 @@ describe("TranslateService", function () {
                     expect(translation).toBe("Hello !");
                 }));
 
-                it("accepts only first parameter without key", fakeAsync(function() {
+                it("accepts only first parameter without key", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         A: "[[ T : b , = a ]]",
@@ -1077,7 +1140,7 @@ describe("TranslateService", function () {
                     expect(translation).toBe("");
                 }));
 
-                it("second parameter got added to the object", fakeAsync(function() {
+                it("second parameter got added to the object", fakeAsync(() => {
                     translate.waitForTranslation();
                     loaderPromiseResolve({
                         REFERENCE: "{{hello}} {{person}}!",
@@ -1094,7 +1157,7 @@ describe("TranslateService", function () {
                 }));
             });
 
-            it("informs about missing translation", function() {
+            it("informs about missing translation", () => {
                 spyOn(translate.logHandler, "info");
 
                 translate.instant("UNDEFINED");
@@ -1103,7 +1166,7 @@ describe("TranslateService", function () {
                     .toHaveBeenCalledWith("Translation for \'UNDEFINED\' in language en not found");
             });
 
-            it("shows error when parsing throws error", fakeAsync(function() {
+            it("shows error when parsing throws error", fakeAsync(() => {
                 translate.waitForTranslation();
                 loaderPromiseResolve({
                     BROKEN: 'This "{{throw}}" is empty string',
@@ -1118,7 +1181,7 @@ describe("TranslateService", function () {
 
             }));
 
-            it("can not get __context as parameter", fakeAsync(function() {
+            it("can not get __context as parameter", fakeAsync(() => {
                 translate.waitForTranslation();
                 loaderPromiseResolve({
                     INTERPOLATION: "The sum from 1+2 is {{1+2}}",
@@ -1131,7 +1194,7 @@ describe("TranslateService", function () {
                 expect(translate.logHandler.error).toHaveBeenCalledWith("Parameter \'__context\' is not allowed.");
             }));
 
-            it("can not get numeric keys in parameter", fakeAsync(function() {
+            it("can not get numeric keys in parameter", fakeAsync(() => {
                 translate.waitForTranslation();
                 loaderPromiseResolve({
                     INTERPOLATION: "The sum from 1+2 is {{1+2}}",
@@ -1146,7 +1209,23 @@ describe("TranslateService", function () {
                 expect(translate.logHandler.error).toHaveBeenCalledWith("Parameter \'42\' is not allowed.");
             }));
 
-            it("continues with other parameters after __context", fakeAsync(function() {
+            it("ignores prototyped properties in parameters", fakeAsync(() => {
+                translate.waitForTranslation();
+
+                loaderPromiseResolve({
+                    INTERPOLATION: "{{something}}",
+                });
+                JasminePromise.flush();
+
+                let MyObject = function MyOption(): void {};
+                MyObject.prototype.something = 42;
+
+                let result = translate.instant("INTERPOLATION", new MyObject());
+
+                expect(result).toBe("");
+            }));
+
+            it("continues with other parameters after __context", fakeAsync(() => {
                 translate.waitForTranslation();
                 loaderPromiseResolve({
                     VARIABLES_TEST: "This {{count > 5 ? 'is interesting' : 'is boring'}}",
@@ -1159,7 +1238,7 @@ describe("TranslateService", function () {
                 expect(translation).toBe("This is interesting");
             }));
 
-            it("continues with other parameters after numeric", fakeAsync(function() {
+            it("continues with other parameters after numeric", fakeAsync(() => {
                 translate.waitForTranslation();
                 loaderPromiseResolve({
                     VARIABLES_TEST: "This {{count > 5 ? 'is interesting' : 'is boring'}}",
@@ -1172,7 +1251,7 @@ describe("TranslateService", function () {
                 expect(translation).toBe("This is interesting");
             }));
 
-            it("ignores array as parameters", fakeAsync(function() {
+            it("ignores array as parameters", fakeAsync(() => {
                 translate.waitForTranslation();
                 loaderPromiseResolve({
                     INTERPOLATION: "The sum from 1+2 is {{1+2}}",
