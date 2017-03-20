@@ -104,7 +104,7 @@ export class TranslateService {
     public waitForTranslation(lang: string = this._lang): Promise<void> {
         let l = this.config.langProvided(lang, true);
         if (!l) {
-            return Promise.reject("Language not provided");
+            return Promise.reject("Language " + lang + " not provided");
         } else {
             lang = String(l);
         }
@@ -160,6 +160,9 @@ export class TranslateService {
             let l = this.config.langProvided(lang, true);
             if (l) {
                 lang = String(l);
+            } else {
+                this.logHandler.error("Language " + lang + " not provided");
+                return keys;
             }
         }
 
@@ -259,16 +262,14 @@ export class TranslateService {
      * @returns {string}
      * @private
      */
-    private _referencedError(sub: string, unexpected: string, expected?: string, pos?: number): string {
+    private _referencedError(sub: string, unexpected: string, expected: string, pos?: number): string {
         let msg = "Parse error unexpected " + unexpected;
 
         if (pos !== undefined) {
             msg += " at pos " + (pos + 3);
         }
 
-        if (expected) {
-            msg += " expected " + expected;
-        }
+        msg += " expected " + expected;
 
         this.logHandler.error(msg + " in '" + sub + "'");
         return "";

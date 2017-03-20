@@ -1,6 +1,5 @@
 import {TranslateComponent}                             from "./TranslateComponent";
 import {TranslateConfig}                                from "./TranslateConfig";
-import {TranslateLoader}                                from "./TranslateLoader";
 import {TranslateLoaderJson} from "./TranslateLoaderJson";
 import {TranslateLogHandler}                            from "./TranslateLogHandler";
 import {TranslatePipe}                                  from "./TranslatePipe";
@@ -21,16 +20,9 @@ import {HttpModule}                                     from "@angular/http";
     imports: [HttpModule],
     providers: [
         { provide: TranslateConfig, useValue: new TranslateConfig({}) },
-        { provide: TranslateLoaderJson, useClass: TranslateLoaderJson },
-        { provide: TranslateLogHandler, useClass: TranslateLogHandler },
+        TranslateLoaderJson,
+        TranslateLogHandler,
         TranslateService,
     ],
 })
 export class TranslatorModule {}
-
-export const TRANSLATE_PROVIDERS: any[] = [
-    { provide: TranslateConfig, useValue: new TranslateConfig({}) },
-    { provide: TranslateLoader, useClass: TranslateLoaderJson },
-    { provide: TranslateLogHandler, useValue: TranslateLogHandler },
-    TranslateService,
-];

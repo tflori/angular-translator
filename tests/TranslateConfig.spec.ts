@@ -1,7 +1,7 @@
 import {TranslateConfig} from "../index";
 
-describe("TranslateConfig", function() {
-    it("is defined", function() {
+describe("TranslateConfig", () => {
+    it("is defined", () => {
         let translateConfig = new TranslateConfig({});
 
         expect(TranslateConfig).toBeDefined();
@@ -9,7 +9,7 @@ describe("TranslateConfig", function() {
         expect(translateConfig instanceof TranslateConfig).toBeTruthy();
     });
 
-    it("gets default language from parameter defaultLang", function() {
+    it("gets default language from parameter defaultLang", () => {
         let translateConfig = new TranslateConfig({
             defaultLang: "cn",
             providedLangs: [ "en", "cn" ],
@@ -18,19 +18,19 @@ describe("TranslateConfig", function() {
         expect(translateConfig.defaultLang).toBe("cn");
     });
 
-    it("defines a list of provided languages", function() {
+    it("defines a list of provided languages", () => {
         let translateConfig = new TranslateConfig({});
 
         expect(translateConfig.providedLangs).toEqual(["en"]);
     });
 
-    it("gets provided languages from parameter providedLangs", function() {
+    it("gets provided languages from parameter providedLangs", () => {
         let translateConfig = new TranslateConfig({ providedLangs: [ "cn" ] });
 
         expect(translateConfig.providedLangs).toEqual([ "cn" ]);
     });
 
-    it("uses first provided language", function() {
+    it("uses first provided language", () => {
         let translateConfig = new TranslateConfig({
             defaultLang: "en", // default - unnecessary
             providedLangs: [ "cn" ],
@@ -39,14 +39,14 @@ describe("TranslateConfig", function() {
         expect(translateConfig.defaultLang).toBe("cn");
     });
 
-    describe("navigatorLanguages", function() {
-        it("is always an array", function() {
+    describe("navigatorLanguages", () => {
+        it("is always an array", () => {
             let translateConfig = new TranslateConfig({});
 
             expect(translateConfig.navigatorLanguages instanceof Array).toBe(true);
         });
 
-        it("uses navigator.languages when given", function() {
+        it("uses navigator.languages when given", () => {
             TranslateConfig.navigator = { languages: [ "bm", "de", "fr", "en" ] };
 
             let translateConfig = new TranslateConfig({});
@@ -54,7 +54,7 @@ describe("TranslateConfig", function() {
             expect(translateConfig.navigatorLanguages).toEqual([ "bm", "de", "fr", "en" ]);
         });
 
-        it("transforms navigator.languages to Array if it is String", function() {
+        it("transforms navigator.languages to Array if it is String", () => {
             TranslateConfig.navigator = { languages: "bm" };
 
             let translateConfig = new TranslateConfig({});
@@ -62,7 +62,7 @@ describe("TranslateConfig", function() {
             expect(translateConfig.navigatorLanguages).toEqual([ "bm" ]);
         });
 
-        it("falls back to navigator.language", function() {
+        it("falls back to navigator.language", () => {
             TranslateConfig.navigator = {language: "fr"};
 
             let translateConfig = new TranslateConfig({});
@@ -71,14 +71,14 @@ describe("TranslateConfig", function() {
         });
     });
 
-    describe("langProvided", function() {
+    describe("langProvided", () => {
         let translateConfig: TranslateConfig;
 
-        beforeEach(function() {
+        beforeEach(() => {
             translateConfig = new TranslateConfig({});
         });
 
-        it("returns the language if provided", function() {
+        it("returns the language if provided", () => {
             translateConfig.providedLangs = ["bm", "en"];
 
             let providedLang = translateConfig.langProvided("bm");
@@ -86,7 +86,7 @@ describe("TranslateConfig", function() {
             expect(providedLang).toBe("bm");
         });
 
-        it("returns false when it is not provided", function() {
+        it("returns false when it is not provided", () => {
             translateConfig.providedLangs = ["en"];
 
             let providedLang = translateConfig.langProvided("bm");
@@ -94,7 +94,7 @@ describe("TranslateConfig", function() {
             expect(providedLang).toBeFalsy();
         });
 
-        it("returns provided language when we search with country", function() {
+        it("returns provided language when we search with country", () => {
             translateConfig.providedLangs = ["en"];
 
             let providedLang = translateConfig.langProvided("en-US");
@@ -102,7 +102,7 @@ describe("TranslateConfig", function() {
             expect(providedLang).toBe("en");
         });
 
-        it("returns the first provided country specific language", function() {
+        it("returns the first provided country specific language", () => {
             translateConfig.providedLangs = ["de-DE", "de-AT"];
 
             let providedLang = translateConfig.langProvided("de-CH");
@@ -110,7 +110,7 @@ describe("TranslateConfig", function() {
             expect(providedLang).toBe("de-DE");
         });
 
-        it("normalizes provided languages for checks", function() {
+        it("normalizes provided languages for checks", () => {
             translateConfig.providedLangs = [ "DE", "DE_AT" ];
 
             let providedLang = translateConfig.langProvided("de-AT");
@@ -118,7 +118,7 @@ describe("TranslateConfig", function() {
             expect(providedLang).toBe("DE_AT");
         });
 
-        it("normalizes searched language", function() {
+        it("normalizes searched language", () => {
             translateConfig.providedLangs = [ "de-DE", "de-AT" ];
 
             let providedLang = translateConfig.langProvided("DE/de");
@@ -126,7 +126,7 @@ describe("TranslateConfig", function() {
             expect(providedLang).toBe("de-DE");
         });
 
-        it("only finds direct matches", function() {
+        it("only finds direct matches", () => {
             translateConfig.providedLangs = ["de-DE"];
 
             let providedLang = translateConfig.langProvided("de", true);
@@ -134,7 +134,7 @@ describe("TranslateConfig", function() {
             expect(providedLang).toBeFalsy();
         });
 
-        it("only takes valid matches", function() {
+        it("only takes valid matches", () => {
             translateConfig.providedLangs = [ "br", "en" ];
 
             let providedLang = translateConfig.langProvided("british");

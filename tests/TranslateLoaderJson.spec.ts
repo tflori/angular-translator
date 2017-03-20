@@ -64,6 +64,21 @@ describe("TranslateLoaderJson", function () {
             expect(request.method).toBe(RequestMethod.Get);
         });
 
+        it("can be configured", () => {
+            spyOn(backend, "createConnection").and.callThrough();
+
+            loader.configure({
+                extension: "-lang.json",
+                path: "app/translations",
+            });
+            loader.load("en");
+
+            expect(backend.createConnection).toHaveBeenCalled();
+            let request = JasmineHelper.calls(backend.createConnection).mostRecent().args[0];
+            expect(request.url).toBe("app/translations/en-lang.json");
+            expect(request.method).toBe(RequestMethod.Get);
+        });
+
         it("resolves when connection responds", function () {
             let promise = loader.load("en");
 
