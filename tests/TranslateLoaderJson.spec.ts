@@ -1,5 +1,6 @@
 import {
     TranslateLoaderJson,
+    TranslateLoaderJsonConfig,
 } from "../index";
 
 import {JasmineHelper}               from "./helper/JasmineHelper";
@@ -14,9 +15,48 @@ import {
 }                                    from "@angular/http";
 import {MockBackend, MockConnection} from "@angular/http/testing";
 
+describe("TranslateLoaderJsonConfig", function () {
+    it("is defined", function () {
+        let config = new TranslateLoaderJsonConfig();
+
+        expect(TranslateLoaderJsonConfig).toBeDefined();
+        expect(config).toBeDefined();
+        expect(config instanceof TranslateLoaderJsonConfig).toBeTruthy();
+    });
+
+    it("defines default path and extension", function () {
+        let config = new TranslateLoaderJsonConfig();
+
+        expect(config.path).toBe("assets/i18n/");
+        expect(config.extension).toBe(".json");
+    });
+
+    it("overrides defaults by constructor", function () {
+        let config = new TranslateLoaderJsonConfig("localization", "-lang.json");
+
+        expect(config.path).toBe("localization/");
+        expect(config.extension).toBe("-lang.json");
+    });
+});
+
 describe("TranslateLoaderJson", function () {
     it("is defined", function () {
         expect(TranslateLoaderJson).toBeDefined();
+    });
+
+    describe("constructor", function () {
+        it("requires a TranslateLoaderJsonConfig", function () {
+            TestBed.configureTestingModule({
+                imports: [HttpModule],
+                providers: [TranslateLoaderJson],
+            });
+
+            let action = function () {
+                TestBed.get(TranslateLoaderJson);
+            };
+
+            expect(action).toThrow(new Error("No provider for TranslateLoaderJsonConfig!"));
+        });
     });
 
     describe("load", function () {
@@ -29,6 +69,7 @@ describe("TranslateLoaderJson", function () {
                 imports: [HttpModule],
                 providers: [
                     {provide: XHRBackend, useClass: MockBackend},
+                    {provide: TranslateLoaderJsonConfig, useValue: new TranslateLoaderJsonConfig()},
                     TranslateLoaderJson,
                 ],
             });
@@ -61,21 +102,6 @@ describe("TranslateLoaderJson", function () {
             expect(backend.createConnection).toHaveBeenCalled();
             let request = JasmineHelper.calls(backend.createConnection).mostRecent().args[0];
             expect(request.url).toBe("assets/i18n/en.json");
-            expect(request.method).toBe(RequestMethod.Get);
-        });
-
-        it("can be configured", () => {
-            spyOn(backend, "createConnection").and.callThrough();
-
-            loader.configure({
-                extension: "-lang.json",
-                path: "app/translations",
-            });
-            loader.load("en");
-
-            expect(backend.createConnection).toHaveBeenCalled();
-            let request = JasmineHelper.calls(backend.createConnection).mostRecent().args[0];
-            expect(request.url).toBe("app/translations/en-lang.json");
             expect(request.method).toBe(RequestMethod.Get);
         });
 

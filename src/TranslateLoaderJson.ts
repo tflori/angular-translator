@@ -1,36 +1,38 @@
 import {TranslateLoader}    from "./TranslateLoader";
+import {Inject, Injectable} from "@angular/core";
+import {Http}               from "@angular/http";
 
-import {Injectable} from "@angular/core";
-import {Http}       from "@angular/http";
+export class TranslateLoaderJsonConfig {
+    public path: string = "assets/i18n/";
+    public extension: string = ".json";
+
+    // @todo maybe we will change it to a destructed parameter like we did for TranslateConfig
+    constructor(path?: string, extension?: string) {
+        if (path) {
+            this.path = path.replace(/\/+$/, "") + "/";
+        }
+
+        if (extension) {
+            this.extension = extension;
+        }
+    }
+}
 
 @Injectable()
 export class TranslateLoaderJson extends TranslateLoader {
-    private options: {
-        extension: string,
-        path: string
-    } = {
-        extension: ".json",
-        path: "assets/i18n",
-    };
+    private _http: Http;
+    private _config: TranslateLoaderJsonConfig;
 
-    constructor(private  http: Http) {
+    constructor(@Inject(Http) http: Http, @Inject(TranslateLoaderJsonConfig) config: TranslateLoaderJsonConfig) {
         super();
-    }
-
-    public configure(config: any): void {
-        if (typeof config.extension === "string") {
-            this.options.extension = config.extension;
-        }
-
-        if (typeof config.path === "string") {
-            this.options.path = config.path;
-        }
+        this._http = http;
+        this._config = config;
     }
 
     public load(lang: string): Promise<Object> {
         return new Promise((resolve, reject) => {
-            let file = this.options.path + "/" + lang + this.options.extension;
-            this.http.get(file)
+            let file = this._config.path + lang + this._config.extension;
+            this._http.get(file)
                 .subscribe(
                     (response) => {
                         if (response.status === 200) {

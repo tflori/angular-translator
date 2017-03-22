@@ -1,38 +1,23 @@
-import {TranslateLoader}     from "./TranslateLoader";
-import {TranslateLoaderJson} from "./TranslateLoaderJson";
-
-import {Type} from "@angular/core";
-
 export class TranslateConfig {
     public static navigator: any = window && window.navigator ? window.navigator : {};
 
     public defaultLang: string;
     public providedLangs: string[];
     public detectLanguageOnStart: boolean;
-    public loader: Type<TranslateLoader>;
-    public loaderConfig: Object;
-
     public navigatorLanguages: string[];
 
     constructor({
         defaultLang = "en",
         providedLangs = ["en"],
         detectLanguageOnStart = true,
-        loader = TranslateLoaderJson,
-        loaderConfig = {},
-    }: {
+        }: {
         defaultLang?: string,
-        providedLangs?: string[],
-        detectLanguageOnStart?: boolean,
-        loader?: Type<TranslateLoader>,
-        loaderConfig?: Object
+        providedLangs?: string[]
+        detectLanguageOnStart?: boolean
     }) {
-        this.defaultLang = providedLangs.indexOf(defaultLang) > -1 ? defaultLang : providedLangs[0];
+        this.defaultLang   = providedLangs.indexOf(defaultLang) > -1 ? defaultLang : providedLangs[0];
         this.providedLangs = providedLangs;
         this.detectLanguageOnStart = detectLanguageOnStart;
-        this.loader = loader;
-        this.loaderConfig = loaderConfig;
-
         this.navigatorLanguages = ((): string[] => {
             let navigator: any = TranslateConfig.navigator;
 
@@ -75,8 +60,8 @@ export class TranslateConfig {
             return languageString.replace(
                 regExp,
                 function (substring: string, language: string, country: string = "") {
-                    language = language.toLowerCase();
-                    country = country.toUpperCase();
+                    language    = language.toLowerCase();
+                    country     = country.toUpperCase();
                     return country ? language + "-" + country : language;
                 }
             );
@@ -94,7 +79,7 @@ export class TranslateConfig {
             provided = this.providedLangs[p];
         } else if (!strict) {
             lang = lang.substr(0, 2);
-            p = providedLangsNormalized.indexOf(lang);
+            p    = providedLangsNormalized.indexOf(lang);
             if (p > -1) {
                 provided = this.providedLangs[p];
             } else {
