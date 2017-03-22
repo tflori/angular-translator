@@ -1,7 +1,7 @@
 import {TranslateLoader} from "../index";
 
-describe("TranslateLoader", function() {
-    it("is defined", function() {
+describe("TranslateLoader", () => {
+    it("is defined", () => {
         expect(TranslateLoader).toBeDefined();
     });
 

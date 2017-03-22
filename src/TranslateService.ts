@@ -2,31 +2,30 @@ import {TranslateConfig}     from "./TranslateConfig";
 import {TranslateLoader}     from "./TranslateLoader";
 import {TranslateLogHandler} from "./TranslateLogHandler";
 
-import {Inject, Injectable} from "@angular/core";
-import {Observable}         from "rxjs/Observable";
-import {Observer}           from "rxjs/Observer";
+import {Injectable, Injector} from "@angular/core";
+import {Observable}           from "rxjs/Observable";
+import {Observer}             from "rxjs/Observer";
 
 import "rxjs/add/operator/share";
 
 @Injectable()
 export class TranslateService {
     public languageChanged: Observable<string>;
-    public logHandler: TranslateLogHandler;
 
-    private _config: TranslateConfig;
-    private _loader: TranslateLoader;
-
+    private loader: TranslateLoader;
     private _lang: string;
     private _loadedLangs: Object = {};
     private _translations: Object = {};
     private _languageChangedObserver: Observer<string>;
 
-    constructor(@Inject(TranslateConfig) config: TranslateConfig,
-                @Inject(TranslateLoader) loader: TranslateLoader,
-                @Inject(TranslateLogHandler) logHandler: TranslateLogHandler) {
-        this._config = config;
-        this._loader = loader;
+    constructor(public logHandler: TranslateLogHandler,
+                private config: TranslateConfig,
+                private injector: Injector) {
+        this.config = config;
         this.logHandler = logHandler;
+
+        this.loader = injector.get(config.loader);
+        this.loader.configure(config.loaderConfig);
 
         this._lang = config.defaultLang;
 
@@ -48,7 +47,7 @@ export class TranslateService {
     }
 
     set lang(lang: string) {
-        let providedLang = this._config.langProvided(lang, true);
+        let providedLang = this.config.langProvided(lang, true);
 
         if (typeof providedLang === "string") {
             this._lang = providedLang;
@@ -76,15 +75,17 @@ export class TranslateService {
         let detected: string|boolean = false;
         let i: number;
 
+        this.logHandler.debug("Detecting language from " + JSON.stringify(navLangs) + " in strict mode.");
         for (i = 0; i < navLangs.length; i++) {
-            detected = this._config.langProvided(navLangs[i], true);
+            detected = this.config.langProvided(navLangs[i], true);
             if (detected) {
                 break;
             }
         }
         if (!detected) {
+            this.logHandler.debug("Detecting language from " + JSON.stringify(navLangs) + " in non-strict mode.");
             for (i = 0; i < navLangs.length; i++) {
-                detected = this._config.langProvided(navLangs[i]);
+                detected = this.config.langProvided(navLangs[i]);
                 if (detected) {
                     break;
                 }
@@ -101,9 +102,9 @@ export class TranslateService {
      * @returns {Promise<void>|Promise}
      */
     public waitForTranslation(lang: string = this._lang): Promise<void> {
-        let l = this._config.langProvided(lang, true);
+        let l = this.config.langProvided(lang, true);
         if (!l) {
-            return Promise.reject("Language not provided");
+            return Promise.reject("Language " + lang + " not provided");
         } else {
             lang = String(l);
         }
@@ -123,7 +124,7 @@ export class TranslateService {
     public translate(keys: string|string[], params: any = {}, lang: string = this._lang): Promise<string|string[]> {
         return new Promise<string|string[]>((resolve) => {
             if (lang !== this._lang) {
-                let l = this._config.langProvided(lang, true);
+                let l = this.config.langProvided(lang, true);
                 if (!l) {
                     resolve(keys);
                     return;
@@ -156,9 +157,12 @@ export class TranslateService {
         }
 
         if (lang !== this._lang) {
-            let l = this._config.langProvided(lang, true);
+            let l = this.config.langProvided(lang, true);
             if (l) {
                 lang = String(l);
+            } else {
+                this.logHandler.error("Language " + lang + " not provided");
+                return keys;
             }
         }
 
@@ -205,7 +209,7 @@ export class TranslateService {
     private _loadLang(lang: string): Promise<void> {
         if (!this._loadedLangs[lang]) {
             this._loadedLangs[lang] = new Promise<void>((resolve, reject) => {
-                this._loader.load(lang).then((translations) => {
+                this.loader.load(lang).then((translations) => {
                     this._translations[lang] = translations;
                     this.logHandler.info("Language " + lang + " got loaded");
                     resolve();
@@ -258,16 +262,14 @@ export class TranslateService {
      * @returns {string}
      * @private
      */
-    private _referencedError(sub: string, unexpected: string, expected?: string, pos?: number): string {
+    private _referencedError(sub: string, unexpected: string, expected: string, pos?: number): string {
         let msg = "Parse error unexpected " + unexpected;
 
         if (pos !== undefined) {
             msg += " at pos " + (pos + 3);
         }
 
-        if (expected) {
-            msg += " expected " + expected;
-        }
+        msg += " expected " + expected;
 
         this.logHandler.error(msg + " in '" + sub + "'");
         return "";
