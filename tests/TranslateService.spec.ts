@@ -445,13 +445,14 @@ describe("TranslateService", function () {
             }));
 
             it("uses instant to translate after loader resolves", fakeAsync(() => {
-                spyOn(translate, "instant");
+                let defaultModule = translate.module("default");
+                spyOn(defaultModule, "instant");
                 translate.translate("TEXT");
 
                 loaderPromiseResolve({TEXT: "This is a text"});
                 JasminePromise.flush();
 
-                expect(translate.instant).toHaveBeenCalledWith("TEXT", {}, translate.lang);
+                expect(defaultModule.instant).toHaveBeenCalledWith("TEXT", {}, translate.lang);
             }));
 
             it("resolves with the return value from instant", fakeAsync(() => {

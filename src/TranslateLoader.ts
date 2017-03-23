@@ -1,5 +1,6 @@
 export abstract class TranslateLoader {
-    public abstract load(lang: string): Promise<Object>;
+    public module = "default";
 
-    public configure(config: Object): void {}
+    public abstract load(lang: string): Promise<Object>;
+    public configure(config: any): void {}
 }

@@ -60,7 +60,7 @@ describe("TranslateLoaderJson", function () {
 
             expect(backend.createConnection).toHaveBeenCalled();
             let request = JasmineHelper.calls(backend.createConnection).mostRecent().args[0];
-            expect(request.url).toBe("assets/i18n/en.json");
+            expect(request.url).toBe("assets/i18n/./en.json");
             expect(request.method).toBe(RequestMethod.Get);
         });
 
@@ -68,14 +68,14 @@ describe("TranslateLoaderJson", function () {
             spyOn(backend, "createConnection").and.callThrough();
 
             loader.configure({
-                extension: "-lang.json",
-                path: "app/translations",
+                path: "app/translations/{{module}}/{{lang}}-lang.json",
             });
+            loader.module = "test";
             loader.load("en");
 
             expect(backend.createConnection).toHaveBeenCalled();
             let request = JasmineHelper.calls(backend.createConnection).mostRecent().args[0];
-            expect(request.url).toBe("app/translations/en-lang.json");
+            expect(request.url).toBe("app/translations/test/en-lang.json");
             expect(request.method).toBe(RequestMethod.Get);
         });
 
