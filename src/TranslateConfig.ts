@@ -10,7 +10,8 @@ export class TranslateConfig {
     public providedLangs: string[];
     public detectLanguageOnStart: boolean;
     public loader: Type<TranslateLoader>;
-    public loaderConfig: Object;
+    public loaderConfig: any;
+    public modules: any;
 
     public navigatorLanguages: string[];
 
@@ -20,18 +21,21 @@ export class TranslateConfig {
         detectLanguageOnStart = true,
         loader = TranslateLoaderJson,
         loaderConfig = {},
+        modules = {},
     }: {
         defaultLang?: string,
         providedLangs?: string[],
         detectLanguageOnStart?: boolean,
         loader?: Type<TranslateLoader>,
-        loaderConfig?: Object
+        loaderConfig?: any,
+        modules?: any,
     }) {
         this.defaultLang = providedLangs.indexOf(defaultLang) > -1 ? defaultLang : providedLangs[0];
         this.providedLangs = providedLangs;
         this.detectLanguageOnStart = detectLanguageOnStart;
         this.loader = loader;
         this.loaderConfig = loaderConfig;
+        this.modules = modules;
 
         this.navigatorLanguages = ((): string[] => {
             let navigator: any = TranslateConfig.navigator;

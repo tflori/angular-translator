@@ -6,11 +6,9 @@ import {Http}       from "@angular/http";
 @Injectable()
 export class TranslateLoaderJson extends TranslateLoader {
     private options: {
-        extension: string,
         path: string
     } = {
-        extension: ".json",
-        path: "assets/i18n",
+        path: "assets/i18n/{{ module }}/{{ lang }}.json",
     };
 
     constructor(private  http: Http) {
@@ -18,10 +16,6 @@ export class TranslateLoaderJson extends TranslateLoader {
     }
 
     public configure(config: any): void {
-        if (typeof config.extension === "string") {
-            this.options.extension = config.extension;
-        }
-
         if (typeof config.path === "string") {
             this.options.path = config.path;
         }
@@ -29,7 +23,14 @@ export class TranslateLoaderJson extends TranslateLoader {
 
     public load(lang: string): Promise<Object> {
         return new Promise((resolve, reject) => {
-            let file = this.options.path + "/" + lang + this.options.extension;
+            let file = this.options.path.replace(/\{\{\s*([a-z]+)\s*\}\}/g, (substring: string, ...args: any[]) => {
+                switch (args[0]) {
+                    case "lang":
+                        return lang;
+                    case "module":
+                        return this.module !== "default" ? this.module : ".";
+                }
+            });
             this.http.get(file)
                 .subscribe(
                     (response) => {
