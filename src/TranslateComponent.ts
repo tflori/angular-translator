@@ -1,6 +1,7 @@
 import {TranslateService} from "./TranslateService";
+import {Translator}       from "./Translator";
 
-import {Component, Inject, Input} from "@angular/core";
+import {Component, Input} from "@angular/core";
 
 @Component({
     selector: "[translate]",
@@ -9,12 +10,10 @@ import {Component, Inject, Input} from "@angular/core";
 export class TranslateComponent {
     public translation: string = "";
 
-    private _translate: TranslateService;
     private _key: string;
     private _params: any = {};
 
-    constructor(@Inject(TranslateService) translate: TranslateService) {
-        this._translate = translate;
+    constructor(private _: Translator, private translate: TranslateService) {
 
         translate.languageChanged.subscribe(() => {
             this._startTranslation();
@@ -28,7 +27,7 @@ export class TranslateComponent {
 
     @Input("translateParams") set params(params: any) {
         if (typeof params !== "object") {
-            this._translate.logHandler.error("Params have to be an object");
+            this.translate.logHandler.error("Params have to be an object");
             return;
         }
 
@@ -40,7 +39,7 @@ export class TranslateComponent {
         if (!this._key) {
             return;
         }
-        this._translate.translate(this._key, this._params).then(
+        this._.translate(this._key, this._params).then(
             (translation) => this.translation = String(translation)
         );
     }

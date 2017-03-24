@@ -1,5 +1,7 @@
-import {TranslateService}            from "./TranslateService";
-import {Inject, Pipe, PipeTransform} from "@angular/core";
+import {TranslateService} from "./TranslateService";
+import {Translator}       from "./Translator";
+
+import {Pipe, PipeTransform} from "@angular/core";
 
 @Pipe({
     name: "translate",
@@ -16,14 +18,11 @@ export class TranslatePipe implements PipeTransform {
         return {};
     }
 
-    private _translate: TranslateService;
     private _promise: Promise<string|string[]>;
     private _translation: string = "";
     private _translated: { key: string, params: any };
 
-    constructor(@Inject(TranslateService) translate: TranslateService) {
-        this._translate = translate;
-
+    constructor(private translate: TranslateService, private _: Translator) {
         translate.languageChanged.subscribe(() => {
             this._startTranslation();
         });
@@ -44,7 +43,7 @@ export class TranslatePipe implements PipeTransform {
             if (typeof args[0] === "string") {
                 params = TranslatePipe._parseParams(args[0]);
                 if (!Object.keys(params).length) {
-                    this._translate.logHandler.error("'" + args[0] + "' could not be parsed to object");
+                    this.translate.logHandler.error("'" + args[0] + "' could not be parsed to object");
                 }
             } else if (typeof args[0] === "object") {
                 params = args[0];
@@ -74,7 +73,7 @@ export class TranslatePipe implements PipeTransform {
         if (!this._translated || !this._translated.key) {
             return;
         }
-        this._promise = this._translate.translate(this._translated.key, this._translated.params);
+        this._promise = this._.translate(this._translated.key, this._translated.params);
         this._promise.then((translation) => this._translation = String(translation));
     }
 }
