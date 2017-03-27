@@ -1,6 +1,6 @@
 {
   "name": "angular2-translator",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "A translate-service, translate-pipe and translate-component for angular2",
   "repository": {
     "type": "git",
@@ -42,10 +42,9 @@
   "typings": "./index.d.ts",
   "homepage": "https://github.com/tflori/angular2-translator",
   "peerDependencies": {
-    "@angular/common": "2.*",
-    "@angular/compiler": "2.*",
-    "@angular/core": "2.*",
-    "@angular/http": "2.*"
+    "@angular/common": "*",
+    "@angular/core": "*",
+    "@angular/http": "*"
   },
   "devDependencies": {
     "@angular/common": "2.*",
