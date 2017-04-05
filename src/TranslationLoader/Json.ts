@@ -1,34 +1,30 @@
-import {TranslateLoader}    from "./TranslateLoader";
+import {TranslationLoader}    from "../TranslationLoader";
 
 import {Injectable} from "@angular/core";
 import {Http}       from "@angular/http";
 
 @Injectable()
-export class TranslateLoaderJson extends TranslateLoader {
-    private options: {
-        path: string
-    } = {
-        path: "assets/i18n/{{ module }}/{{ lang }}.json",
-    };
-
+export class TranslationLoaderJson extends TranslationLoader {
     constructor(private  http: Http) {
         super();
     }
 
-    public configure(config: any): void {
-        if (typeof config.path === "string") {
-            this.options.path = config.path;
-        }
-    }
-
-    public load(lang: string): Promise<Object> {
+    public load({
+            language,
+            module = "default",
+            path = "assets/i18n/{{ module }}/{{ language }}.json",
+        }: {
+            language?: string,
+            module?: string,
+            path?: string
+        }): Promise<Object> {
         return new Promise((resolve, reject) => {
-            let file = this.options.path.replace(/\{\{\s*([a-z]+)\s*\}\}/g, (substring: string, ...args: any[]) => {
+            let file = path.replace(/\{\{\s*([a-z]+)\s*\}\}/g, (substring: string, ...args: any[]) => {
                 switch (args[0]) {
-                    case "lang":
-                        return lang;
+                    case "language":
+                        return language;
                     case "module":
-                        return this.module !== "default" ? this.module : ".";
+                        return module !== "default" ? module : ".";
                 }
             });
             this.http.get(file)

@@ -1,13 +1,16 @@
 /src/*
 !/src/*.ts
 /index.*
-!/index.ts
-!/index.d.ts
+!/index*.ts
 
 /coverage/
 /typings/
 /tests/
 /.idea/
+
+/docs/*
+!/docs/*.md
+!/docs/images/
 
 .gitignore
 .editorconfig
