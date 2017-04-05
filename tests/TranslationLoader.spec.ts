@@ -1,8 +1,8 @@
-import {TranslateLoader} from "../index";
+import {TranslationLoader} from "../src/TranslationLoader";
 
-describe("TranslateLoader", () => {
+describe("TranslationLoader", () => {
     it("is defined", () => {
-        expect(TranslateLoader).toBeDefined();
+        expect(TranslationLoader).toBeDefined();
     });
 
     // because it is abstract we can only test if it is defined

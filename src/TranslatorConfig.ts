@@ -1,4 +1,11 @@
+import {TranslationLoader} from "./TranslationLoader";
+import {TranslationLoaderJson} from "./TranslationLoader/Json"
+
+import {Type} from "@angular/core";
+
 export class TranslatorConfig {
+    public static navigator: any = window && window.navigator ? window.navigator : {};
+
     /**
      * Normalize a language
      *
@@ -22,12 +29,33 @@ export class TranslatorConfig {
 
     private options: any = {
         defaultLanguage: "en",
-        providedLanguages: ["en"],
+        providedLanguages: [ "en" ],
+        detectLanguage: true,
+        preferExactMatches: false,
+        navigatorLanguages: [ "en" ],
+        loader: TranslationLoaderJson,
     };
 
     private moduleName: string;
 
     constructor(options?: any, module?: string) {
+        this.options.navigatorLanguages = ((): string[] => {
+            let navigator: any = TranslatorConfig.navigator;
+
+            if (navigator.languages instanceof Array) {
+                return Array.prototype.slice.call(navigator.languages);
+            } else {
+                return [
+                    navigator.languages ||
+                    navigator.language ||
+                    navigator.browserLanguage ||
+                    navigator.userLanguage,
+                ].filter((v) => {
+                    return typeof v === "string";
+                });
+            }
+        })();
+
         this.setOptions(options);
         this.moduleName = module;
     }
@@ -38,6 +66,26 @@ export class TranslatorConfig {
 
     get providedLanguages(): string[] {
         return this.options.providedLanguages;
+    }
+
+    get loader(): Type<TranslationLoader> {
+        return this.options.loader;
+    }
+
+    get loaderOptions(): any {
+        return this.options.loaderOptions || {};
+    }
+
+    get detectLanguage(): boolean {
+        return this.options.detectLanguage;
+    }
+
+    get preferExactMatches(): boolean {
+        return this.options.preferExactMatches;
+    }
+
+    get navigatorLanguages(): string[] {
+        return this.options.navigatorLanguages;
     }
 
     /**

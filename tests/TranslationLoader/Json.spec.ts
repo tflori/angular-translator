@@ -1,9 +1,9 @@
 import {
-    TranslateLoaderJson,
-} from "../index";
+    TranslationLoaderJson,
+} from "../../index";
 
-import {JasmineHelper}               from "./helper/JasmineHelper";
-import {PromiseMatcher}              from "./helper/promise-matcher";
+import {JasmineHelper}               from "../helper/JasmineHelper";
+import {PromiseMatcher}              from "../helper/promise-matcher";
 import {TestBed}                     from "@angular/core/testing";
 import {
     HttpModule,
@@ -14,13 +14,13 @@ import {
 }                                    from "@angular/http";
 import {MockBackend, MockConnection} from "@angular/http/testing";
 
-describe("TranslateLoaderJson", function () {
+describe("TranslationLoaderJson", function () {
     it("is defined", function () {
-        expect(TranslateLoaderJson).toBeDefined();
+        expect(TranslationLoaderJson).toBeDefined();
     });
 
     describe("load", function () {
-        let loader: TranslateLoaderJson;
+        let loader: TranslationLoaderJson;
         let backend: MockBackend;
         let connection: MockConnection;
 
@@ -29,12 +29,12 @@ describe("TranslateLoaderJson", function () {
                 imports: [HttpModule],
                 providers: [
                     {provide: XHRBackend, useClass: MockBackend},
-                    TranslateLoaderJson,
+                    TranslationLoaderJson,
                 ],
             });
 
             backend = TestBed.get(XHRBackend);
-            loader = TestBed.get(TranslateLoaderJson);
+            loader = TestBed.get(TranslationLoaderJson);
             backend.connections.subscribe((c: MockConnection) => connection = c);
 
             PromiseMatcher.install();
@@ -48,7 +48,7 @@ describe("TranslateLoaderJson", function () {
         });
 
         it("returns a promise", function () {
-            let promise = loader.load("en");
+            let promise = loader.load({ language: "en" });
 
             expect(promise instanceof Promise).toBeTruthy();
         });
@@ -56,7 +56,7 @@ describe("TranslateLoaderJson", function () {
         it("loads a language file", function () {
             spyOn(backend, "createConnection").and.callThrough();
 
-            loader.load("en");
+            loader.load({ language: "en" });
 
             expect(backend.createConnection).toHaveBeenCalled();
             let request = JasmineHelper.calls(backend.createConnection).mostRecent().args[0];
@@ -67,11 +67,11 @@ describe("TranslateLoaderJson", function () {
         it("can be configured", () => {
             spyOn(backend, "createConnection").and.callThrough();
 
-            loader.configure({
-                path: "app/translations/{{module}}/{{lang}}-lang.json",
+            loader.load({
+                language: "en",
+                module: "test",
+                path: "app/translations/{{module}}/{{language}}-lang.json",
             });
-            loader.module = "test";
-            loader.load("en");
 
             expect(backend.createConnection).toHaveBeenCalled();
             let request = JasmineHelper.calls(backend.createConnection).mostRecent().args[0];
@@ -80,7 +80,7 @@ describe("TranslateLoaderJson", function () {
         });
 
         it("resolves when connection responds", function () {
-            let promise = loader.load("en");
+            let promise = loader.load({ language: "en" });
 
             connection.mockRespond(new Response(new ResponseOptions({
                 body: JSON.stringify({TEXT: "This is a text"}),
@@ -91,7 +91,7 @@ describe("TranslateLoaderJson", function () {
         });
 
         it("transforms result to object", function () {
-            let promise = loader.load("en");
+            let promise = loader.load({ language: "en" });
 
             connection.mockRespond(new Response(new ResponseOptions({
                 body: JSON.stringify({TEXT: "This is a text"}),
@@ -102,7 +102,7 @@ describe("TranslateLoaderJson", function () {
         });
 
         it("rejectes when connection fails", function () {
-            let promise = loader.load("en");
+            let promise = loader.load({ language: "en" });
 
             connection.mockRespond(new Response(new ResponseOptions({
                 status: 500,
@@ -113,7 +113,7 @@ describe("TranslateLoaderJson", function () {
         });
 
         it("rejects when connection throws", function () {
-            let promise = loader.load("en");
+            let promise = loader.load({ language: "en" });
 
             connection.mockError(new Error("Some reason"));
 
@@ -121,7 +121,7 @@ describe("TranslateLoaderJson", function () {
         });
 
         it("combines arrays to a string", function () {
-            let promise = loader.load("en");
+            let promise = loader.load({ language: "en" });
 
             connection.mockRespond(new Response(new ResponseOptions({
                 body: JSON.stringify({
@@ -140,7 +140,7 @@ describe("TranslateLoaderJson", function () {
         });
 
         it("allows nested objects", function () {
-            let promise = loader.load("en");
+            let promise = loader.load({ language: "en" });
             let nestedObj: any = {
                 TEXT: {
                     NESTED: "This is a text",
@@ -156,7 +156,7 @@ describe("TranslateLoaderJson", function () {
         });
 
         it("allows multiple nested objects", function () {
-            let promise = loader.load("en");
+            let promise = loader.load({ language: "en" });
             let nestedObj: any = {
                 TEXT: {
                     NESTED: "This is a text",
@@ -175,7 +175,7 @@ describe("TranslateLoaderJson", function () {
         });
 
         it("combines arrays to a string while returning nested objects", function () {
-            let promise = loader.load("en");
+            let promise = loader.load({ language: "en" });
             let nestedObj: any = {
                 COOKIE_INFORMATION: [
                     "We are using cookies to adjust our website to the needs of our customers. ",
@@ -199,7 +199,7 @@ describe("TranslateLoaderJson", function () {
         });
 
         it("allows nested objects with lower case keys and with camel case", function () {
-            let promise = loader.load("en");
+            let promise = loader.load({ language: "en" });
             let nestedObj: any = {
                 text: {
                     nestedText: "This is a text",
@@ -215,7 +215,7 @@ describe("TranslateLoaderJson", function () {
         });
 
         it("filters non string values within nested object", function () {
-            let promise = loader.load("en");
+            let promise = loader.load({ language: "en" });
             let nestedObj: any = {
                 TEXT: {
                     ANSWER: 42,
@@ -232,7 +232,7 @@ describe("TranslateLoaderJson", function () {
         });
 
         it("combines arrays to a string while beeing in nested objects", function () {
-            let promise = loader.load("en");
+            let promise = loader.load({ language: "en" });
             let nestedObj: any = {
                 TEXT: {
                     COOKIE_INFORMATION: [
@@ -255,7 +255,7 @@ describe("TranslateLoaderJson", function () {
         });
 
         it("merges translations to one dimension", function () {
-            let promise = loader.load("en");
+            let promise = loader.load({ language: "en" });
 
             connection.mockRespond(new Response(new ResponseOptions({
                 body: JSON.stringify({
@@ -276,7 +276,7 @@ describe("TranslateLoaderJson", function () {
         });
 
         it("filters non string values", function () {
-            let promise = loader.load("en");
+            let promise = loader.load({ language: "en" });
 
             connection.mockRespond(new Response(new ResponseOptions({
                 body: JSON.stringify({

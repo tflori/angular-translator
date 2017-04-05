@@ -18,6 +18,18 @@ describe("TranslatorConfig", () => {
         expect(translatorConfig.defaultLanguage).toBe("cn");
     });
 
+    it("ignores options from prototype", () => {
+        let MyObject = function MyOption(): void {};
+        MyObject.prototype.defaultLanguage = "de";
+        let config = new MyObject();
+        config.providedLanguages = ["en", "de"];
+
+        let translatorConfig = new TranslatorConfig(config);
+
+        expect(translatorConfig.defaultLanguage).toBe("en");
+        expect(translatorConfig.providedLanguages).toEqual(["en", "de"]);
+    });
+
     it("defines a list of provided languages", () => {
         let translatorConfig = new TranslatorConfig();
 
@@ -120,6 +132,48 @@ describe("TranslatorConfig", () => {
             let providedLanguage = translatorConfig.providedLanguage("british");
 
             expect(providedLanguage).toBeFalsy();
+        });
+    });
+
+    describe("navigatorLanguages", () => {
+        it("is always an array", () => {
+            let translateConfig = new TranslatorConfig();
+
+            expect(translateConfig.navigatorLanguages instanceof Array).toBe(true);
+        });
+
+        it("uses navigator.languages when given", () => {
+            TranslatorConfig.navigator = { languages: [ "bm", "de", "fr", "en" ] };
+
+            let translateConfig = new TranslatorConfig();
+
+            expect(translateConfig.navigatorLanguages).toEqual([ "bm", "de", "fr", "en" ]);
+        });
+
+        it("transforms navigator.languages to Array if it is String", () => {
+            TranslatorConfig.navigator = { languages: "bm" };
+
+            let translateConfig = new TranslatorConfig();
+
+            expect(translateConfig.navigatorLanguages).toEqual([ "bm" ]);
+        });
+
+        it("falls back to navigator.language", () => {
+            TranslatorConfig.navigator = {language: "fr"};
+
+            let translateConfig = new TranslatorConfig();
+
+            expect(translateConfig.navigatorLanguages).toEqual(["fr"]);
+        });
+
+        it("can be overwritten by options", () => {
+            TranslatorConfig.navigator = {language: "fr"};
+
+            let translateConfig = new TranslatorConfig({
+                navigatorLanguages: ["de", "en"],
+            });
+
+            expect(translateConfig.navigatorLanguages).toEqual(["de", "en"]);
         });
     });
 
