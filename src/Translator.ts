@@ -3,7 +3,7 @@ import {TranslationLoader} from "./TranslationLoader";
 import {TranslatorConfig} from "./TranslatorConfig";
 import {TranslatorContainer} from "./TranslatorContainer";
 
-import {Injector, ReflectiveInjector} from "@angular/core";
+import {Injector} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {Observer} from "rxjs/Observer";
 
@@ -14,24 +14,24 @@ export class Translator {
         };
     }
 
-    private _language: string = "en";
+    private LANGUAGE: string = "en";
 
     private config: TranslatorConfig;
     private logHandler: TranslateLogHandler;
     private loader: TranslationLoader;
     private languageChangedObservable: Observable<string>;
     private languageChangedObserver: Observer<string>;
-    private loadedLanguages: Object = {};
-    private translations: Object = {};
+    private loadedLanguages: object = {};
+    private translations: object = {};
 
     constructor(
-        private _module: string,
-        private injector: Injector
+        private MODULE: string,
+        private injector: Injector,
     ) {
         let translatorConfig = injector.get(TranslatorConfig);
-        this.config = _module === "default" ? translatorConfig : translatorConfig.module(_module);
+        this.config = MODULE === "default" ? translatorConfig : translatorConfig.module(MODULE);
 
-        this._language = this.config.defaultLanguage;
+        this.LANGUAGE = this.config.defaultLanguage;
         this.logHandler = injector.get(TranslateLogHandler);
 
         this.languageChangedObservable = new Observable<string>((observer: any) => {
@@ -39,7 +39,7 @@ export class Translator {
         });
 
         injector.get(TranslatorContainer).languageChanged.subscribe((language) => {
-            this.language = language;
+            this.LANGUAGE = language;
         });
     }
 
@@ -48,19 +48,19 @@ export class Translator {
     }
 
     get module(): string {
-        return this._module;
+        return this.MODULE;
     }
 
     get language() {
-        return this._language;
+        return this.LANGUAGE;
     }
 
     set language(language: string) {
         let providedLanguage = this.config.providedLanguage(language, true);
 
         if (typeof providedLanguage === "string") {
-            this._language = providedLanguage;
-            this.logHandler.info("Language changed to " + providedLanguage);
+            this.LANGUAGE = providedLanguage;
+            this.logHandler.info(this.generateMessage("language changed", { language: providedLanguage }));
 
             // only when someone subscribes the observer get created
             if (this.languageChangedObserver) {
@@ -135,9 +135,7 @@ export class Translator {
         let t: string;
         while (i--) {
             if (!this.translations[language] || !this.translations[language][keys[i]]) {
-                this.logHandler.info(
-                    "Translation for '" + keys[i] + "' in language " + language + " not found"
-                );
+                this.logHandler.info(this.generateMessage("missing", { key: keys[i], language }));
                 result.unshift(keys[i]);
                 continue;
             }
@@ -177,11 +175,11 @@ export class Translator {
             if (providedLanguage) {
                 return String(providedLanguage);
             } else {
-                this.logHandler.error("Language " + language + " not provided");
+                this.logHandler.error(this.generateMessage("language not provided", { language }));
                 return null;
             }
         } else {
-            return this.language;
+            return this.LANGUAGE;
         }
     }
 
@@ -205,12 +203,10 @@ export class Translator {
 
                 this.loader.load(loaderOptions).then((translations) => {
                     this.translations[language] = translations;
-                    this.logHandler.info("Language " + language + " got loaded");
+                    this.logHandler.info(this.generateMessage("language loaded", { language }));
                     resolve();
                 }, (reason) => {
-                    this.logHandler.error(
-                        "Language " + language + " could not be loaded (" + reason + ")"
-                    );
+                    this.logHandler.error(this.generateMessage("language not loaded", { language, reason }));
                     reject(reason);
                 });
             });
@@ -218,6 +214,7 @@ export class Translator {
         return this.loadedLanguages[language];
     }
 
+    /* tslint:disable:variable-name */
     /**
      * Parses the expression in the given __context.
      *
@@ -247,6 +244,7 @@ export class Translator {
         func.push("return (" + expression + "); })()");
         return eval(func.join("\n"));
     }
+    /* tslint:enable:variable-name */
 
     /**
      * Outputs a parse error for an error in translation references.
@@ -279,7 +277,7 @@ export class Translator {
      * @returns {any}
      * @private
      */
-    private getParam(params: Object, getter: string): any {
+    private getParam(params: object, getter: string): any {
         let pos = getter.indexOf(".");
 
         if (pos === -1) {
@@ -301,7 +299,7 @@ export class Translator {
      * @returns {string}
      * @private
      */
-    private translateReferenced(sub: string, expression: string, params: Object, lang: string): string {
+    private translateReferenced(sub: string, expression: string, params: object, lang: string): string {
         let j: number;
         let status = "wait_key";
         let key: string;
@@ -369,7 +367,7 @@ export class Translator {
                     } else if (expression[j] === "=") {
                         if (Object.keys(translateParams).length > 0) {
                             this.logHandler.error(
-                                "Parse error only first parameter can be passed as params in " + "'" + sub + "'"
+                                "Parse error only first parameter can be passed as params in " + "'" + sub + "'",
                             );
                             return "";
                         }
@@ -464,5 +462,42 @@ export class Translator {
         }
 
         return String(this.instant(key, translateParams, lang));
+    }
+
+    private generateMessage(key: string, params: any = {}): string {
+        let msg: string;
+        params.module = this.module;
+        switch (key) {
+            case "missing":
+                msg = "Translation for '{{key}}'" +
+                    " in{{ module !== 'default' ? \" module '\" + module + \"' and\" : '' }}" +
+                    " language {{language}} not found";
+                break;
+
+            case "language changed":
+                msg = "Language changed to {{language}}" +
+                    "{{ module !== 'default' ? \" in module '\" + module + \"'\" : '' }}";
+                break;
+
+            case "language not provided":
+                msg = "Language {{language}} not provided" +
+                    "{{ module !== 'default' ? \" in module '\" + module + \"'\" : '' }}";
+                break;
+
+            case "language loaded":
+                msg = "Language {{language}}" +
+                    "{{ module !== 'default' ? \" for module '\" + module + \"'\" : '' }}" +
+                    " got loaded";
+                break;
+
+            case "language not loaded":
+                msg = "Language {{language}}" +
+                    "{{ module !== 'default' ? \" for module '\" + module + \"'\" : '' }}" +
+                    " could not be loaded ({{reason}})";
+        }
+
+        return msg.replace(/{{\s*(.*?)\s*}}/g, (sub: string, expression: string) => {
+            return this.parse(expression, params) || "";
+        });
     }
 }

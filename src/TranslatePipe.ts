@@ -8,7 +8,7 @@ import {Pipe, PipeTransform} from "@angular/core";
     pure: false,
 })
 export class TranslatePipe implements PipeTransform {
-    private static _parseParams(arg: string): Object {
+    private static _parseParams(arg: string): object {
         try {
             let o = eval("(" + arg + ")");
             if (typeof o === "object") {
@@ -37,7 +37,7 @@ export class TranslatePipe implements PipeTransform {
      * @returns {string}
      */
     public transform(key: string, args: any[] = []): string {
-        let params: Object = <ObjectConstructor> {};
+        let params: object = {};
 
         if (args[0]) {
             if (typeof args[0] === "string") {

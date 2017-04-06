@@ -1,7 +1,6 @@
-import {TranslateComponent, TranslatePipe, TranslationLoaderJson, Translator, TranslatorModule} from "../index";
+import {TranslateComponent, Translator, TranslatorModule} from "../index";
 
 import {TestBed} from "@angular/core/testing";
-import {Type} from "@angular/core";
 
 describe("TranslatorModule", () => {
     beforeEach(() => {

@@ -1,5 +1,5 @@
 import {TranslationLoader} from "./TranslationLoader";
-import {TranslationLoaderJson} from "./TranslationLoader/Json"
+import {TranslationLoaderJson} from "./TranslationLoader/Json";
 
 import {Type} from "@angular/core";
 
@@ -19,11 +19,11 @@ export class TranslatorConfig {
         }
         return languageString.replace(
             regExp,
-            function (substring: string, language: string, country: string = "") {
+            (substring: string, language: string, country: string = "") => {
                 language = language.toLowerCase();
                 country = country.toUpperCase();
                 return country ? language + "-" + country : language;
-            }
+            },
         );
     }
 
@@ -138,9 +138,7 @@ export class TranslatorConfig {
             if (p > -1) {
                 provided = this.providedLanguages[p];
             } else {
-                p = providedLanguagesNormalized.map(function (l) {
-                    return l.substr(0, 2);
-                }).indexOf(language);
+                p = providedLanguagesNormalized.map((l) => l.substr(0, 2)).indexOf(language);
                 if (p > -1) {
                     provided = this.providedLanguages[p];
                 }

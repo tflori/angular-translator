@@ -1,7 +1,7 @@
-import {TranslationLoader}    from "../TranslationLoader";
+import {TranslationLoader} from "../TranslationLoader";
 
 import {Injectable} from "@angular/core";
-import {Http}       from "@angular/http";
+import {Http} from "@angular/http";
 
 @Injectable()
 export class TranslationLoaderJson extends TranslationLoader {
@@ -16,8 +16,8 @@ export class TranslationLoaderJson extends TranslationLoader {
         }: {
             language?: string,
             module?: string,
-            path?: string
-        }): Promise<Object> {
+            path?: string,
+        }): Promise<object> {
         return new Promise((resolve, reject) => {
             let file = path.replace(/\{\{\s*([a-z]+)\s*\}\}/g, (substring: string, ...args: any[]) => {
                 switch (args[0]) {
@@ -40,7 +40,7 @@ export class TranslationLoaderJson extends TranslationLoader {
                     },
                     (reason: Error) => {
                         reject(reason.message);
-                    }
+                    },
                 );
         });
     }

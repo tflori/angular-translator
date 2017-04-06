@@ -19,6 +19,7 @@ describe("TranslatorConfig", () => {
     });
 
     it("ignores options from prototype", () => {
+        // tslint:disable-next-line
         let MyObject = function MyOption(): void {};
         MyObject.prototype.defaultLanguage = "de";
         let config = new MyObject();

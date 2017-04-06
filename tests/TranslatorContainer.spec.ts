@@ -5,7 +5,7 @@ import {
     TranslatorContainer,
 } from "../index";
 
-import {Injector, ReflectiveInjector} from "@angular/core";
+import {ReflectiveInjector} from "@angular/core";
 import {TestBed} from "@angular/core/testing";
 import {Observable} from "rxjs/Observable";
 import {TranslateLogHandlerMock, TranslationLoaderMock} from "./helper/TranslatorMocks";
@@ -15,18 +15,18 @@ describe("TranslatorContainer", () => {
         expect(TranslatorContainer).toBeDefined();
     });
 
-    it("requires a TranslatorConfig", function () {
+    it("requires a TranslatorConfig", () => {
         let injector = ReflectiveInjector.resolveAndCreate([
             { provide: TranslateLogHandler, useClass: TranslateLogHandlerMock },
             TranslatorContainer,
         ]);
 
-        let action = function () {
+        let action = () => {
             try {
                 injector.get(TranslatorContainer);
             } catch (e) {
                 expect(e.message).toBe(
-                    "No provider for TranslatorConfig! (TranslatorContainer -> TranslatorConfig)"
+                    "No provider for TranslatorConfig! (TranslatorContainer -> TranslatorConfig)",
                 );
                 throw e;
             }
@@ -34,7 +34,7 @@ describe("TranslatorContainer", () => {
         expect(action).toThrow();
     });
 
-    it("requires a TranslateLogHandler", function () {
+    it("requires a TranslateLogHandler", () => {
         let translatorConfig = new TranslatorConfig({
             loader: TranslationLoaderMock,
         });
@@ -43,12 +43,12 @@ describe("TranslatorContainer", () => {
             TranslatorContainer,
         ]);
 
-        let action = function () {
+        let action = () => {
             try {
                 injector.get(TranslatorContainer);
             } catch (e) {
                 expect(e.message).toBe(
-                    "No provider for TranslateLogHandler! (TranslatorContainer -> TranslateLogHandler)"
+                    "No provider for TranslateLogHandler! (TranslatorContainer -> TranslateLogHandler)",
                 );
                 throw e;
             }
@@ -166,7 +166,7 @@ describe("TranslatorContainer", () => {
         });
 
         describe("change language", () => {
-            it("checks that language is provided using strict checking", () =>{
+            it("checks that language is provided using strict checking", () => {
                 spyOn(translatorConfig, "providedLanguage").and.callThrough();
 
                 translatorContainer.language = "en" ;
@@ -174,7 +174,7 @@ describe("TranslatorContainer", () => {
                 expect(translatorConfig.providedLanguage).toHaveBeenCalledWith("en", true);
             });
 
-            it("sets current language to the provided language", () =>{
+            it("sets current language to the provided language", () => {
                 translatorConfig.setOptions({ providedLanguages: [ "de/de" ]});
 
                 translatorContainer.language = "de-DE";
@@ -182,7 +182,7 @@ describe("TranslatorContainer", () => {
                 expect(translatorContainer.language).toBe("de/de");
             });
 
-            it("throws error if language is not provided", () =>{
+            it("throws error if language is not provided", () => {
                 translatorConfig.setOptions({ providedLanguages: [ "de/de" ]});
 
                 let action = () => {
@@ -192,7 +192,7 @@ describe("TranslatorContainer", () => {
                 expect(action).toThrow(new Error("Language de not provided"));
             });
 
-            it("does not change when language not available", function() {
+            it("does not change when language not available", () => {
                 try {
                     translatorContainer.language = "ru";
                 } catch (e) {}
