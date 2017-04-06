@@ -2,29 +2,30 @@ import {
     TranslationLoaderJson,
 } from "../../index";
 
-import {JasmineHelper}               from "../helper/JasmineHelper";
-import {PromiseMatcher}              from "../helper/promise-matcher";
-import {TestBed}                     from "@angular/core/testing";
+import {JasmineHelper} from "../helper/JasmineHelper";
+import {PromiseMatcher} from "../helper/promise-matcher";
+
+import {TestBed} from "@angular/core/testing";
 import {
     HttpModule,
     RequestMethod,
     Response,
     ResponseOptions,
     XHRBackend,
-}                                    from "@angular/http";
+} from "@angular/http";
 import {MockBackend, MockConnection} from "@angular/http/testing";
 
-describe("TranslationLoaderJson", function () {
-    it("is defined", function () {
+describe("TranslationLoaderJson", () => {
+    it("is defined", () => {
         expect(TranslationLoaderJson).toBeDefined();
     });
 
-    describe("load", function () {
+    describe("load", () => {
         let loader: TranslationLoaderJson;
         let backend: MockBackend;
         let connection: MockConnection;
 
-        beforeEach(function () {
+        beforeEach(() => {
             TestBed.configureTestingModule({
                 imports: [HttpModule],
                 providers: [
@@ -42,18 +43,18 @@ describe("TranslationLoaderJson", function () {
 
         afterEach(PromiseMatcher.uninstall);
 
-        it("is defined", function () {
+        it("is defined", () => {
             expect(loader.load).toBeDefined();
             expect(typeof loader.load).toBe("function");
         });
 
-        it("returns a promise", function () {
+        it("returns a promise", () => {
             let promise = loader.load({ language: "en" });
 
             expect(promise instanceof Promise).toBeTruthy();
         });
 
-        it("loads a language file", function () {
+        it("loads a language file", () => {
             spyOn(backend, "createConnection").and.callThrough();
 
             loader.load({ language: "en" });
@@ -79,7 +80,7 @@ describe("TranslationLoaderJson", function () {
             expect(request.method).toBe(RequestMethod.Get);
         });
 
-        it("resolves when connection responds", function () {
+        it("resolves when connection responds", () => {
             let promise = loader.load({ language: "en" });
 
             connection.mockRespond(new Response(new ResponseOptions({
@@ -90,7 +91,7 @@ describe("TranslationLoaderJson", function () {
             expect(promise).toBeResolved();
         });
 
-        it("transforms result to object", function () {
+        it("transforms result to object", () => {
             let promise = loader.load({ language: "en" });
 
             connection.mockRespond(new Response(new ResponseOptions({
@@ -101,7 +102,7 @@ describe("TranslationLoaderJson", function () {
             expect(promise).toBeResolvedWith({TEXT: "This is a text"});
         });
 
-        it("rejectes when connection fails", function () {
+        it("rejectes when connection fails", () => {
             let promise = loader.load({ language: "en" });
 
             connection.mockRespond(new Response(new ResponseOptions({
@@ -112,7 +113,7 @@ describe("TranslationLoaderJson", function () {
             expect(promise).toBeRejectedWith("StatusCode: 500");
         });
 
-        it("rejects when connection throws", function () {
+        it("rejects when connection throws", () => {
             let promise = loader.load({ language: "en" });
 
             connection.mockError(new Error("Some reason"));
@@ -120,7 +121,7 @@ describe("TranslationLoaderJson", function () {
             expect(promise).toBeRejectedWith("Some reason");
         });
 
-        it("combines arrays to a string", function () {
+        it("combines arrays to a string", () => {
             let promise = loader.load({ language: "en" });
 
             connection.mockRespond(new Response(new ResponseOptions({
@@ -139,7 +140,7 @@ describe("TranslationLoaderJson", function () {
             });
         });
 
-        it("allows nested objects", function () {
+        it("allows nested objects", () => {
             let promise = loader.load({ language: "en" });
             let nestedObj: any = {
                 TEXT: {
@@ -155,7 +156,7 @@ describe("TranslationLoaderJson", function () {
             expect(promise).toBeResolvedWith({"TEXT.NESTED": "This is a text"});
         });
 
-        it("allows multiple nested objects", function () {
+        it("allows multiple nested objects", () => {
             let promise = loader.load({ language: "en" });
             let nestedObj: any = {
                 TEXT: {
@@ -174,7 +175,7 @@ describe("TranslationLoaderJson", function () {
             expect(promise).toBeResolvedWith({"TEXT.NESTED": "This is a text", "TEXT.SECONDNEST.TEXT": "Second text"});
         });
 
-        it("combines arrays to a string while returning nested objects", function () {
+        it("combines arrays to a string while returning nested objects", () => {
             let promise = loader.load({ language: "en" });
             let nestedObj: any = {
                 COOKIE_INFORMATION: [
@@ -192,13 +193,13 @@ describe("TranslationLoaderJson", function () {
             })));
 
             expect(promise).toBeResolvedWith({
-                COOKIE_INFORMATION: "We are using cookies to adjust our website to " +
+                "COOKIE_INFORMATION": "We are using cookies to adjust our website to " +
                 "the needs of our customers. By using our websites you agree to store cookies on your computer, " +
                 "tablet or smartphone.", "TEXT.NESTED": "This is a text",
             });
         });
 
-        it("allows nested objects with lower case keys and with camel case", function () {
+        it("allows nested objects with lower case keys and with camel case", () => {
             let promise = loader.load({ language: "en" });
             let nestedObj: any = {
                 text: {
@@ -214,7 +215,7 @@ describe("TranslationLoaderJson", function () {
             expect(promise).toBeResolvedWith({"text.nestedText": "This is a text"});
         });
 
-        it("filters non string values within nested object", function () {
+        it("filters non string values within nested object", () => {
             let promise = loader.load({ language: "en" });
             let nestedObj: any = {
                 TEXT: {
@@ -231,7 +232,7 @@ describe("TranslationLoaderJson", function () {
             expect(promise).toBeResolvedWith({"TEXT.NESTED": "This is a text"});
         });
 
-        it("combines arrays to a string while beeing in nested objects", function () {
+        it("combines arrays to a string while beeing in nested objects", () => {
             let promise = loader.load({ language: "en" });
             let nestedObj: any = {
                 TEXT: {
@@ -254,7 +255,7 @@ describe("TranslationLoaderJson", function () {
             });
         });
 
-        it("merges translations to one dimension", function () {
+        it("merges translations to one dimension", () => {
             let promise = loader.load({ language: "en" });
 
             connection.mockRespond(new Response(new ResponseOptions({
@@ -275,7 +276,7 @@ describe("TranslationLoaderJson", function () {
             });
         });
 
-        it("filters non string values", function () {
+        it("filters non string values", () => {
             let promise = loader.load({ language: "en" });
 
             connection.mockRespond(new Response(new ResponseOptions({

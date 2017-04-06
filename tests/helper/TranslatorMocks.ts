@@ -1,6 +1,7 @@
 import {TranslateLogHandler} from "../../index";
 import {TranslationLoader} from "../../src/TranslationLoader";
 
+/* tslint:disable */
 export class TranslationLoaderMock extends TranslationLoader {
     private _provided: Object = {};
 

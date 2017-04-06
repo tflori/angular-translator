@@ -67,7 +67,7 @@
     "reflect-metadata": "^0.1.8",
     "remap-istanbul": "*",
     "rxjs": "*",
-    "systemjs": "^0.20",
+    "systemjs": "^0.20.12",
     "systemjs-builder": "^0.16",
     "tslint": "*",
     "typescript": "2.2.1",

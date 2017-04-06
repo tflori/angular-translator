@@ -17,7 +17,7 @@ describe("TranslatePipe", () => {
     });
 
     describe("constructor", () => {
-        it("requires a Translator", function () {
+        it("requires a Translator", () => {
             let injector = ReflectiveInjector.resolveAndCreate([ TranslatePipe ]);
 
             let action = () => {

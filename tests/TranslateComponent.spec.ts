@@ -14,7 +14,7 @@ import {TranslateLogHandlerMock, TranslationLoaderMock} from "./helper/Translato
 describe("TranslateComponent", () => {
 
     describe("constructor", () => {
-        it("requires a Translator", function () {
+        it("requires a Translator", () => {
             let injector = ReflectiveInjector.resolveAndCreate([ TranslateComponent ]);
 
             let action = () => {

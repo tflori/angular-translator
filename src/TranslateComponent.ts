@@ -1,5 +1,5 @@
 import {TranslateLogHandler} from "./TranslateLogHandler";
-import {Translator}       from "./Translator";
+import {Translator} from "./Translator";
 
 import {Component, Input} from "@angular/core";
 
@@ -10,8 +10,8 @@ import {Component, Input} from "@angular/core";
 export class TranslateComponent {
     public translation: string = "";
 
-    private _key: string;
-    private _params: any = {};
+    private KEY: string;
+    private PARAMS: any = {};
 
     constructor(private translator: Translator, private logHandler: TranslateLogHandler) {
         translator.languageChanged.subscribe(() => {
@@ -20,7 +20,7 @@ export class TranslateComponent {
     }
 
     @Input("translate") set key(key: string) {
-        this._key = key;
+        this.KEY = key;
         this._startTranslation();
     }
 
@@ -30,16 +30,16 @@ export class TranslateComponent {
             return;
         }
 
-        this._params = params;
+        this.PARAMS = params;
         this._startTranslation();
     }
 
     private _startTranslation() {
-        if (!this._key) {
+        if (!this.KEY) {
             return;
         }
-        this.translator.translate(this._key, this._params).then(
-            (translation) => this.translation = String(translation)
+        this.translator.translate(this.KEY, this.PARAMS).then(
+            (translation) => this.translation = String(translation),
         );
     }
 }
