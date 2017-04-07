@@ -1,6 +1,6 @@
-import {TranslateLoader}    from "./TranslateLoader";
+import {TranslateLoader} from "./TranslateLoader";
 import {Inject, Injectable} from "@angular/core";
-import {Http}               from "@angular/http";
+import {Http} from "@angular/http";
 
 export class TranslateLoaderJsonConfig {
     public path: string = "assets/i18n/";
