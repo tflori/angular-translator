@@ -1,4 +1,4 @@
-import {TranslateService}         from "./TranslateService";
+import {TranslateService} from "./TranslateService";
 
 import {Component, Inject, Input} from "@angular/core";
 
