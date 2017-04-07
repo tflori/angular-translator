@@ -1,7 +1,8 @@
-import {TranslateLoader} from "../../index";
 import {TranslateLogHandler} from "../../index";
+import {TranslationLoader} from "../../src/TranslationLoader";
 
-export class TranslateLoaderMock extends TranslateLoader {
+/* tslint:disable */
+export class TranslationLoaderMock extends TranslationLoader {
     private _provided: Object = {};
 
     public provide(lang: string, translations: Object) {

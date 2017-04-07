@@ -36,7 +36,6 @@ module.exports = function (config) {
       { pattern: 'tests/helper/**/*.js', included: false, watched: true},
 
       // test files
-      // { pattern: 'tests/TranslateService.spec.js', included: false, watched: true },
       { pattern: 'tests/**/*.spec.js', included: false, watched: true },
 
       'karma-test-shim.js'

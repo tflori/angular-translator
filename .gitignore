@@ -9,6 +9,5 @@ docs/_site
 !karma-test-shim.js
 !karma.conf.js
 !bundle.js
-!bundles/*.js
 .editorconfig
 typings/**/typings.json

@@ -1,5 +1,6 @@
 import {flushMicrotasks} from "@angular/core/testing";
 
+/* tslint:disable */
 export class PromiseMatcher {
     public static getInstance() {
         if (!this._instance) {
