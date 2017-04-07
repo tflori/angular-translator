@@ -9,6 +9,26 @@ import {TranslateService}                               from "./TranslateService
 import {NgModule}                                       from "@angular/core";
 import {HttpModule}                                     from "@angular/http";
 
+export class DefaultTranslateConfig extends TranslateConfig {
+    constructor() {
+        super({});
+    }
+}
+
+export class DefaultTranslateLoaderJsonConfig extends TranslateLoaderJsonConfig {
+    constructor() {
+        super("assets/i18n/", ".json");
+    }
+}
+
+export const TRANSLATE_PROVIDERS: any[] = [
+    { provide: TranslateConfig, useClass: DefaultTranslateConfig },
+    { provide: TranslateLoaderJsonConfig, useClass: DefaultTranslateLoaderJsonConfig },
+    { provide: TranslateLoader, useClass: TranslateLoaderJson },
+    TranslateLogHandler,
+    TranslateService,
+];
+
 @NgModule({
     declarations: [
         TranslatePipe,
@@ -20,19 +40,7 @@ import {HttpModule}                                     from "@angular/http";
     ],
     imports: [HttpModule],
     providers: [
-        { provide: TranslateConfig, useValue: new TranslateConfig({}) },
-        { provide: TranslateLoaderJsonConfig, useValue: new TranslateLoaderJsonConfig() },
-        { provide: TranslateLoader, useClass: TranslateLoaderJson },
-        { provide: TranslateLogHandler, useClass: TranslateLogHandler },
-        TranslateService,
+        TRANSLATE_PROVIDERS,
     ],
 })
 export class TranslatorModule {}
-
-export const TRANSLATE_PROVIDERS: any[] = [
-    { provide: TranslateConfig, useValue: new TranslateConfig({}) },
-    { provide: TranslateLoaderJsonConfig, useValue: new TranslateLoaderJsonConfig() },
-    { provide: TranslateLoader, useClass: TranslateLoaderJson },
-    { provide: TranslateLogHandler, useValue: TranslateLogHandler },
-    TranslateService,
-];

@@ -149,26 +149,26 @@ Or load the file directly:
 
 ## The Classes
 
-[TranslateConfig](TranslateConfig.html) - 
+[TranslateConfig](TranslateConfig.md) - 
 The TranslateConfig is a dependency for TranslateService. As the name suggests it gives a configuration for the TranslateService.
 
-[TranslateService](TranslateService.html) - 
+[TranslateService](TranslateService.md) - 
 The TranslateService holds the core functionality for this module. It is not only for translation also
 it provides functions for control structures.
 
-[TranslateComponent](TranslateComponent.html) - 
+[TranslateComponent](TranslateComponent.md) - 
 This is a angular2 component for the selector `[translate]`
 
-[TranslatePipe](TranslatePipe.html) - 
+[TranslatePipe](TranslatePipe.md) - 
 The TranslatePipe is the easiest way for translation but it has some drawbacks.
 
-[TranslateLoaderJson](TranslateLoaderJson.html) - 
+[TranslateLoaderJson](TranslateLoaderJson.md) - 
 For now this is the only existing TranslateLoader.
 
 ## Further Readings
 
-You can [make translations dynamic](dynamize.html) by giving parameter that can be used inside the translation.
+You can [make translations dynamic](dynamize.md) by giving parameter that can be used inside the translation.
 
-Configure [TranslateLogHandler](TranslateLogHandler.html) to get informations about missing translations and other problems in your translations.
+Configure [TranslateLogHandler](TranslateLogHandler.md) to get informations about missing translations and other problems in your translations.
 
-Create your own [TranslateLoader](TranslateLoader.html) that fits your needs.
+Create your own [TranslateLoader](TranslateLoader.md) that fits your needs.
