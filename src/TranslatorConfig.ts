@@ -1,8 +1,9 @@
 import {TranslationLoader} from "./TranslationLoader";
 import {TranslationLoaderJson} from "./TranslationLoader/Json";
 
-import {Type} from "@angular/core";
+import {Injectable, Optional, Type} from "@angular/core";
 
+@Injectable()
 export class TranslatorConfig {
     public static navigator: any = window && window.navigator ? window.navigator : {};
 
@@ -38,7 +39,10 @@ export class TranslatorConfig {
 
     private moduleName: string;
 
-    constructor(options?: any, module?: string) {
+    constructor(
+        @Optional() options?: any,
+        @Optional() module?: string,
+    ) {
         this.options.navigatorLanguages = ((): string[] => {
             let navigator: any = TranslatorConfig.navigator;
 
