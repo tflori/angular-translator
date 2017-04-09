@@ -5,7 +5,7 @@ import {TestBed} from "@angular/core/testing";
 describe("TranslatorModule", () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [ TranslatorModule ],
+            imports: [ TranslatorModule.forRoot() ],
         });
     });
 

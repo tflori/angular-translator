@@ -3,10 +3,11 @@ import {TranslationLoader} from "./TranslationLoader";
 import {TranslatorConfig} from "./TranslatorConfig";
 import {TranslatorContainer} from "./TranslatorContainer";
 
-import {Injector} from "@angular/core";
+import {Injectable, Injector} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {Observer} from "rxjs/Observer";
 
+@Injectable()
 export class Translator {
     public static factory(module: string): (translatorContainer: TranslatorContainer) => Translator {
         return (translatorContainer: TranslatorContainer): Translator => {

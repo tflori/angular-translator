@@ -1,7 +1,9 @@
 import {TranslateLogHandler} from "./TranslateLogHandler";
 import {Translator} from "./Translator";
+import {TranslatorContainer} from "./TranslatorContainer";
 
-import {Pipe, PipeTransform} from "@angular/core";
+import {Inject, Pipe, PipeTransform} from "@angular/core";
+import {Subscription} from "rxjs/Subscription";
 
 @Pipe({
     name: "translate",
@@ -21,9 +23,14 @@ export class TranslatePipe implements PipeTransform {
     private promise: Promise<string|string[]>;
     private translation: string = "";
     private translated: { key: string, params: any };
+    private subscription: Subscription;
 
-    constructor(private translator: Translator, private logHandler: TranslateLogHandler) {
-        translator.languageChanged.subscribe(() => {
+    constructor(
+        private translator: Translator,
+        private translatorContainer: TranslatorContainer,
+        private logHandler: TranslateLogHandler,
+    ) {
+        this.subscription = this.translator.languageChanged.subscribe(() => {
             this.startTranslation();
         });
     }
@@ -50,6 +57,10 @@ export class TranslatePipe implements PipeTransform {
             }
         }
 
+        // if (args[1]) {
+        //    this.module = String(args[1]);
+        // }
+
         if (this.translated && this.promise &&
             ( this.translated.key !== key ||
               JSON.stringify(this.translated.params) !== JSON.stringify(params)
@@ -68,6 +79,17 @@ export class TranslatePipe implements PipeTransform {
 
         return this.translation;
     }
+
+    // set module(module: string) {
+    //    if (this.subscription) {
+    //        this.subscription.unsubscribe();
+    //    }
+    //    this.translator = this.translatorContainer.getTranslator(module);
+    //    this.subscription = this.translator.languageChanged.subscribe(() => {
+    //        this.startTranslation();
+    //    });
+    //    this.startTranslation();
+    // }
 
     private startTranslation() {
         if (!this.translated || !this.translated.key) {

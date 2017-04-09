@@ -6,7 +6,7 @@ import {Translator} from "./Translator";
 import {TranslatorConfig} from "./TranslatorConfig";
 import {TranslatorContainer} from "./TranslatorContainer";
 
-import {NgModule} from "@angular/core";
+import {ModuleWithProviders, NgModule} from "@angular/core";
 import {HttpModule} from "@angular/http";
 
 @NgModule({
@@ -20,11 +20,28 @@ import {HttpModule} from "@angular/http";
     ],
     imports: [HttpModule],
     providers: [
-        { provide: TranslatorConfig, useValue: new TranslatorConfig() },
         TranslationLoaderJson,
         TranslateLogHandler,
         TranslatorContainer,
-        { provide: Translator, useFactory: Translator.factory("default"), deps: [ TranslatorContainer ] },
     ],
 })
-export class TranslatorModule {}
+export class TranslatorModule {
+    public static forRoot(config: any = {}): ModuleWithProviders {
+        return {
+            ngModule: TranslatorModule,
+            providers: [
+                { provide: TranslatorConfig, useValue: new TranslatorConfig(config) },
+                { provide: Translator, useFactory: Translator.factory("default"), deps: [TranslatorContainer] },
+            ],
+        };
+    }
+
+    public static forChild(module: string = "default") {
+        return {
+            ngModule: TranslatorModule,
+            providers: [
+                { provide: Translator, useFactory: Translator.factory(module), deps: [TranslatorContainer] },
+            ],
+        };
+    }
+}
