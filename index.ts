@@ -6,4 +6,4 @@ export * from "./src/TranslationLoader/Json";
 export * from "./src/Translator";
 export * from "./src/TranslatorConfig";
 export * from "./src/TranslatorContainer";
-export { TranslatorModule } from "./src/TranslatorModule";
+export * from "./src/TranslatorModule";

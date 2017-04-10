@@ -1,6 +1,6 @@
 {
   "name": "angular2-translator",
-  "version": "2.0.0-alpha3",
+  "version": "2.0.0-alpha5",
   "description": "A translate-service, translate-pipe and translate-component for angular2",
   "repository": {
     "type": "git",
@@ -10,7 +10,7 @@
     "test": "karma start",
     "tslint": "tslint -c tslint.json --exclude=\"**/*.d.ts\" --exclude=\"node_modules/**/*.ts\" \"**/*.ts\"",
     "start": "karma start --singleRun=false --autoWatch=true",
-    "prepublish": "ngc && webpack",
+    "prepublish": "typings install && ngc && webpack",
     "coveralls": "cat coverage/lcov.info | coveralls",
     "karma": "karma start --browsers smallerChrome"
   },
