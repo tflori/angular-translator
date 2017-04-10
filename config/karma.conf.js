@@ -28,7 +28,7 @@ module.exports = function(config) {
         remapCoverageReporter: {
             'text-summary': null, // stdout
             html: './coverage/html',
-            'text-lcov': './coverage/lcov.info',
+            'lcovonly': './coverage/lcov.info',
         },
 
         // Webpack please don't spam the console when running in karma!
