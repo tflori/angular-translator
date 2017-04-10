@@ -95,7 +95,7 @@ main.ts:
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { TranslateLoaderJsonConfig, TranslatorModule } from "angular2-translator";
+import { TranslateLoaderJsonConfig, TranslatorModule } from "angular-translator";
 
 import { AppComponent } from './app.component';
 
