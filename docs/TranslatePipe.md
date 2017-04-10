@@ -36,7 +36,7 @@ For the most usecases we suggest you to translate before in the component. Here 
 
 ```ts
 import {Component} from '@angular/core';
-import {TranslateService} from 'angular2-translator';
+import {TranslateService} from 'angular-translator';
 
 @Component({
   selector: 'my-component',

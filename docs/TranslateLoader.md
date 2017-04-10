@@ -32,7 +32,7 @@ is a complete example how this could look like:
 
 ```ts
 import {Injectable} from "@angular/core";
-import {TranslateLoader} from "angular2-translator";
+import {TranslateLoader} from "angular-translator";
 
 @Injectable()
 export class TranslateLoaderStatic extends TranslateLoader {
@@ -70,7 +70,7 @@ bootstrap can look like:
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { TranslateConfig, TranslateLoader, TranslatorModule } from "angular2-translator";
+import { TranslateConfig, TranslateLoader, TranslatorModule } from "angular-translator";
 
 import { AppComponent } from './app.component';
 import { TranslateLoaderStatic } from "./TranslateLoaderStatic"

@@ -9,7 +9,7 @@ The TranslateConfig is a dependency for TranslateService. As the name suggests i
 
 You can change the properties by giving an object to the constructor:
 ```ts
-import {TranslateConfig} from 'angular2-translator';
+import {TranslateConfig} from 'angular-translator';
 
 new TranslateConfig({
   defaultLang: 'de'
@@ -42,7 +42,7 @@ languages matches against this regular expression too. Otherwise you will never 
 Example:
 
 ```ts
-import {TranslateConfig} from 'angular2-translator';
+import {TranslateConfig} from 'angular-translator';
 
 var translateConfig = new TranslateConfig({
   providedLangs: ['EN', 'EN/usa']
@@ -58,7 +58,7 @@ This example shows how you usually use the TranslateConfig class:
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { TranslateConfig, TranslatorModule } from "angular2-translator";
+import { TranslateConfig, TranslatorModule } from "angular-translator";
 
 import { AppComponent } from './app.component';
 

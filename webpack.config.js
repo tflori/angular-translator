@@ -24,9 +24,9 @@ module.exports = {
     output: {
         path: path.resolve('./bundles'),
         publicPath: 'angular-translator',
-        filename: 'angular2-translator.js',
+        filename: 'angular-translator.js',
         libraryTarget: 'umd',
-        library: 'angular2-translator'
+        library: 'angular-translator'
     },
 
     // require those dependencies but don't bundle them

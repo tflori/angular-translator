@@ -15,7 +15,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-import { TranslateLogHandler, TranslatorModule } from 'angular2-translator';
+import { TranslateLogHandler, TranslatorModule } from 'angular-translator';
 
 import { AppComponent } from './app.component';
 
