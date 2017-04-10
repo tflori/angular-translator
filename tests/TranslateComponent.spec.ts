@@ -1,4 +1,5 @@
 import {
+    provideTranslator,
     TranslateComponent,
     TranslateLogHandler,
     Translator,
@@ -38,7 +39,7 @@ describe("TranslateComponent", () => {
                 TranslatorContainer,
                 { provide: TranslationLoaderMock, useValue: new TranslationLoaderMock() },
                 { provide: TranslatorConfig, useValue: translatorConfig },
-                { provide: Translator, useFactory: Translator.factory("test"), deps: [TranslatorContainer]},
+                provideTranslator("test"),
             ]);
 
             let action = () => {
@@ -63,7 +64,7 @@ describe("TranslateComponent", () => {
                 { provide: TranslationLoaderMock, useValue: new TranslationLoaderMock() },
                 { provide: TranslatorConfig, useValue: translatorConfig },
                 { provide: TranslateLogHandler, useClass: TranslateLogHandlerMock },
-                { provide: Translator, useFactory: Translator.factory("test"), deps: [TranslatorContainer]},
+                provideTranslator("test"),
             ]);
 
             let translator: Translator = injector.get(Translator);
@@ -92,7 +93,7 @@ describe("TranslateComponent", () => {
                     { provide: TranslatorConfig, useValue: translatorConfig},
                     { provide: TranslationLoaderMock, useValue: new TranslationLoaderMock() },
                     { provide: TranslateLogHandler, useClass: TranslateLogHandlerMock },
-                    { provide: Translator, useFactory: Translator.factory("test"), deps: [TranslatorContainer]},
+                    provideTranslator("test"),
                     TranslatorContainer,
                     TranslateComponent,
                 ],

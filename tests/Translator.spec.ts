@@ -92,58 +92,6 @@ describe("Translator", () => {
         });
     });
 
-    describe("factory", () => {
-        let translatorContainer: TranslatorContainer;
-        let translatorConfig: TranslatorConfig;
-
-        beforeEach(() => {
-            translatorConfig = new TranslatorConfig({
-                loader: TranslationLoaderMock,
-            });
-            TestBed.configureTestingModule({
-                providers: [
-                    { provide: TranslatorConfig, useValue: translatorConfig},
-                    { provide: TranslationLoaderMock, useValue: new TranslationLoaderMock() },
-                    { provide: TranslateLogHandler, useClass: TranslateLogHandlerMock },
-                    TranslatorContainer,
-                ],
-            });
-
-            translatorContainer = TestBed.get(TranslatorContainer);
-        });
-
-        it("returns a factory", () => {
-            let factory = Translator.factory("test");
-
-            expect(typeof factory).toBe("function");
-        });
-
-        it("requires a translatorContainer", () => {
-            let factory = Translator.factory("test");
-
-            expect(factory.length).toBe(1); // the type is not testable as it gets converted to js
-        });
-
-        it("calls getTranslator from TranslatorContainer", () => {
-            let factory = Translator.factory("test");
-            spyOn(translatorContainer, "getTranslator");
-
-            factory(translatorContainer);
-
-            expect(translatorContainer.getTranslator).toHaveBeenCalledWith("test");
-        });
-
-        it("returns the result from getTranslator", () => {
-            let factory = Translator.factory("test");
-            let translator = new Translator("anything", TestBed.get(Injector));
-            spyOn(translatorContainer, "getTranslator").and.returnValue(translator);
-
-            let result = factory(translatorContainer);
-
-            expect(result).toBe(translator);
-        });
-    });
-
     describe("instance", () => {
         let translator: Translator;
         let translatorConfig: TranslatorConfig;

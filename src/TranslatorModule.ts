@@ -6,8 +6,11 @@ import {Translator} from "./Translator";
 import {TranslatorConfig} from "./TranslatorConfig";
 import {TranslatorContainer} from "./TranslatorContainer";
 
-import {ModuleWithProviders, NgModule} from "@angular/core";
+import {Inject, InjectionToken, ModuleWithProviders, NgModule, Optional, Provider, SkipSelf} from "@angular/core";
 import {HttpModule} from "@angular/http";
+
+export const TRANSLATOR_OPTIONS: InjectionToken<object> = new InjectionToken("TRANSLATOR_OPTIONS");
+export const TRANSLATOR_MODULE: InjectionToken<string> = new InjectionToken("TRANSLATOR_MODULE");
 
 @NgModule({
     declarations: [
@@ -26,22 +29,29 @@ import {HttpModule} from "@angular/http";
     ],
 })
 export class TranslatorModule {
-    public static forRoot(config: any = {}): ModuleWithProviders {
+    public static forRoot(options: any = {}, module: string = "default"): ModuleWithProviders {
         return {
             ngModule: TranslatorModule,
             providers: [
-                { provide: TranslatorConfig, useValue: new TranslatorConfig(config) },
-                { provide: Translator, useFactory: Translator.factory("default"), deps: [TranslatorContainer] },
+                { provide: TRANSLATOR_OPTIONS, useValue: options },
+                { provide: TranslatorConfig, useFactory: createTranslatorConfig, deps: [ TRANSLATOR_OPTIONS ] },
+                provideTranslator(module),
             ],
         };
     }
+}
 
-    public static forChild(module: string = "default") {
-        return {
-            ngModule: TranslatorModule,
-            providers: [
-                { provide: Translator, useFactory: Translator.factory(module), deps: [TranslatorContainer] },
-            ],
-        };
-    }
+export function provideTranslator(module: string): Provider[] {
+    return [
+        { provide: TRANSLATOR_MODULE, useValue: module },
+        { provide: Translator, useFactory: createTranslator, deps: [ TranslatorContainer, TRANSLATOR_MODULE ] },
+    ];
+}
+
+export function createTranslatorConfig(config: any = {}) {
+    return new TranslatorConfig(config);
+}
+
+export function createTranslator(translatorContainer: TranslatorContainer, module: string) {
+    return translatorContainer.getTranslator(module);
 }

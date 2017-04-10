@@ -9,12 +9,6 @@ import {Observer} from "rxjs/Observer";
 
 @Injectable()
 export class Translator {
-    public static factory(module: string): (translatorContainer: TranslatorContainer) => Translator {
-        return (translatorContainer: TranslatorContainer): Translator => {
-            return translatorContainer.getTranslator(module);
-        };
-    }
-
     private LANGUAGE: string = "en";
 
     private config: TranslatorConfig;
