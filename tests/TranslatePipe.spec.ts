@@ -84,6 +84,7 @@ describe("TranslatePipe", () => {
         let translatorConfig: TranslatorConfig;
         let translatePipe: TranslatePipe;
         let logHandler: TranslateLogHandler;
+        let translateContainer: TranslatorContainer;
 
         beforeEach(() => {
             translatorConfig = new TranslatorConfig({
@@ -105,6 +106,7 @@ describe("TranslatePipe", () => {
             translator = TestBed.get(Translator);
             translatePipe = TestBed.get(TranslatePipe);
             logHandler = TestBed.get(TranslateLogHandler);
+            translateContainer = TestBed.get(TranslatorContainer);
 
             spyOn(translator, "translate").and.returnValue(Promise.resolve("This is a text"));
             spyOn(logHandler, "error");
@@ -198,6 +200,58 @@ describe("TranslatePipe", () => {
             translator.language = "de";
 
             expect(translator.translate).not.toHaveBeenCalled();
+        });
+
+        describe("translatorModule attribute", () => {
+            let anotherTranslator: Translator;
+
+            beforeEach(() => {
+                anotherTranslator = translateContainer.getTranslator("another");
+
+                spyOn(anotherTranslator, "translate").and.returnValue(Promise.resolve("This is a text"));
+            });
+
+            it("uses another module with translatorModule", () => {
+                spyOn(translateContainer, "getTranslator").and.callThrough();
+
+                translatePipe.transform("TEXT", [{}, "another"]);
+
+                expect(translateContainer.getTranslator).toHaveBeenCalledWith("another");
+            });
+
+            it("subscribes to the other language changed", () => {
+                spyOn(anotherTranslator.languageChanged, "subscribe").and.callThrough();
+
+                translatePipe.transform("TEXT", [{}, "another"]);
+
+                expect(anotherTranslator.languageChanged.subscribe).toHaveBeenCalled();
+            });
+
+            it("starts the translation when module got changed", () => {
+                translatePipe.transform("TEXT", [{}]);
+
+                translatePipe.transform("TEXT", [{}, "another"]);
+
+                expect(anotherTranslator.translate).toHaveBeenCalledWith("TEXT", {});
+            });
+
+            it("does not react on language changes of original translator", () => {
+                translatePipe.transform("TEXT", [{}]);
+                translatePipe.transform("TEXT", [{}, "another"]);
+
+                translator.language = "de";
+
+                expect(JasmineHelper.calls(anotherTranslator.translate).count()).toBe(1);
+            });
+
+            it("restarts translation on language changes", () => {
+                translatePipe.transform("TEXT", [{}, "another"]);
+                JasmineHelper.calls(anotherTranslator.translate).reset();
+
+                anotherTranslator.language = "de";
+
+                expect(anotherTranslator.translate).toHaveBeenCalledWith("TEXT", {});
+            });
         });
     });
 });

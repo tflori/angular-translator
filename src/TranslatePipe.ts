@@ -22,7 +22,7 @@ export class TranslatePipe implements PipeTransform {
 
     private promise: Promise<string|string[]>;
     private translation: string = "";
-    private translated: { key: string, params: any };
+    private translated: { key: string, params: any, module: string };
     private subscription: Subscription;
 
     constructor(
@@ -57,13 +57,15 @@ export class TranslatePipe implements PipeTransform {
             }
         }
 
-        // if (args[1]) {
-        //    this.module = String(args[1]);
-        // }
+        if (args[1]) {
+            this.module = String(args[1]);
+        }
 
         if (this.translated && this.promise &&
-            ( this.translated.key !== key ||
-              JSON.stringify(this.translated.params) !== JSON.stringify(params)
+            (
+                this.translated.key !== key ||
+                JSON.stringify(this.translated.params) !== JSON.stringify(params) ||
+                this.translated.module !== args[1]
             )
         ) {
             this.promise = null;
@@ -73,6 +75,7 @@ export class TranslatePipe implements PipeTransform {
             this.translated = {
                 key,
                 params,
+                module: args[1],
             };
             this.startTranslation();
         }
@@ -80,16 +83,15 @@ export class TranslatePipe implements PipeTransform {
         return this.translation;
     }
 
-    // set module(module: string) {
-    //    if (this.subscription) {
-    //        this.subscription.unsubscribe();
-    //    }
-    //    this.translator = this.translatorContainer.getTranslator(module);
-    //    this.subscription = this.translator.languageChanged.subscribe(() => {
-    //        this.startTranslation();
-    //    });
-    //    this.startTranslation();
-    // }
+     set module(module: string) {
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+        }
+        this.translator = this.translatorContainer.getTranslator(module);
+        this.subscription = this.translator.languageChanged.subscribe(() => {
+            this.startTranslation();
+        });
+     }
 
     private startTranslation() {
         if (!this.translated || !this.translated.key) {

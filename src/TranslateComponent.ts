@@ -12,8 +12,8 @@ import {Subscription} from "rxjs/Subscription";
 export class TranslateComponent {
     public translation: string = "";
 
-    private KEY: string;
-    private PARAMS: any = {};
+    private _key: string;
+    private _params: any = {};
     private subscription: Subscription;
 
     constructor(
@@ -27,7 +27,7 @@ export class TranslateComponent {
     }
 
     @Input("translate") set key(key: string) {
-        this.KEY = key;
+        this._key = key;
         this.startTranslation();
     }
 
@@ -37,26 +37,26 @@ export class TranslateComponent {
             return;
         }
 
-        this.PARAMS = params;
+        this._params = params;
         this.startTranslation();
     }
 
-    // @Input("translatorModule") set module(module: string) {
-    //    if (this.subscription) {
-    //        this.subscription.unsubscribe();
-    //    }
-    //    this.translator = this.translatorContainer.getTranslator(module);
-    //    this.subscription = this.translator.languageChanged.subscribe(() => {
-    //        this.startTranslation();
-    //    });
-    //    this.startTranslation();
-    // }
+     @Input("translatorModule") set module(module: string) {
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+        }
+        this.translator = this.translatorContainer.getTranslator(module);
+        this.subscription = this.translator.languageChanged.subscribe(() => {
+            this.startTranslation();
+        });
+        this.startTranslation();
+     }
 
     private startTranslation() {
-        if (!this.KEY) {
+        if (!this._key) {
             return;
         }
-        this.translator.translate(this.KEY, this.PARAMS).then(
+        this.translator.translate(this._key, this._params).then(
             (translation) => this.translation = String(translation),
         );
     }

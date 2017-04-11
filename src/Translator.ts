@@ -9,8 +9,7 @@ import {Observer} from "rxjs/Observer";
 
 @Injectable()
 export class Translator {
-    private LANGUAGE: string = "en";
-
+    private _language: string = "en";
     private config: TranslatorConfig;
     private logHandler: TranslateLogHandler;
     private loader: TranslationLoader;
@@ -20,13 +19,13 @@ export class Translator {
     private translations: object = {};
 
     constructor(
-        private MODULE: string,
+        private _module: string,
         private injector: Injector,
     ) {
         let translatorConfig = injector.get(TranslatorConfig);
-        this.config = MODULE === "default" ? translatorConfig : translatorConfig.module(MODULE);
+        this.config = _module === "default" ? translatorConfig : translatorConfig.module(_module);
 
-        this.LANGUAGE = this.config.defaultLanguage;
+        this._language = this.config.defaultLanguage;
         this.logHandler = injector.get(TranslateLogHandler);
 
         this.languageChangedObservable = new Observable<string>((observer: any) => {
@@ -34,7 +33,7 @@ export class Translator {
         });
 
         injector.get(TranslatorContainer).languageChanged.subscribe((language) => {
-            this.LANGUAGE = language;
+            this._language = language;
         });
     }
 
@@ -43,18 +42,18 @@ export class Translator {
     }
 
     get module(): string {
-        return this.MODULE;
+        return this._module;
     }
 
     get language() {
-        return this.LANGUAGE;
+        return this._language;
     }
 
     set language(language: string) {
         let providedLanguage = this.config.providedLanguage(language, true);
 
         if (typeof providedLanguage === "string") {
-            this.LANGUAGE = providedLanguage;
+            this._language = providedLanguage;
             this.logHandler.info(this.generateMessage("language changed", { language: providedLanguage }));
 
             // only when someone subscribes the observer get created
@@ -174,7 +173,7 @@ export class Translator {
                 return null;
             }
         } else {
-            return this.LANGUAGE;
+            return this._language;
         }
     }
 
