@@ -8,7 +8,7 @@ import {Translator} from "./Translator";
 
 @Injectable()
 export class TranslatorContainer {
-    private LANGUAGE: string = "en";
+    private _language: string = "en";
     private languageChangedObservable: Observable<string>;
     private languageChangedObserver: Observer<string>;
     private translators: any = {};
@@ -18,7 +18,7 @@ export class TranslatorContainer {
         private logHandler: TranslateLogHandler,
         private injector: Injector,
     ) {
-        this.LANGUAGE = config.defaultLanguage;
+        this._language = config.defaultLanguage;
         if (config.detectLanguage) {
             this.detectLanguage();
         }
@@ -30,14 +30,14 @@ export class TranslatorContainer {
     }
 
     get language(): string {
-        return this.LANGUAGE;
+        return this._language;
     }
 
     set language(language: string) {
         let providedLanguage = this.config.providedLanguage(language, true);
 
         if (typeof providedLanguage === "string") {
-            this.LANGUAGE = providedLanguage;
+            this._language = providedLanguage;
 
             // only when someone subscribes the observer get created
             if (this.languageChangedObserver) {
@@ -68,7 +68,7 @@ export class TranslatorContainer {
         let i: number;
 
         const detected = (language): boolean => {
-            this.LANGUAGE = language;
+            this._language = language;
             this.logHandler.info("Language " + language + " got detected");
             return true;
         };

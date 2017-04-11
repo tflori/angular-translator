@@ -81,6 +81,7 @@ describe("TranslateComponent", () => {
         let translatorConfig: TranslatorConfig;
         let translateComponent: TranslateComponent;
         let logHandler: TranslateLogHandler;
+        let translateContainer: TranslatorContainer;
 
         beforeEach(() => {
             translatorConfig = new TranslatorConfig({
@@ -102,6 +103,7 @@ describe("TranslateComponent", () => {
             translator = TestBed.get(Translator);
             translateComponent = TestBed.get(TranslateComponent);
             logHandler = TestBed.get(TranslateLogHandler);
+            translateContainer = TestBed.get(TranslatorContainer);
 
             spyOn(translator, "translate").and.returnValue(Promise.resolve("This is a text"));
             spyOn(logHandler, "error");
@@ -168,6 +170,59 @@ describe("TranslateComponent", () => {
             translateComponent.params = "foo";
 
             expect(logHandler.error).toHaveBeenCalledWith("Params have to be an object");
+        });
+
+        describe("translatorModule attribute", () => {
+            let anotherTranslator: Translator;
+
+            beforeEach(() => {
+                anotherTranslator = translateContainer.getTranslator("another");
+
+                spyOn(anotherTranslator, "translate").and.returnValue(Promise.resolve("This is a text"));
+            });
+
+            it("uses another module with translatorModule", () => {
+                spyOn(translateContainer, "getTranslator").and.callThrough();
+
+                translateComponent.module = "another";
+
+                expect(translateContainer.getTranslator).toHaveBeenCalledWith("another");
+            });
+
+            it("subscribes to the other language changed", () => {
+                spyOn(anotherTranslator.languageChanged, "subscribe").and.callThrough();
+
+                translateComponent.module = "another";
+
+                expect(anotherTranslator.languageChanged.subscribe).toHaveBeenCalled();
+            });
+
+            it("starts the translation after module is changed", () => {
+                translateComponent.key = "TEXT";
+
+                translateComponent.module = "another";
+
+                expect(anotherTranslator.translate).toHaveBeenCalledWith("TEXT", {});
+            });
+
+            it("does not react on language changes of original translator", () => {
+                translateComponent.key = "TEXT";
+                translateComponent.module = "another";
+
+                translator.language = "de";
+
+                expect(JasmineHelper.calls(anotherTranslator.translate).count()).toBe(1);
+            });
+
+            it("restarts translation on language changes", () => {
+                translateComponent.key = "TEXT";
+                translateComponent.module = "another";
+                JasmineHelper.calls(anotherTranslator.translate).reset();
+
+                anotherTranslator.language = "de";
+
+                expect(anotherTranslator.translate).toHaveBeenCalledWith("TEXT", {});
+            });
         });
     });
 });
