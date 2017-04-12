@@ -82,6 +82,22 @@ export class AppComponent {
 
 To learn more have a look at [the documentation](https://tflori.github.io/angular-translator/).
 
+## How to upgrade from angular2-translator
+
+1. Upgrade the package
+  - remove angular2-translator
+  - install angular-translator
+  
+2. Update your setup
+  - use `TranslatorModule.forRoot()`
+  
+3. Change the implementation from TranslateService to Translator
+  - same functionality
+  
+4. Change the implementation for changing the language
+  - you can use `Translator` if you don't plan to have multiple modules
+  - we suggest to use `TranslatorContainer.language` to change the language
+
 ## How to install
 
 ### Get the package
