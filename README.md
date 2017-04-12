@@ -1,11 +1,11 @@
-# Angular2 Translator
+# Angular Translator
 
-[![Build Status](https://travis-ci.org/tflori/angular2-translator.svg?branch=master)](https://travis-ci.org/tflori/angular2-translator)
-[![Coverage Status](https://coveralls.io/repos/github/tflori/angular2-translator/badge.svg?branch=master)](https://coveralls.io/github/tflori/angular2-translator?branch=master)
-[![npm version](https://badge.fury.io/js/angular2-translator.svg)](https://badge.fury.io/js/angular2-translator)
+[![Build Status](https://travis-ci.org/tflori/angular-translator.svg?branch=master)](https://travis-ci.org/tflori/angular-translator)
+[![Coverage Status](https://coveralls.io/repos/github/tflori/angular-translator/badge.svg?branch=master)](https://coveralls.io/github/tflori/angular-translator?branch=master)
+[![npm version](https://badge.fury.io/js/angular-translator.svg)](https://badge.fury.io/js/angular-translator)
 
-`angular2-translator` is a simple translation service for angular2 applications. It should support all necessary
-features for translation, like interpolation, references to other translations and so on.
+`angular-translator` is a simple translation service for angular applications. It should support all necessary
+features for translation. Like interpolation, references to other translations, modules and loaders.
 
 ## Features
 
@@ -22,7 +22,7 @@ It supports interpolation so you can:
 - execute functions in your translations  
   `"LAST_LOGIN":"Your last login was on {{lastLogin.format('MM/DD/YYYY')}}"`
   
-[* dynamic translations](https://tflori.github.io/angular2-translator/dynamize.html)
+[* dynamic translations](https://tflori.github.io/angular-translator/dynamize.html)
   
 ### Refer to other translations
 
@@ -36,83 +36,91 @@ By referring to other translations you can make it easy to have everywhere the s
 }
 ```
 
-[* dynamic translations](https://tflori.github.io/angular2-translator/dynamize.html)
+[* dynamic translations](https://tflori.github.io/angular-translator/dynamize.html)
+
+### Modules
+
+Your translations can be divided to multiple modules. Each module can have a different configuration. This way you have
+more control over the size of translation files and are able to provide some modules in more or less languages.
+
+[* Modules](https://tflori.github.io/angular-translator/modules.html)
 
 ### Different loaders
 
-This module supports different loaders. Currently each loader has to load all translations for the app. You can write
-your own loader or use the only one we have developed for you - the JSON loader.
+This module supports different loaders. It is shipped with a basic JSON loader (next paragraph). You can create own 
+and static loaders. It is also possible to use different loader strategies for each module.
 
-[* TranslateLoader](https://tflori.github.io/angular2-translator/TranslateLoader.html)
+[* TranslationLoader](https://tflori.github.io/angular-translator/TranslationLoader.html)
 
 #### JSON loader
 
-It is a very basic loader that loads your JSON translation files. A translation can be an array to allow multiline
-translations (to make the files readable and better structured).
+It is a basic loader that loads the translation for a specific language and module from your JSON file. A translation
+can be an array to allow multi line translations (to make the files readable and better structured).
 
-[* TranslateLoaderJson](https://tflori.github.io/angular2-translator/TranslateLoaderJson.html)
+[* TranslationLoaderJson](https://tflori.github.io/angular-translator/TranslationLoaderJson.html)
 
 ## How to use
 
 Simple basic usage:
 
 ```ts
-import {Component} from "angular2/core";
-import {TranslateService, TranslatePipe, TranslateComponent} from "angular2-translator";
+import { Component } from "angular2/core";
+import { Translator } from "angular-translator";
 
 @Component({
     selector: "my-app",
     template: "{TEXT|translate} is the same as <span translate=\"TEXT\"></span>"
 })
 export class AppComponent {
-    constructor(translate: TranslateService) {
-        translate.translate("TEXT").then(
+    constructor(translator: Translator) {
+        translator.translate("TEXT").then(
           (translation) => console.log(translation)
         );
     }
 }
 ```
 
-To learn more have a look at [the documentation](https://tflori.github.io/angular2-translator/).
+To learn more have a look at [the documentation](https://tflori.github.io/angular-translator/).
+
+## How to upgrade from angular2-translator
+
+1. Upgrade the package
+  - remove angular2-translator
+  - install angular-translator
+  
+2. Update your setup
+  - use `TranslatorModule.forRoot()`
+  
+3. Change the implementation from TranslateService to Translator
+  - same functionality
+  
+4. Change the implementation for changing the language
+  - you can use `Translator` if you don't plan to have multiple modules
+  - we suggest to use `TranslatorContainer.language` to change the language
 
 ## How to install
 
-### Via npm
+### Get the package
 
 First you need to install the package. The easiest way is to install it via npm:
 
 ```bash
-npm install --save angular2-translator
+npm install --save angular-translator
 ```
 
-### Manually
+## Setup angular module
 
-You also can clone the repository and symlink the project folder or what ever:
-
-```bash
-git clone https://github.com/tflori/angular2-translator.git
-ln -s angular2-translator MyApp/libs/angular2-translator
-```
-
-> You should know what you do and don't follow this guide for installation.
-
-## How to use
-
-You have to set up your `NgModule` to import the `TranslatorModule` and may be configure it:
+You have to set up each `NgModule`  where you want to use the `TranslatorModule` and may be configure it:
 
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { TranslateConfig, TranslatorModule } from "angular2-translator";
+import { TranslatorModule } from "angular-translator";
 
 import { AppComponent } from './app.component';
 
 export function translateConfigFactory() {
-    return new TranslateConfig({
-        defaultLang: "de",
-        providedLangs: [ "de", "en" ],
-        detectLanguageOnStart: false
-    });
+    return new TranslateConfig();
 }
 
 @NgModule({
@@ -121,10 +129,11 @@ export function translateConfigFactory() {
   ],
   imports: [
     BrowserModule,
-    TranslatorModule,
-  ],
-  providers: [
-    { provide: TranslateConfig, useFactory: translateConfigFactory},
+    TranslatorModule.forRoot({
+      defaultLang: "de",
+      providedLangs: [ "de", "en" ],
+      detectLanguageOnStart: false
+    }),
   ],
   bootstrap: [AppComponent]
 })
@@ -133,18 +142,23 @@ export class AppModule { }
 
 ### Using SystemJs
 
-When you are using SystemJs you need to configure where to load angular2-translator:
+When you are using SystemJs you need to configure where to load angular-translator:
 
 ```js
 System.config({
     map: {
-        'angular2-translator':       'npm:angular2-translator/bundles/angular2-translator.js'
+        'angular-translator':       'npm:angular-translator/bundles/angular-translator.js'
     }
 });
 ```
- 
-Or load the file directly:
 
-```html
-<script type="text/javascript" src="node_modules/angular2-translator/bundles/angular2-translator.js"></script>
+### Manually
+
+You also can clone the repository and symlink the project folder or what ever:
+
+```bash
+git clone https://github.com/tflori/angular-translator.git
+ln -s angular-translator MyApp/libs/angular-translator
 ```
+
+> You should know what you do and don't follow this guide for installation.

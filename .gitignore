@@ -3,11 +3,13 @@ node_modules
 coverage/*
 docs/_site
 *.map
+*.metadata.json
 *.d.ts
 !tests/helper/promise-matchers.d.ts
+
 *.js
-!karma-test-shim.js
-!karma.conf.js
-!bundle.js
+!/karma.conf.js
+!/webpack.config.js
+!/config/*.js
 .editorconfig
 typings/**/typings.json

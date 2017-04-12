@@ -1,38 +1,33 @@
-import {TranslateLoader} from "./TranslateLoader";
-import {Inject, Injectable} from "@angular/core";
+import {TranslationLoader} from "../TranslationLoader";
+
+import {Injectable} from "@angular/core";
 import {Http} from "@angular/http";
 
-export class TranslateLoaderJsonConfig {
-    public path: string = "assets/i18n/";
-    public extension: string = ".json";
-
-    // @todo maybe we will change it to a destructed parameter like we did for TranslateConfig
-    constructor(path?: string, extension?: string) {
-        if (path) {
-            this.path = path.replace(/\/+$/, "") + "/";
-        }
-
-        if (extension) {
-            this.extension = extension;
-        }
-    }
-}
-
 @Injectable()
-export class TranslateLoaderJson extends TranslateLoader {
-    private _http: Http;
-    private _config: TranslateLoaderJsonConfig;
-
-    constructor(@Inject(Http) http: Http, @Inject(TranslateLoaderJsonConfig) config: TranslateLoaderJsonConfig) {
+export class TranslationLoaderJson extends TranslationLoader {
+    constructor(private  http: Http) {
         super();
-        this._http = http;
-        this._config = config;
     }
 
-    public load(lang: string): Promise<Object> {
+    public load({
+            language,
+            module = "default",
+            path = "assets/i18n/{{ module }}/{{ language }}.json",
+        }: {
+            language?: string,
+            module?: string,
+            path?: string,
+        }): Promise<object> {
         return new Promise((resolve, reject) => {
-            let file = this._config.path + lang + this._config.extension;
-            this._http.get(file)
+            let file = path.replace(/\{\{\s*([a-z]+)\s*\}\}/g, (substring: string, ...args: any[]) => {
+                switch (args[0]) {
+                    case "language":
+                        return language;
+                    case "module":
+                        return module !== "default" ? module : ".";
+                }
+            });
+            this.http.get(file)
                 .subscribe(
                     (response) => {
                         if (response.status === 200) {
@@ -45,7 +40,7 @@ export class TranslateLoaderJson extends TranslateLoader {
                     },
                     (reason: Error) => {
                         reject(reason.message);
-                    }
+                    },
                 );
         });
     }

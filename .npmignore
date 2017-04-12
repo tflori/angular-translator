@@ -1,21 +1,17 @@
-/src/*
-!/src/*.ts
-/index.*
-!/index.ts
-!/index.d.ts
-
 /coverage/
 /typings/
 /tests/
 /.idea/
 
+/docs/*
+!/docs/*.md
+!/docs/images/
+
 .gitignore
 .editorconfig
-karma-test-shim.js
 karma.conf.js
 node_modules
 npm-debug.log
-bundle.js
 tsconfig.json
 tslint.json
 typings.json

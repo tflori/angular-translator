@@ -1,12 +1,16 @@
-import {TranslateService}            from "./TranslateService";
+import {TranslateLogHandler} from "./TranslateLogHandler";
+import {Translator} from "./Translator";
+import {TranslatorContainer} from "./TranslatorContainer";
+
 import {Inject, Pipe, PipeTransform} from "@angular/core";
+import {Subscription} from "rxjs/Subscription";
 
 @Pipe({
     name: "translate",
     pure: false,
 })
 export class TranslatePipe implements PipeTransform {
-    private static _parseParams(arg: string): Object {
+    private static _parseParams(arg: string): object {
         try {
             let o = eval("(" + arg + ")");
             if (typeof o === "object") {
@@ -16,65 +20,84 @@ export class TranslatePipe implements PipeTransform {
         return {};
     }
 
-    private _translate: TranslateService;
-    private _promise: Promise<string|string[]>;
-    private _translation: string = "";
-    private _translated: { key: string, params: any };
+    private promise: Promise<string|string[]>;
+    private translation: string = "";
+    private translated: { key: string, params: any, module: string };
+    private subscription: Subscription;
 
-    constructor(@Inject(TranslateService) translate: TranslateService) {
-        this._translate = translate;
-
-        translate.languageChanged.subscribe(() => {
-            this._startTranslation();
+    constructor(
+        private translator: Translator,
+        private translatorContainer: TranslatorContainer,
+        private logHandler: TranslateLogHandler,
+    ) {
+        this.subscription = this.translator.languageChanged.subscribe(() => {
+            this.startTranslation();
         });
     }
 
     /**
      * Translates key with given args.
      *
-     * @see TranslateService.translate
+     * @see TranslateService.translator
      * @param {string} key
      * @param {array?} args
      * @returns {string}
      */
     public transform(key: string, args: any[] = []): string {
-        let params: Object = <ObjectConstructor> {};
+        let params: object = {};
 
         if (args[0]) {
             if (typeof args[0] === "string") {
                 params = TranslatePipe._parseParams(args[0]);
                 if (!Object.keys(params).length) {
-                    this._translate.logHandler.error("'" + args[0] + "' could not be parsed to object");
+                    this.logHandler.error("'" + args[0] + "' could not be parsed to object");
                 }
             } else if (typeof args[0] === "object") {
                 params = args[0];
             }
         }
 
-        if (this._translated && this._promise &&
-            ( this._translated.key !== key ||
-              JSON.stringify(this._translated.params) !== JSON.stringify(params)
+        if (args[1]) {
+            this.module = String(args[1]);
+        }
+
+        if (this.translated && this.promise &&
+            (
+                this.translated.key !== key ||
+                JSON.stringify(this.translated.params) !== JSON.stringify(params) ||
+                this.translated.module !== args[1]
             )
         ) {
-            this._promise = null;
+            this.promise = null;
         }
 
-        if (!this._promise) {
-            this._translated = {
+        if (!this.promise) {
+            this.translated = {
                 key,
                 params,
+                module: args[1],
             };
-            this._startTranslation();
+            this.startTranslation();
         }
 
-        return this._translation;
+        return this.translation;
     }
 
-    private _startTranslation() {
-        if (!this._translated || !this._translated.key) {
+     set module(module: string) {
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+        }
+        this.translator = this.translatorContainer.getTranslator(module);
+        this.subscription = this.translator.languageChanged.subscribe(() => {
+            this.startTranslation();
+        });
+     }
+
+    private startTranslation() {
+        if (!this.translated || !this.translated.key) {
             return;
         }
-        this._promise = this._translate.translate(this._translated.key, this._translated.params);
-        this._promise.then((translation) => this._translation = String(translation));
+        this.promise = this.translator.translate(this.translated.key, this.translated.params);
+        this.promise.then((translation) => this.translation = String(translation));
     }
 }

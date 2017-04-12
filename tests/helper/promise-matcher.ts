@@ -1,11 +1,9 @@
 import {flushMicrotasks} from "@angular/core/testing";
 
+/* tslint:disable */
 export class PromiseMatcher {
     public static getInstance() {
-        if (!this._instance) {
-            this._instance = new PromiseMatcher();
-        }
-        return this._instance;
+        return PromiseMatcher._instance;
     }
 
     public static install() {
@@ -16,7 +14,7 @@ export class PromiseMatcher {
         PromiseMatcher.getInstance()._uninstall();
     }
 
-    private static _instance: PromiseMatcher;
+    private static _instance: PromiseMatcher = new PromiseMatcher();;
 
     private _originalPromise: any;
     private _global: any;
@@ -66,7 +64,7 @@ export class PromiseMatcher {
 
 let i = 0;
 export class JasminePromise {
-    public static NativePromise: any;
+    public static NativePromise: any = global.Promise;
 
     public static reject(reason) {
         return new JasminePromise((resolve, reject) => reject(reason));

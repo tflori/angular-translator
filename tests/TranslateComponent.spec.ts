@@ -1,97 +1,155 @@
 import {
-    TRANSLATE_PROVIDERS,
+    provideTranslator,
     TranslateComponent,
-    TranslateConfig,
-    TranslateLoader,
     TranslateLogHandler,
-    TranslateService,
+    Translator,
+    TranslatorConfig,
+    TranslatorContainer,
 } from "../index";
 
-import {JasmineHelper}                  from "./helper/JasmineHelper";
-import {TranslateLoaderMock}            from "./helper/TranslateLoaderMock";
-import {ReflectiveInjector}             from "@angular/core";
-import {fakeAsync, flushMicrotasks}     from "@angular/core/testing";
+import {ReflectiveInjector} from "@angular/core";
+import {fakeAsync, flushMicrotasks, TestBed} from "@angular/core/testing";
+import {JasmineHelper} from "./helper/JasmineHelper";
+import {TranslateLogHandlerMock, TranslationLoaderMock} from "./helper/TranslatorMocks";
 
-describe("TranslateComponent", function() {
+describe("TranslateComponent", () => {
 
-    describe("constructor", function() {
-        it("requires a TranslateService", function () {
+    describe("constructor", () => {
+        it("requires a Translator", () => {
             let injector = ReflectiveInjector.resolveAndCreate([ TranslateComponent ]);
 
-            let action = function () {
-                injector.get(TranslateComponent);
+            let action = () => {
+                try {
+                    injector.get(TranslateComponent);
+                } catch (e) {
+                    expect(e.message).toContain("No provider for Translator!");
+                    throw e;
+                }
             };
-
-            // let providerError = new NoProviderError(injector, ReflectiveKey.get(TranslateService));
-            // providerError.addKey(injector, ReflectiveKey.get(TranslateComponent));
             expect(action).toThrow();
+        });
+
+        it("requires a TranslateLogHandler", () => {
+            let translatorConfig: TranslatorConfig = new TranslatorConfig({
+                loader: TranslationLoaderMock,
+                providedLanguages: [ "en", "de" ],
+            });
+            let injector = ReflectiveInjector.resolveAndCreate([
+                TranslateComponent,
+                TranslatorContainer,
+                { provide: TranslationLoaderMock, useValue: new TranslationLoaderMock() },
+                { provide: TranslatorConfig, useValue: translatorConfig },
+                provideTranslator("test"),
+            ]);
+
+            let action = () => {
+                try {
+                    injector.get(TranslateComponent);
+                } catch (e) {
+                    expect(e.message).toContain("No provider for TranslateLogHandler!");
+                    throw e;
+                }
+            };
+            expect(action).toThrow();
+        });
+
+        it("subscribes on language changes", () => {
+            let translatorConfig: TranslatorConfig = new TranslatorConfig({
+                loader: TranslationLoaderMock,
+                providedLanguages: [ "en", "de" ],
+            });
+            let injector = ReflectiveInjector.resolveAndCreate([
+                TranslateComponent,
+                TranslatorContainer,
+                { provide: TranslationLoaderMock, useValue: new TranslationLoaderMock() },
+                { provide: TranslatorConfig, useValue: translatorConfig },
+                { provide: TranslateLogHandler, useClass: TranslateLogHandlerMock },
+                provideTranslator("test"),
+            ]);
+
+            let translator: Translator = injector.get(Translator);
+            spyOn(translator.languageChanged, "subscribe").and.callThrough();
+
+            injector.get(TranslateComponent);
+
+            expect(translator.languageChanged.subscribe).toHaveBeenCalled();
         });
     });
 
-    describe("instance", function() {
-        let translate: TranslateService;
+    describe("instance", () => {
+        let translator: Translator;
+        let translatorConfig: TranslatorConfig;
         let translateComponent: TranslateComponent;
         let logHandler: TranslateLogHandler;
+        let translateContainer: TranslatorContainer;
 
-        beforeEach(function() {
-            let injector = ReflectiveInjector.resolveAndCreate([
-                TRANSLATE_PROVIDERS,
-                { provide: TranslateLoader, useValue: new TranslateLoaderMock() },
-                { provide: TranslateConfig, useValue: new TranslateConfig( {
-                    providedLangs: [ "en", "de" ],
-                } ) },
-                { provide: TranslateLogHandler, useValue: new TranslateLogHandler() },
-            ]);
+        beforeEach(() => {
+            translatorConfig = new TranslatorConfig({
+                loader: TranslationLoaderMock,
+                providedLanguages: [ "en", "de" ],
+            });
 
-            translate = injector.get(TranslateService);
-            translateComponent = new TranslateComponent(translate);
-            logHandler = injector.get(TranslateLogHandler);
+            TestBed.configureTestingModule({
+                providers: [
+                    { provide: TranslatorConfig, useValue: translatorConfig},
+                    { provide: TranslationLoaderMock, useValue: new TranslationLoaderMock() },
+                    { provide: TranslateLogHandler, useClass: TranslateLogHandlerMock },
+                    provideTranslator("test"),
+                    TranslatorContainer,
+                    TranslateComponent,
+                ],
+            });
 
-            spyOn(translate, "translate").and.returnValue(Promise.resolve("This is a text"));
+            translator = TestBed.get(Translator);
+            translateComponent = TestBed.get(TranslateComponent);
+            logHandler = TestBed.get(TranslateLogHandler);
+            translateContainer = TestBed.get(TranslatorContainer);
+
+            spyOn(translator, "translate").and.returnValue(Promise.resolve("This is a text"));
             spyOn(logHandler, "error");
         });
 
-        it("starts translation when key got set", function() {
+        it("starts translation when key got set", () => {
             translateComponent.key = "TEXT";
 
-            expect(translate.translate).toHaveBeenCalledWith("TEXT", {});
+            expect(translator.translate).toHaveBeenCalledWith("TEXT", {});
         });
 
-        it("starts translation when key is set and params got changed", function() {
+        it("starts translation when key is set and params got changed", () => {
             translateComponent.key = "TEXT";
-            JasmineHelper.calls(translate.translate).reset();
+            JasmineHelper.calls(translator.translate).reset();
 
             translateComponent.params = { some: "value" };
 
-            expect(translate.translate).toHaveBeenCalledWith("TEXT", { some: "value" });
+            expect(translator.translate).toHaveBeenCalledWith("TEXT", { some: "value" });
         });
 
-        it("restarts translation when key got changed", function() {
+        it("restarts translation when key got changed", () => {
             translateComponent.key = "ANYTHING";
             translateComponent.params = { some: "value" };
-            JasmineHelper.calls(translate.translate).reset();
+            JasmineHelper.calls(translator.translate).reset();
 
             translateComponent.key = "TEXT";
 
-            expect(translate.translate).toHaveBeenCalledWith("TEXT", { some: "value" });
+            expect(translator.translate).toHaveBeenCalledWith("TEXT", { some: "value" });
         });
 
-        it("does not translate when key got not set", function() {
+        it("does not translate when key got not set", () => {
             translateComponent.params = { some: "value" };
 
-            expect(translate.translate).not.toHaveBeenCalled();
+            expect(translator.translate).not.toHaveBeenCalled();
         });
 
-        it("does not accept non-object params", function() {
+        it("does not accept non-object params", () => {
             translateComponent.key = "TEXT";
-            JasmineHelper.calls(translate.translate).reset();
+            JasmineHelper.calls(translator.translate).reset();
 
             translateComponent.params = "foo";
 
-            expect(translate.translate).not.toHaveBeenCalled();
+            expect(translator.translate).not.toHaveBeenCalled();
         });
 
-        it("stores translation when promise got resolved", fakeAsync(function() {
+        it("stores translation when promise got resolved", fakeAsync(() => {
             translateComponent.key = "TEXT";
 
             flushMicrotasks();
@@ -99,19 +157,72 @@ describe("TranslateComponent", function() {
             expect(translateComponent.translation).toBe("This is a text");
         }));
 
-        it("restarts translation when language got changed", function() {
+        it("restarts translation when language got changed", () => {
             translateComponent.key = "TEXT";
-            JasmineHelper.calls(translate.translate).reset();
+            JasmineHelper.calls(translator.translate).reset();
 
-            translate.lang = "de";
+            translator.language = "de";
 
-            expect(translate.translate).toHaveBeenCalledWith("TEXT", {});
+            expect(translator.translate).toHaveBeenCalledWith("TEXT", {});
         });
 
-        it("shows error if params are not object", function() {
+        it("shows error if params are not object", () => {
             translateComponent.params = "foo";
 
             expect(logHandler.error).toHaveBeenCalledWith("Params have to be an object");
+        });
+
+        describe("translatorModule attribute", () => {
+            let anotherTranslator: Translator;
+
+            beforeEach(() => {
+                anotherTranslator = translateContainer.getTranslator("another");
+
+                spyOn(anotherTranslator, "translate").and.returnValue(Promise.resolve("This is a text"));
+            });
+
+            it("uses another module with translatorModule", () => {
+                spyOn(translateContainer, "getTranslator").and.callThrough();
+
+                translateComponent.module = "another";
+
+                expect(translateContainer.getTranslator).toHaveBeenCalledWith("another");
+            });
+
+            it("subscribes to the other language changed", () => {
+                spyOn(anotherTranslator.languageChanged, "subscribe").and.callThrough();
+
+                translateComponent.module = "another";
+
+                expect(anotherTranslator.languageChanged.subscribe).toHaveBeenCalled();
+            });
+
+            it("starts the translation after module is changed", () => {
+                translateComponent.key = "TEXT";
+
+                translateComponent.module = "another";
+
+                expect(anotherTranslator.translate).toHaveBeenCalledWith("TEXT", {});
+            });
+
+            it("does not react on language changes of original translator", () => {
+                translateComponent.key = "TEXT";
+                translateComponent.module = "another";
+
+                translator.language = "de";
+
+                expect(JasmineHelper.calls(anotherTranslator.translate).count()).toBe(1);
+            });
+
+            it("restarts translation on language changes", () => {
+                translateComponent.key = "TEXT";
+                translateComponent.module = "another";
+                JasmineHelper.calls(anotherTranslator.translate).reset();
+
+                anotherTranslator.language = "de";
+
+                expect(anotherTranslator.translate).toHaveBeenCalledWith("TEXT", {});
+            });
         });
     });
 });

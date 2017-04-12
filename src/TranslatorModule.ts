@@ -1,33 +1,16 @@
-import {TranslateComponent}                             from "./TranslateComponent";
-import {TranslateConfig}                                from "./TranslateConfig";
-import {TranslateLoader}                                from "./TranslateLoader";
-import {TranslateLoaderJson, TranslateLoaderJsonConfig} from "./TranslateLoaderJson";
-import {TranslateLogHandler}                            from "./TranslateLogHandler";
-import {TranslatePipe}                                  from "./TranslatePipe";
-import {TranslateService}                               from "./TranslateService";
+import {TranslateComponent} from "./TranslateComponent";
+import {TranslateLogHandler} from "./TranslateLogHandler";
+import {TranslatePipe} from "./TranslatePipe";
+import {TranslationLoaderJson} from "./TranslationLoader/Json";
+import {Translator} from "./Translator";
+import {TranslatorConfig} from "./TranslatorConfig";
+import {TranslatorContainer} from "./TranslatorContainer";
 
-import {NgModule}                                       from "@angular/core";
-import {HttpModule}                                     from "@angular/http";
+import {Inject, InjectionToken, ModuleWithProviders, NgModule, Optional, Provider, SkipSelf} from "@angular/core";
+import {HttpModule} from "@angular/http";
 
-export class DefaultTranslateConfig extends TranslateConfig {
-    constructor() {
-        super({});
-    }
-}
-
-export class DefaultTranslateLoaderJsonConfig extends TranslateLoaderJsonConfig {
-    constructor() {
-        super("assets/i18n/", ".json");
-    }
-}
-
-export const TRANSLATE_PROVIDERS: any[] = [
-    { provide: TranslateConfig, useClass: DefaultTranslateConfig },
-    { provide: TranslateLoaderJsonConfig, useClass: DefaultTranslateLoaderJsonConfig },
-    { provide: TranslateLoader, useClass: TranslateLoaderJson },
-    TranslateLogHandler,
-    TranslateService,
-];
+export const TRANSLATOR_OPTIONS: InjectionToken<object> = new InjectionToken("TRANSLATOR_OPTIONS");
+export const TRANSLATOR_MODULE: InjectionToken<string> = new InjectionToken("TRANSLATOR_MODULE");
 
 @NgModule({
     declarations: [
@@ -40,7 +23,35 @@ export const TRANSLATE_PROVIDERS: any[] = [
     ],
     imports: [HttpModule],
     providers: [
-        TRANSLATE_PROVIDERS,
+        TranslationLoaderJson,
+        TranslateLogHandler,
+        TranslatorContainer,
     ],
 })
-export class TranslatorModule {}
+export class TranslatorModule {
+    public static forRoot(options: any = {}, module: string = "default"): ModuleWithProviders {
+        return {
+            ngModule: TranslatorModule,
+            providers: [
+                { provide: TRANSLATOR_OPTIONS, useValue: options },
+                { provide: TranslatorConfig, useFactory: createTranslatorConfig, deps: [ TRANSLATOR_OPTIONS ] },
+                provideTranslator(module),
+            ],
+        };
+    }
+}
+
+export function provideTranslator(module: string): Provider[] {
+    return [
+        { provide: TRANSLATOR_MODULE, useValue: module },
+        { provide: Translator, useFactory: createTranslator, deps: [ TranslatorContainer, TRANSLATOR_MODULE ] },
+    ];
+}
+
+export function createTranslatorConfig(config: any = {}) {
+    return new TranslatorConfig(config);
+}
+
+export function createTranslator(translatorContainer: TranslatorContainer, module: string) {
+    return translatorContainer.getTranslator(module);
+}

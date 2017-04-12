@@ -5,11 +5,11 @@ permalink: /
 ---
 # Angular2 Translator
 
-[![Build Status](https://travis-ci.org/tflori/angular2-translator.svg?branch=master)](https://travis-ci.org/tflori/angular2-translator)
-[![Coverage Status](https://coveralls.io/repos/github/tflori/angular2-translator/badge.svg?branch=master)](https://coveralls.io/github/tflori/angular2-translator?branch=master)
-[![npm version](https://badge.fury.io/js/angular2-translator.svg)](https://badge.fury.io/js/angular2-translator)
+[![Build Status](https://travis-ci.org/tflori/angular-translator.svg?branch=master)](https://travis-ci.org/tflori/angular-translator)
+[![Coverage Status](https://coveralls.io/repos/github/tflori/angular-translator/badge.svg?branch=master)](https://coveralls.io/github/tflori/angular-translator?branch=master)
+[![npm version](https://badge.fury.io/js/angular-translator.svg)](https://badge.fury.io/js/angular-translator)
 
-`angular2-translator` is a simple translation service for angular2 applications. It should support all necessary
+`angular-translator` is a simple translation service for angular2 applications. It should support all necessary
 features for translation, like interpolation, references to other translations and so on.
 
 ## Features
@@ -57,7 +57,7 @@ Simple basic usage:
 
 ```ts
 import {Component} from "angular2/core";
-import {TranslateService, TranslatePipe, TranslateComponent} from "angular2-translator";
+import {TranslateService, TranslatePipe, TranslateComponent} from "angular-translator";
 
 @Component({
     selector: "my-app",
@@ -79,7 +79,7 @@ export class AppComponent {
 First you need to install the package. The easiest way is to install it via npm:
 
 ```bash
-npm install --save angular2-translator
+npm install --save angular-translator
 ```
 
 ### Manually
@@ -87,8 +87,8 @@ npm install --save angular2-translator
 You also can clone the repository and symlink the project folder or what ever:
 
 ```bash
-git clone https://github.com/tflori/angular2-translator.git
-ln -s angular2-translator MyApp/libs/angular2-translator
+git clone https://github.com/tflori/angular-translator.git
+ln -s angular-translator MyApp/libs/angular-translator
 ```
 
 > You should know what you do and don't follow this guide for installation.
@@ -100,7 +100,7 @@ You have to set up your `NgModule` to import the `TranslatorModule` and may be c
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { TranslateConfig, TranslatorModule } from "angular2-translator";
+import { TranslateConfig, TranslatorModule } from "angular-translator";
 
 import { AppComponent } from './app.component';
 
@@ -130,12 +130,12 @@ export class AppModule { }
 
 ### Using SystemJs
 
-When you are using SystemJs you need to configure where to load angular2-translator:
+When you are using SystemJs you need to configure where to load angular-translator:
 
 ```js
 System.config({
     map: {
-        'angular2-translator':       'npm:angular2-translator/bundles/angular2-translator.js'
+        'angular-translator':       'npm:angular-translator/bundles/angular-translator.js'
     }
 });
 ```
@@ -143,7 +143,7 @@ System.config({
 Or load the file directly:
 
 ```html
-<script type="text/javascript" src="node_modules/angular2-translator/bundles/angular2-translator.js"></script>
+<script type="text/javascript" src="node_modules/angular-translator/bundles/angular-translator.js"></script>
 ```
 
 
