@@ -84,89 +84,93 @@ To learn more have a look at [the documentation](https://tflori.github.io/angula
 
 ## How to upgrade from angular2-translator
 
-1. Upgrade the package  
-  Remove angular2-translator and install angular-translator
+### 1. Upgrade the package
+
+    Remove angular2-translator and install angular-translator
   
     ```bash
     npm remove angular2-translator --save
     npm install angular-translator --save
     ```
   
-2. Update your setup  
-  Angular translator now gives a simple to use static method to configure. You can also remove the providers as they
-  are created by this function.
+### 2. Update your setup
+
+    Angular translator now gives a simple to use static method to configure. You can also remove the providers as they
+    are created by this function.
   
-  ```ts
-  import { BrowserModule } from '@angular/platform-browser';
-  import { NgModule } from '@angular/core';
-  import { FormsModule } from '@angular/forms';
-  import { HttpModule } from '@angular/http';
+    ```ts
+    import { BrowserModule } from '@angular/platform-browser';
+    import { NgModule } from '@angular/core';
+    import { FormsModule } from '@angular/forms';
+    import { HttpModule } from '@angular/http';
+    
+    import { TranslatorModule } from 'angular-translator';
+    
+    import { AppComponent } from './app.component';
+    
+    @NgModule({
+      declarations: [
+        AppComponent
+      ],
+      imports: [
+        BrowserModule,
+        FormsModule,
+        HttpModule,
+        TranslatorModule.forRoot({
+          providedLanguages: ['de', 'en', 'ru'],
+          defaultLanguage: 'de'
+        })
+      ],
+      providers: [],
+      bootstrap: [AppComponent]
+    })
+    export class AppModule { }
+    ```
   
-  import { TranslatorModule } from 'angular-translator';
-  
-  import { AppComponent } from './app.component';
-  
-  @NgModule({
-    declarations: [
-      AppComponent
-    ],
-    imports: [
-      BrowserModule,
-      FormsModule,
-      HttpModule,
-      TranslatorModule.forRoot({
-        providedLanguages: ['de', 'en', 'ru'],
-        defaultLanguage: 'de'
-      })
-    ],
-    providers: [],
-    bootstrap: [AppComponent]
-  })
-  export class AppModule { }
-  ```
-  
-3. Change the implementation from TranslateService to Translator  
-  The `TranslateService` has been renamed to `Translator`. It has the same methods can be interchanged:
-  
-  ```ts
-  import { Component } from '@angular/core';
-  
-  import { TranslateService } from 'angular2-translator'; // before
-  import { Translator } from 'angular-translator'; // now
-  
-  @Component()
-  export class ComponentBefore {
-    constructor(translateService: TranslateService) {
-      translateService.translate('TEXT').then((translation) => this.text = translation);
+### 3. Change the implementation from TranslateService to Translator
+
+    The `TranslateService` has been renamed to `Translator`. It has the same methods can be interchanged:
+    
+    ```ts
+    import { Component } from '@angular/core';
+    
+    import { TranslateService } from 'angular2-translator'; // before
+    import { Translator } from 'angular-translator'; // now
+    
+    @Component()
+    export class ComponentBefore {
+      constructor(translateService: TranslateService) {
+        translateService.translate('TEXT').then((translation) => this.text = translation);
+      }
     }
-  }
-  
-  @Component()
-  export class ComponentNow {
-    constructor(translator: Translator) {
-      translator.translate('TEXT').then((translation) => this.text = translation);
+    
+    @Component()
+    export class ComponentNow {
+      constructor(translator: Translator) {
+        translator.translate('TEXT').then((translation) => this.text = translation);
+      }
     }
-  }
-  ```
+    ```
+    
+    > You can do this by search and replace on your own risk.
   
-  > You can do this by search and replace on your own risk.
+### 4. Change the implementation for changing the language
+
+    The `Translator` still have a public property language and you can leave it as it is. There is a new Service called
+    `TranslatorContainer` that holds all `Translator`s for different modules. When you want to change the language for
+    every module you maybe want to change `TranslatorContainer.language`.
   
-4. Change the implementation for changing the language  
-  The `Translator` still have a public property language and you can leave it as it is. There is a new Service called
-  `TranslatorContainer` that holds all `Translator`s for different modules. When you want to change the language for
-  every module you maybe want to change `TranslatorContainer.language`.
+### 5. Other questions
   
-5. Other questions  
-  
-  > I used the `languageChanged` observable to update translations inside services and components. Do I need to change
-  here something?  
-  
-  No, the `Translator` has the same observable that should be used now.
-  
-  > My configuration seems to be ignored after upgrade.
-  
-  May be you copied your previous config. The parameters have changed: defaultLang - defaultLanguage, providedLangs - 
-  providedLanguages, detectLanguageOnStart - detectLanguage.
+    > I used the `languageChanged` observable to update translations inside services and components. Do I need to change
+    here something?  
+    
+    No, the `Translator` has the same observable that should be used now.
+    
+    > My configuration seems to be ignored after upgrade.
+    
+    May be you copied your previous config. The parameters have changed: defaultLang - defaultLanguage, providedLangs - 
+    providedLanguages, detectLanguageOnStart - detectLanguage.
 
 ## How to install
 
