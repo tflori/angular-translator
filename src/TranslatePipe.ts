@@ -40,32 +40,28 @@ export class TranslatePipe implements PipeTransform {
      *
      * @see TranslateService.translator
      * @param {string} key
-     * @param {array?} args
+     * @param {object} params
+     * @param {string?} module
      * @returns {string}
      */
-    public transform(key: string, args: any[] = []): string {
-        let params: object = {};
-
-        if (args[0]) {
-            if (typeof args[0] === "string") {
-                params = TranslatePipe._parseParams(args[0]);
-                if (!Object.keys(params).length) {
-                    this.logHandler.error("'" + args[0] + "' could not be parsed to object");
-                }
-            } else if (typeof args[0] === "object") {
-                params = args[0];
-            }
+    public transform(key: string, params: object = {}, module?: string): string {
+        if (module) {
+            this.module = module;
         }
 
-        if (args[1]) {
-            this.module = String(args[1]);
+        // backward compatibility: highly deprecated
+        if (params instanceof Array) {
+            params = params[0];
+            if (typeof params === "string") {
+                params = TranslatePipe._parseParams(params);
+            }
         }
 
         if (this.translated && this.promise &&
             (
                 this.translated.key !== key ||
                 JSON.stringify(this.translated.params) !== JSON.stringify(params) ||
-                this.translated.module !== args[1]
+                this.translated.module !== module
             )
         ) {
             this.promise = null;
@@ -75,7 +71,7 @@ export class TranslatePipe implements PipeTransform {
             this.translated = {
                 key,
                 params,
-                module: args[1],
+                module,
             };
             this.startTranslation();
         }
