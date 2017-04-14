@@ -1,6 +1,6 @@
 {
   "name": "angular-translator",
-  "version": "2.0.0-RC3",
+  "version": "2.0.0-RC4",
   "description": "A translate-service, translate-pipe and translate-component for angular2",
   "repository": {
     "type": "git",

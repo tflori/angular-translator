@@ -22,10 +22,12 @@ describe("Translator", () => {
     describe("constructor", () => {
         let injector: Injector;
         let translatorConfig: TranslatorConfig;
+        let translatorContainer: TranslatorContainer;
 
         beforeEach(() => {
             translatorConfig = new TranslatorConfig({
                 loader: TranslationLoaderMock,
+                detectLanguage: false,
             });
             TestBed.configureTestingModule({
                 providers: [
@@ -35,6 +37,7 @@ describe("Translator", () => {
                     TranslatorContainer,
                 ],
             });
+            translatorContainer = TestBed.get(TranslatorContainer);
             injector = TestBed.get(Injector);
         });
 
@@ -65,12 +68,34 @@ describe("Translator", () => {
             expect(translatorConfig.module).not.toHaveBeenCalled();
         });
 
-        it("initialize with default language", () => {
+        it("initialize with current language from TranslatorContainer", () => {
             translatorConfig.setOptions({
                 defaultLanguage: "de",
                 providedLanguages: [ "de", "en" ],
+                detectLanguage: false,
             });
+            translatorContainer.language = "en";
+
             let translator = new Translator("default", injector);
+
+            expect(translator.language).toBe("en");
+        });
+
+        it("uses default language if the language is not provided", () => {
+            translatorConfig.setOptions({
+                defaultLanguage: "ru",
+                providedLanguages: [ "de", "en", "ru" ],
+                detectLanguage: false,
+                modules: {
+                    test: {
+                        defaultLanguage: "de",
+                        providedLanguages: ["de", "en"],
+                    },
+                },
+            });
+            translatorContainer.language = "ru";
+
+            let translator = new Translator("test", injector);
 
             expect(translator.language).toBe("de");
         });
@@ -102,6 +127,7 @@ describe("Translator", () => {
             translatorConfig = new TranslatorConfig({
                 loader: TranslationLoaderMock,
                 providedLanguages: [ "en", "de" ],
+                detectLanguage: false,
             });
             TestBed.configureTestingModule({
                 providers: [
@@ -1180,6 +1206,7 @@ describe("Translator", () => {
             translatorConfig = new TranslatorConfig({
                 loader: TranslationLoaderMock,
                 providedLanguages: [ "en", "de" ],
+                detectLanguage: false,
             });
             TestBed.configureTestingModule({
                 providers: [
