@@ -2,12 +2,16 @@ import {TranslateLogHandler} from "./TranslateLogHandler";
 import {Translator} from "./Translator";
 import {TranslatorContainer} from "./TranslatorContainer";
 
-import {Component, Inject, Input} from "@angular/core";
+import {Component, Input} from "@angular/core";
 import {Subscription} from "rxjs/Subscription";
 
 @Component({
     selector: "[translate]",
     template: "{{translation}}",
+    inputs: [
+        "params:translateParams",
+        "module:translatorModule",
+    ],
 })
 export class TranslateComponent {
     public translation: string = "";
@@ -31,7 +35,7 @@ export class TranslateComponent {
         this.startTranslation();
     }
 
-    @Input("translateParams") set params(params: any) {
+    set params(params: any) {
         if (typeof params !== "object") {
             this.logHandler.error("Params have to be an object");
             return;
@@ -41,7 +45,7 @@ export class TranslateComponent {
         this.startTranslation();
     }
 
-     @Input("translatorModule") set module(module: string) {
+    set module(module: string) {
         if (this.subscription) {
             this.subscription.unsubscribe();
         }
@@ -50,7 +54,7 @@ export class TranslateComponent {
             this.startTranslation();
         });
         this.startTranslation();
-     }
+    }
 
     private startTranslation() {
         if (!this._key) {
