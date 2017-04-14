@@ -23,16 +23,23 @@ export class Translator {
         private injector: Injector,
     ) {
         let translatorConfig = injector.get(TranslatorConfig);
+        this.logHandler = injector.get(TranslateLogHandler);
+        let translatorContainer = injector.get(TranslatorContainer);
+
         this.config = _module === "default" ? translatorConfig : translatorConfig.module(_module);
 
-        this._language = this.config.defaultLanguage;
-        this.logHandler = injector.get(TranslateLogHandler);
+        let providedLanguage = this.config.providedLanguage(translatorContainer.language);
+        if (typeof providedLanguage === "string") {
+            this._language = providedLanguage;
+        } else {
+            this._language = this.config.defaultLanguage;
+        }
 
         this.languageChangedObservable = new Observable<string>((observer: any) => {
             this.languageChangedObserver = observer;
         });
 
-        injector.get(TranslatorContainer).languageChanged.subscribe((language) => {
+        translatorContainer.languageChanged.subscribe((language) => {
             this._language = language;
         });
     }
