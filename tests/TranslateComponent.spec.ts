@@ -5,9 +5,10 @@ import {
     Translator,
     TranslatorConfig,
     TranslatorContainer,
+    TranslatorModule,
 } from "../index";
 
-import {ReflectiveInjector} from "@angular/core";
+import {Component, ReflectiveInjector} from "@angular/core";
 import {fakeAsync, flushMicrotasks, TestBed} from "@angular/core/testing";
 import {JasmineHelper} from "./helper/JasmineHelper";
 import {TranslateLogHandlerMock, TranslationLoaderMock} from "./helper/TranslatorMocks";
@@ -223,6 +224,35 @@ describe("TranslateComponent", () => {
 
                 expect(anotherTranslator.translate).toHaveBeenCalledWith("TEXT", {});
             });
+        });
+    });
+
+    describe("within module", () => {
+        let translator: Translator;
+
+        @Component({
+            selector: "my-component",
+            template: `<p translate="TEXT" [translateParams]="{ some: 'value' }"></p>`,
+        })
+        class MyComponent {}
+
+        beforeEach(() => {
+            TestBed.configureTestingModule({
+                imports: [ TranslatorModule.forRoot() ],
+                declarations: [ MyComponent ],
+            });
+
+            translator = TestBed.get(Translator);
+            spyOn(translator, "translate").and.returnValue(Promise.resolve("some text"));
+        });
+
+        it("first resolves the parameters", () => {
+            let component = TestBed.createComponent(MyComponent);
+
+            component.detectChanges();
+
+            expect(translator.translate).toHaveBeenCalledWith("TEXT", { some: "value" });
+            expect(JasmineHelper.calls(translator.translate).count()).toBe(1);
         });
     });
 });
