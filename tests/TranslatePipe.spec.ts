@@ -132,21 +132,9 @@ describe("TranslatePipe", () => {
         });
 
         it("gets params from args[0]", () => {
-            translatePipe.transform("TEXT", [{ some: "value" }]);
+            translatePipe.transform("TEXT", { some: "value" });
 
             expect(translator.translate).toHaveBeenCalledWith("TEXT", { some: "value" });
-        });
-
-        it("evaluates args[0] to get object", () => {
-            translatePipe.transform("TEXT", ["{some:'value'}"]);
-
-            expect(translator.translate).toHaveBeenCalledWith("TEXT", { some: "value" });
-        });
-
-        it("calls with empty object if args[0] got not evaluated to object", () => {
-            translatePipe.transform("TEXT", ["'value'"]);
-
-            expect(translator.translate).toHaveBeenCalledWith("TEXT", {});
         });
 
         it("returns translation when promise got resolved", fakeAsync(() => {
@@ -168,8 +156,8 @@ describe("TranslatePipe", () => {
         });
 
         it("calls translate again when params changes", () => {
-            translatePipe.transform("TEXT", [{ some: "value" }]);
-            translatePipe.transform("TEXT", [{ some: "otherValue" }]);
+            translatePipe.transform("TEXT", { some: "value" });
+            translatePipe.transform("TEXT", { some: "otherValue" });
 
             expect(translator.translate).toHaveBeenCalledWith("TEXT", { some: "value" });
             expect(translator.translate).toHaveBeenCalledWith("TEXT", { some: "otherValue" });
@@ -184,22 +172,31 @@ describe("TranslatePipe", () => {
             expect(JasmineHelper.calls(translator.translate).count()).toBe(2);
         });
 
-        it("shows error if params could not be parsed", () => {
-            translatePipe.transform("TEXT", ["{baefa}"]);
-
-            expect(logHandler.error).toHaveBeenCalledWith("'{baefa}' could not be parsed to object");
-        });
-
-        it("ignores params that are not object or string", () => {
-            translatePipe.transform("TEXT", [42]);
-
-            expect(translator.translate).toHaveBeenCalledWith("TEXT", {});
-        });
-
         it("does not translate when no values given", () => {
             translator.language = "de";
 
             expect(translator.translate).not.toHaveBeenCalled();
+        });
+
+        it("uses the first item of array if params is an array", () => {
+            let params: any = { some: "value" };
+            translatePipe.transform("TEXT", [params]);
+
+            expect(translator.translate).toHaveBeenCalledWith("TEXT", { some: "value" });
+        });
+
+        it("parses string for backward compatibility", () => {
+            let params: any = "{ some: 'value' }";
+            translatePipe.transform("TEXT", [params]);
+
+            expect(translator.translate).toHaveBeenCalledWith("TEXT", { some: "value" });
+        });
+
+        it("ignores errors while parsing", () => {
+            let params: any = "{something}";
+            translatePipe.transform("TEXT", [params]);
+
+            expect(translator.translate).toHaveBeenCalledWith("TEXT", {});
         });
 
         describe("translatorModule attribute", () => {
@@ -214,7 +211,7 @@ describe("TranslatePipe", () => {
             it("uses another module with translatorModule", () => {
                 spyOn(translateContainer, "getTranslator").and.callThrough();
 
-                translatePipe.transform("TEXT", [{}, "another"]);
+                translatePipe.transform("TEXT", {}, "another");
 
                 expect(translateContainer.getTranslator).toHaveBeenCalledWith("another");
             });
@@ -222,22 +219,22 @@ describe("TranslatePipe", () => {
             it("subscribes to the other language changed", () => {
                 spyOn(anotherTranslator.languageChanged, "subscribe").and.callThrough();
 
-                translatePipe.transform("TEXT", [{}, "another"]);
+                translatePipe.transform("TEXT", {}, "another");
 
                 expect(anotherTranslator.languageChanged.subscribe).toHaveBeenCalled();
             });
 
             it("starts the translation when module got changed", () => {
-                translatePipe.transform("TEXT", [{}]);
+                translatePipe.transform("TEXT", {});
 
-                translatePipe.transform("TEXT", [{}, "another"]);
+                translatePipe.transform("TEXT", {}, "another");
 
                 expect(anotherTranslator.translate).toHaveBeenCalledWith("TEXT", {});
             });
 
             it("does not react on language changes of original translator", () => {
-                translatePipe.transform("TEXT", [{}]);
-                translatePipe.transform("TEXT", [{}, "another"]);
+                translatePipe.transform("TEXT", {});
+                translatePipe.transform("TEXT", {}, "another");
 
                 translator.language = "de";
 
@@ -245,7 +242,7 @@ describe("TranslatePipe", () => {
             });
 
             it("restarts translation on language changes", () => {
-                translatePipe.transform("TEXT", [{}, "another"]);
+                translatePipe.transform("TEXT", {}, "another");
                 JasmineHelper.calls(anotherTranslator.translate).reset();
 
                 anotherTranslator.language = "de";
