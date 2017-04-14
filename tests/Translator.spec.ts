@@ -72,7 +72,7 @@ describe("Translator", () => {
             translatorConfig.setOptions({
                 defaultLanguage: "de",
                 providedLanguages: [ "de", "en" ],
-                detectLanguage: false
+                detectLanguage: false,
             });
             translatorContainer.language = "en";
 
@@ -89,9 +89,9 @@ describe("Translator", () => {
                 modules: {
                     test: {
                         defaultLanguage: "de",
-                        providedLanguages: ["de", "en"]
-                    }
-                }
+                        providedLanguages: ["de", "en"],
+                    },
+                },
             });
             translatorContainer.language = "ru";
 
