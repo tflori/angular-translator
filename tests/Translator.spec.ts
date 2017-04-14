@@ -1191,6 +1191,18 @@ describe("Translator", () => {
                 expect(translation).toBe("The sum from 1+2 is 3");
                 expect(translateLogHandler.error).toHaveBeenCalledWith("Parameters can not be an array.");
             }));
+
+            it("resolves 0 number as '0'", fakeAsync(() => {
+                translator.waitForTranslation();
+                loaderPromiseResolve({
+                    INTERPOLATION: "The count is {{count}}",
+                });
+                JasminePromise.flush();
+
+                let translation = translator.instant("INTERPOLATION", { count: 0 });
+
+                expect(translation).toBe("The count is 0");
+            }));
         });
     });
 

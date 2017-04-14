@@ -243,7 +243,7 @@ export class Translator {
             }
         }
         func.push("return (" + expression + "); })()");
-        return eval(func.join("\n"));
+        return String(eval(func.join("\n")));
     }
     /* tslint:enable:variable-name */
 
