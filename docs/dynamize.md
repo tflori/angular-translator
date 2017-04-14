@@ -15,23 +15,23 @@ This is a simple example with a count to show how it works.
 Your translation file:
 
 ```json
-{ "NEW_MESSAGES": "You have {% raw %}{{count}}{% endraw %} new message{% raw %}{{count == 1 ? '' : 's'}}{% endraw %}" }
+{ "NEW_MESSAGES": "You have {% raw %}{{ count }}{% endraw %} new message{% raw %}{{ count == 1 ? '' : 's' }}{% endraw %}" }
 ```
 
 In your component you can use it like this:
 
 ```ts
-translateService.translate('NEW_MESSAGES', {count: 42}).then((translation) => this.translation = translation);
+translator.translate('NEW_MESSAGES', {count: 42}).then((translation) => this.translation = translation);
 ```
 
 In your template are two ways to use it:
 
 ```html
 <h5>pipe example</h5>
-<p>{% raw %}{{'NEW_MESSAGES'|translate:'{count:42}'}}{% endraw %}</p>
+<p>{% raw %}{{ 'NEW_MESSAGES' | translate : { count: 42 } }}{% endraw %}</p>
 
 <h5>component example</h5>
-<p translate="NEW_MESSAGES" [translateParams]="{count:42}"></p>
+<p translate="NEW_MESSAGES" [translateParams]="{ count: 0 }"></p>
 ```
 
 ## Loading other translations
