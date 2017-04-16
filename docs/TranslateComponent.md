@@ -36,5 +36,15 @@ By adding brackets:
 By using variable inside attribute:
 
 ```html
-<p translate="SOME_{{key}}"></p>
+<p translate="SOME_{% raw %}{{ key }}{% endraw %}"></p>
+```
+
+## Module
+
+You can use a specific module by adding `translatorModule` attribute - you can make it dynamic the same way as
+parameters. If this is empty the provided `Translator` will be used. You can overwrite the provided translator in the
+component (described in section [Modules](modules.md)).
+
+```html
+<p translate="TITLE" translatorModule="admin"></p>
 ```

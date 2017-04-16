@@ -86,7 +86,7 @@ To learn more have a look at [the documentation](https://tflori.github.io/angula
 
 ### 1. Upgrade the package
 
-Remove angular2-translator and install angular-translator
+Remove angular2-translator and install angular-translator.
   
 ```bash
 npm remove angular2-translator --save
@@ -95,8 +95,8 @@ npm install angular-translator --save
 
 ### 2. Update your setup
 
-Angular translator now gives a simple to use static method to configure. You can also remove the providers as they
-are created by this function.
+Angular translator now gives a simple-to-use static method for setup. This function also creates all required providers.
+The usage is as follows.
 
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
@@ -129,7 +129,7 @@ export class AppModule { }
 
 ### 3. Change the implementation from TranslateService to Translator  
 
-The `TranslateService` has been renamed to `Translator`. It has the same methods can be interchanged:
+The `TranslateService` has been renamed to `Translator`. It has the same methods and can therefore be exchanged:
 
 ```ts
 import { Component } from '@angular/core';
@@ -156,9 +156,10 @@ export class ComponentNow {
 
 ### 4. Change the implementation for changing the language
 
-The `Translator` still have a public property language and you can leave it as it is. There is a new Service called
-`TranslatorContainer` that holds all `Translator`s for different modules. When you want to change the language for
-every module you maybe want to change `TranslatorContainer.language`.
+The `Translator` has a public property `language` and you can use it as before with `TranslateService`. There is a new
+service called `TranslatorContainer` that holds all `Translator`s for different modules. When you want to change the
+language for every module you may want to change `TranslatorContainer.language` instead. The change will be forwarded to
+every `Translator`.
 
 ### 5. Other questions
 
@@ -236,3 +237,8 @@ ln -s angular-translator MyApp/libs/angular-translator
 ```
 
 > You should know what you do and don't follow this guide for installation.
+
+## Demo
+
+[This project](https://github.com/tflori/angular-translator-demo) demonstrates how to use angular-translator. The
+production version is distributed [here](https://angular-translator-demo.my-first-domain.de/).

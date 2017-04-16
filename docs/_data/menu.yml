@@ -1,10 +1,14 @@
 Introduction: /
 Dynamize: /dynamize.html
+Modules: /modules.html
 
-TranslateConfig: /TranslateConfig.html
-TranslateService: /TranslateService.html
+'&nbsp;': /placeholder
+
 TranslateComponent: /TranslateComponent.html
-TranslatePipe: /TranslatePipe.html
-TranslateLoaderJson: /TranslateLoaderJson.html
 TranslateLogHandler: /TranslateLogHandler.html
-TranslateLoader: /TranslateLoader.html
+TranslatePipe: /TranslatePipe.html
+TranslationLoader: /TranslationLoader.html
+TranslationLoaderJson: /TranslationLoaderJson.html
+Translator: /Translator.html
+TranslatorConfig: /TranslatorConfig.html
+TranslatorContainer: /TranslatorContainer.html

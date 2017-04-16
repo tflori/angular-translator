@@ -3,14 +3,15 @@ layout: default
 title: Introduction
 permalink: /
 ---
-# Angular2 Translator
+# Angular Translator
 
-[![Build Status](https://travis-ci.org/tflori/angular-translator.svg?branch=master)](https://travis-ci.org/tflori/angular-translator)
-[![Coverage Status](https://coveralls.io/repos/github/tflori/angular-translator/badge.svg?branch=master)](https://coveralls.io/github/tflori/angular-translator?branch=master)
-[![npm version](https://badge.fury.io/js/angular-translator.svg)](https://badge.fury.io/js/angular-translator)
+`angular-translator` is a simple translation service for angular applications. It should support all necessary
+features for translation. Like interpolation, references to other translations, modules and loaders.
 
-`angular-translator` is a simple translation service for angular2 applications. It should support all necessary
-features for translation, like interpolation, references to other translations and so on.
+## Demo
+
+[This project](https://github.com/tflori/angular-translator-demo) demonstrates how to use angular-translator. The
+production version is distributed [here](https://angular-translator-demo.my-first-domain.de/).
 
 ## Features
 
@@ -41,40 +42,43 @@ By referring to other translations you can make it easy to have everywhere the s
 }
 ```
 
+### Modules
+
+Your translations can be divided to multiple modules. Each module can have a different configuration. This way you have
+more control over the size of translation files and are able to provide some modules in more or less languages.
+
 ### Different loaders
 
-This module supports different loaders. Currently each loader has to load all translations for the app. You can write
-your own loader or use the only one we have developed for you - the JSON loader.
+This module supports different loaders. It is shipped with a basic JSON loader (next paragraph). You can create own 
+and static loaders. It is also possible to use different loader strategies for each module.
 
 #### JSON loader
 
-It is a very basic loader that loads your JSON translation files. A translation can be an array to allow multiline
-translations (to make the files readable and better structured).
+It is a basic loader that loads the translation for a specific language and module from your JSON file. A translation
+can be an array to allow multi line translations (to make the files readable and better structured).
 
 ## How to use
 
 Simple basic usage:
 
 ```ts
-import {Component} from "angular2/core";
-import {TranslateService, TranslatePipe, TranslateComponent} from "angular-translator";
+import { Component } from "angular2/core";
+import { Translator } from "angular-translator";
 
 @Component({
     selector: "my-app",
     template: "{TEXT|translate} is the same as <span translate=\"TEXT\"></span>"
 })
 export class AppComponent {
-    constructor(translate: TranslateService) {
-        translate.translate("TEXT").then(
+    constructor(translator: Translator) {
+        translator.translate("TEXT").then(
           (translation) => console.log(translation)
         );
     }
 }
 ```
 
-## How to install
-
-### Via npm
+### Get the package
 
 First you need to install the package. The easiest way is to install it via npm:
 
@@ -82,34 +86,19 @@ First you need to install the package. The easiest way is to install it via npm:
 npm install --save angular-translator
 ```
 
-### Manually
+## Setup angular module
 
-You also can clone the repository and symlink the project folder or what ever:
-
-```bash
-git clone https://github.com/tflori/angular-translator.git
-ln -s angular-translator MyApp/libs/angular-translator
-```
-
-> You should know what you do and don't follow this guide for installation.
-
-## How to use
-
-You have to set up your `NgModule` to import the `TranslatorModule` and may be configure it:
+You have to set up each `NgModule`  where you want to use the `TranslatorModule` and may be configure it:
 
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { TranslateConfig, TranslatorModule } from "angular-translator";
+import { TranslatorModule } from "angular-translator";
 
 import { AppComponent } from './app.component';
 
 export function translateConfigFactory() {
-    return new TranslateConfig({
-        defaultLang: "de",
-        providedLangs: [ "de", "en" ],
-        detectLanguageOnStart: false
-    });
+    return new TranslateConfig();
 }
 
 @NgModule({
@@ -118,10 +107,11 @@ export function translateConfigFactory() {
   ],
   imports: [
     BrowserModule,
-    TranslatorModule,
-  ],
-  providers: [
-    { provide: TranslateConfig, useFactory: translateConfigFactory},
+    TranslatorModule.forRoot({
+      defaultLang: "de",
+      providedLangs: [ "de", "en" ],
+      detectLanguageOnStart: false
+    }),
   ],
   bootstrap: [AppComponent]
 })
@@ -139,36 +129,137 @@ System.config({
     }
 });
 ```
- 
-Or load the file directly:
 
-```html
-<script type="text/javascript" src="node_modules/angular-translator/bundles/angular-translator.js"></script>
+### Manually
+
+You also can clone the repository and symlink the project folder or what ever:
+
+```bash
+git clone https://github.com/tflori/angular-translator.git
+ln -s angular-translator MyApp/libs/angular-translator
 ```
 
+> You should know what you do and don't follow this guide for installation.
 
-## The Classes
+## How to upgrade from angular2-translator
 
-[TranslateConfig](TranslateConfig.md) - 
-The TranslateConfig is a dependency for TranslateService. As the name suggests it gives a configuration for the TranslateService.
+### 1. Upgrade the package
 
-[TranslateService](TranslateService.md) - 
-The TranslateService holds the core functionality for this module. It is not only for translation also
-it provides functions for control structures.
+Remove angular2-translator and install angular-translator.
+  
+```bash
+npm remove angular2-translator --save
+npm install angular-translator --save
+```
 
-[TranslateComponent](TranslateComponent.md) - 
-This is a angular2 component for the selector `[translate]`
+### 2. Update your setup
 
-[TranslatePipe](TranslatePipe.md) - 
-The TranslatePipe is the easiest way for translation but it has some drawbacks.
+Angular translator now gives a simple-to-use static method for setup. This function also creates all required providers.
+The usage is as follows.
 
-[TranslateLoaderJson](TranslateLoaderJson.md) - 
+```ts
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { HttpModule } from '@angular/http';
+
+import { TranslatorModule } from 'angular-translator';
+
+import { AppComponent } from './app.component';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    HttpModule,
+    TranslatorModule.forRoot({
+      providedLanguages: ['de', 'en', 'ru'],
+      defaultLanguage: 'de'
+    })
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+### 3. Change the implementation from TranslateService to Translator  
+
+The `TranslateService` has been renamed to `Translator`. It has the same methods and can therefore be exchanged:
+
+```ts
+import { Component } from '@angular/core';
+
+import { TranslateService } from 'angular2-translator'; // before
+import { Translator } from 'angular-translator'; // now
+
+@Component()
+export class ComponentBefore {
+  constructor(translateService: TranslateService) {
+    translateService.translate('TEXT').then((translation) => this.text = translation);
+  }
+}
+
+@Component()
+export class ComponentNow {
+  constructor(translator: Translator) {
+    translator.translate('TEXT').then((translation) => this.text = translation);
+  }
+}
+```
+
+> You can do this by search and replace on your own risk.
+
+### 4. Change the implementation for changing the language
+
+The `Translator` has a public property `language` and you can use it as before with `TranslateService`. There is a new
+service called `TranslatorContainer` that holds all `Translator`s for different modules. When you want to change the
+language for every module you may want to change `TranslatorContainer.language` instead. The change will be forwarded to
+every `Translator`.
+
+### 5. Other questions
+
+> I used the `languageChanged` observable to update translations inside services and components. Do I need to change
+here something?  
+
+No, the `Translator` has the same observable that should be used now.
+
+> My configuration seems to be ignored after upgrade.
+
+May be you copied your previous config. The parameters have changed: defaultLang - defaultLanguage, providedLangs - 
+providedLanguages, detectLanguageOnStart - detectLanguage.
+
+## The Main Classes
+
+**[TranslatorConfig](TranslatorConfig.md)** - 
+The `TranslatorConfig` holds the configuration for this module.
+
+**[Translator](Translator.md)** - 
+The `Translator` provides the core functionality for this module. You can translate, check if translations are loaded
+and subscribe to language changes with this class.
+
+**[TranslatorContainer](TranslatorContainer.md)** -
+The `TranslatorContainer` holds the `Translator` instances - one for each module one.
+
+**[TranslateComponent](TranslateComponent.md)** - 
+This is the component for the selector `[translate]`
+
+**[TranslatePipe](TranslatePipe.md)** - 
+The `TranslatePipe` is the easiest way for translation in templates.
+
+**[TranslationLoaderJson](TranslationLoaderJson.md)** - 
 For now this is the only existing TranslateLoader.
 
 ## Further Readings
 
-You can [make translations dynamic](dynamize.md) by giving parameter that can be used inside the translation.
+You can **[make translations dynamic](dynamize.md)** by giving parameters that can be used inside the translations.
 
-Configure [TranslateLogHandler](TranslateLogHandler.md) to get informations about missing translations and other problems in your translations.
+**[Modules](modules.md)** allow you to split translation files and provide subsets in different languages.
 
-Create your own [TranslateLoader](TranslateLoader.md) that fits your needs.
+Overwrite **[TranslateLogHandler](TranslateLogHandler.md)** to get information about missing translations and other
+problems in your translations.
+
+Create your own **[TranslationLoader](TranslationLoader.md)** that fits your needs.
