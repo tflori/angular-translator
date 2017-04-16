@@ -29,6 +29,8 @@ require('rxjs/Rx');
 var testing = require('@angular/core/testing');
 var browser = require('@angular/platform-browser-dynamic/testing');
 
+Zone[Zone.__symbol__('ignoreConsoleErrorUncaughtError')] = true;
+
 testing.TestBed.initTestEnvironment(
     browser.BrowserDynamicTestingModule,
     browser.platformBrowserDynamicTesting()

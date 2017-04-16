@@ -42,7 +42,7 @@ export class Translator {
         }).share();
 
         translatorContainer.languageChanged.subscribe((language) => {
-            this._language = language;
+            this.language = language;
         });
     }
 
