@@ -237,3 +237,8 @@ ln -s angular-translator MyApp/libs/angular-translator
 ```
 
 > You should know what you do and don't follow this guide for installation.
+
+## Demo
+
+[This project](https://github.com/tflori/angular-translator-demo) demonstrates how to use angular-translator. The
+production version is distributed [here](https://angular-translator-demo.my-first-domain.de/).

@@ -1,13 +1,11 @@
 ---
 layout: default
 title: TranslateLoaderJson
-permalink: /TranslateLoaderJson.html
+permalink: /TranslationLoaderJson.html
 ---
-# TranslateLoaderJson
+# TranslationLoaderJson
 
 The TranslateLoaderJson loads one json file for each language via angular2/http.
-
-You have to add `HTTP_PROVIDERS` to your bootstrap to make it work.
 
 ## Multiline translations
 
@@ -59,19 +57,11 @@ So you can access them with `translate('app.loginText')`. You need to refer to t
 }
 ```
 
-## TranslateLoaderJsonConfig
+## Configure
 
-To configure TranslateLoaderJson you can create your own TranslateLoaderJsonConfig and provide it.
-
-Configurable is the base path where translation files are served and the extension that is used.
-
-```ts
-class TranslateLoaderJsonConfig {
-  constructor(path: string, extension: string) {}
-}
-```
-
-Default values are `path = 'assets/i18n'` and `extension = '.json'` .
+There is only one option that can be changed: the path where to load json files. This path can contain two
+variables in mustache style. The default value is `assets/i18n/{{ module }}/{{ language }}.json`. To change it you
+pass this option to the configuration like here:
 
 > **CAUTION:** the default values changed from version 1.4. Before the default path was `i18n` - so you either change
 > this in your config or move the files.
@@ -81,11 +71,12 @@ Directory structure:
 
 ```
 + project
-  + app
+  + assets
     + localization
-      - en-lang.json
-      - de-lang.json
-      - fr-lang.json
+          - en-lang.json
+          - de-lang.json
+          - fr-lang.json
+  + app
     - main.ts
     - myApp.ts
 ```
@@ -95,13 +86,10 @@ main.ts:
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { TranslateLoaderJsonConfig, TranslatorModule } from "angular-translator";
+
+import { TranslatorModule } from 'angular-translator';
 
 import { AppComponent } from './app.component';
-
-export function translateLoaderConfigFactory() {
-    return new TranslateLoaderJsonConfig('app/localization', '-lang.json')
-}
 
 @NgModule({
   declarations: [
@@ -109,11 +97,14 @@ export function translateLoaderConfigFactory() {
   ],
   imports: [
     BrowserModule,
-    TranslatorModule,
+    TranslatorModule.forRoot({
+      providedLanguages: ['en', 'de', 'fr'],
+      loaderOptions: {
+        path: 'assets/localization/{{language}}-lang.json
+      }
+    }),
   ],
-  providers: [
-      { provide: TranslateLoaderJsonConfig, useFactory: translateLoaderConfigFactory },
-  ],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

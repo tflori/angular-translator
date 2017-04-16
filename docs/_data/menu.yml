@@ -7,8 +7,8 @@ Modules: /modules.html
 TranslateComponent: /TranslateComponent.html
 TranslateLogHandler: /TranslateLogHandler.html
 TranslatePipe: /TranslatePipe.html
-TranslationLoader: /TranslateLoader.html
-TranslationLoaderJson: /TranslateLoaderJson.html
+TranslationLoader: /TranslationLoader.html
+TranslationLoaderJson: /TranslationLoaderJson.html
 Translator: /Translator.html
-TranslatorConfig: /TranslateConfig.html
+TranslatorConfig: /TranslatorConfig.html
 TranslatorContainer: /TranslatorContainer.html

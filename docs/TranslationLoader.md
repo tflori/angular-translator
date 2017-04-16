@@ -1,17 +1,17 @@
 ---
 layout: default
-title: TranslateLoader
-permalink: /TranslateLoader.html
+title: TranslationLoader
+permalink: /TranslationLoader.html
 ---
-# TranslateLoader
+# TranslationLoader
 
-This abstract class has to be used to define a new `TranslateLoader`. A `TranslateLoader` has to define a method `load` 
-with the following footprint `load(lang: string): Promise<Object>`. To inject the loader to 
+This abstract class has to be used to define a new `TranslationLoader`. A `TranslationLoader` has to define a method
+`load` with the following footprint `load(options: any): Promise<object>`. To inject the loader to 
 [TranslateService](docs/TranslateService.md) it has to have the annotation `@Injectable()`.
 
 ## Load method
 
-This is the only method required in a `TranslateLoader`. The loader gets a string for the language that should be
+This is the only method required in a `TranslationLoader`. The loader gets a string for the language that should be
 loaded (defined in `TranslateConfig` see [TranslateConfig](docs/TranslateConfig.md)). The loader should be able to
 load every language provided there.
 
@@ -25,6 +25,9 @@ object that holds the translations. This could look like this JSON example:
 }
 ```
 
+The load method gets an object with all options set in the `loaderOptions` configuration plus the key `language` and
+the key `module`. An example how to use this information can be found in the `TranslationLoaderJson` source.
+
 ## Static loader example
 
 Maybe you want to send only one javascript file for performance reasons and the translations should be included. Here
@@ -32,10 +35,11 @@ is a complete example how this could look like:
 
 ```ts
 import {Injectable} from "@angular/core";
-import {TranslateLoader} from "angular-translator";
+
+import {TranslationLoader} from "angular-translator";
 
 @Injectable()
-export class TranslateLoaderStatic extends TranslateLoader {
+export class TranslationLoaderStatic extends TranslationLoader {
     private translations:Object = {
         en: {
             "HELLO WORLD": "Hello World!"
@@ -51,15 +55,11 @@ export class TranslateLoaderStatic extends TranslateLoader {
         }
     };
 
-    constructor() {
-        super();
-    }
-
-    public load(lang:string):Promise<Object> {
-        if (!this.translations[lang]) {
+    public load({language}: any):Promise<object> {
+        if (!this.translations[language]) {
             Promise.reject("Language unknown");
         }
-        return Promise.resolve(this.translations[lang]);
+        return Promise.resolve(this.translations[language]);
     }
 }
 ```
@@ -70,32 +70,30 @@ bootstrap can look like:
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { TranslateConfig, TranslateLoader, TranslatorModule } from "angular-translator";
+
+import { TranslatorModule } from "angular-translator";
 
 import { AppComponent } from './app.component';
-import { TranslateLoaderStatic } from "./TranslateLoaderStatic"
+import { TranslationLoaderStatic } from "./TranslationLoaderStatic"
 
-export function translateConfigFactory() {
-  return new TranslateConfig({
-    defaultLang: "ru",
-    providedLangs: [ "de", "en", "fr", "ru" ],
-    detectLanguageOnStart: false
-  });
-}
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
-  imports: [
-    BrowserModule,
-    TranslatorModule,
-  ],
-  providers: [
-    { provide: TranslateConfig, useFactory: translateConfigFactory },
-    { provide: TranslateLoader, useClass: TranslateLoaderStatic },
-  ],
-  bootstrap: [AppComponent]
+    declarations: [
+        AppComponent
+    ],
+    imports: [
+        BrowserModule,
+        TranslatorModule.forRoot({
+            defaultLanguage: "ru",
+            providedLanguages: [ "de", "en", "fr", "ru" ],
+            detectLanguage: false,
+            loader: TranslationLoaderStatic
+        }),
+    ],
+    providers: [
+        TranslationLoaderStatic,
+    ],
+    bootstrap: [AppComponent]
 })
 export class AppModule { }
 ```

@@ -44,7 +44,7 @@ Other translations are loaded before the content of double braces got parsed.
 
 ### Passing parameters
 
-Parameters can be passed directly under the same name, with a different name and partially.  To pass a variable with a 
+Parameters can be passed directly under the same name, with a different name and partially. To pass a variable with a 
 different name you define a getter. To pass a variable with the same name you can leave the getter empty. The getter
 can contain dots which means that you refer to the `object.key` and pass only key from this object.
 
@@ -60,9 +60,16 @@ can contain dots which means that you refer to the `object.key` and pass only ke
   "GREET": "[[ HELLO ]] {% raw %}{{name}}{% endraw %}",
   "USER_LOGGED_IN": "[[GREET:name]], your last login was on {% raw %}{{lastLogin}}{% endraw %}",
   "SALUTATION": "{% raw %}{{title ? title : (gender == 'w' ? 'Mrs.' : 'Mr.')}} {{firstName}} {{lastName}}{% endraw %}",
-  "WELCOME": "Welcome [[ SALUTATION : title=user.title, gender=user.gender, firstName=user.firstName, lastName=user.lastName ]]"
+  "WELCOME": [
+    "Welcome [[ SALUTATION : ",
+      "title=user.title, gender=user.gender, firstName=user.firstName, lastName=user.lastName",
+    "]]"
+  ]
 }
 ```
+
+> In this example we use `string[]` as translation. See [TranslationLoaderJson](TranslationLoaderJson.md) for more
+> details.
 
 ## Logic in translations
 
@@ -76,54 +83,55 @@ course language related.
 Parameters have to be stored in an object. That is easy when you using javascript:
 
 ```ts
-this.user = {name:'Thomas', lastLogin: moment('2016-03-06 22:13:31')};
-translateService.translate('USER_LOGGED_IN', {name:this.user.name,lastLogin:this.user.lastLogin.fromNow()})
+this.user = { name:'Thomas', lastLogin: moment('2016-03-06 22:13:31') };
+translator.translate(
+  'USER_LOGGED_IN', 
+  { 
+    name: this.user.name,
+    lastLogin: this.user.lastLogin.fromNow()
+  }
+);
 ```
 
-For [TranslateComponent](docs/TranslateComponent.md) there is a second attribute `translateParams`. To pass variables
+For [TranslateComponent](TranslateComponent.md) there is a second attribute `translateParams`. To pass variables
 you need to write in brackets:
 
 ```html
-<p translate="USER_LOGGED_IN" [translateParams]="{name:user.name,lastLogin:user.lastLogin.fromNow()}"></p>
+<p   translate        = "USER_LOGGED_IN"
+    [translateParams] = "{ name: user.name, lastLogin: user.lastLogin.fromNow() }"></p>
 ```
 
-It begins to get really bad for pipes - that is the drawback why we suggest to use the component for complicated things:
+For [TranslatePipe](TranslatePipe.md) you pass the params as first parameter:
 
 ```html
-<p>{% raw %}{{'USER_LOGGED_IN'|translate:'{name:\'' + user.name + '\',lastLogin:\'' + user.lastLogin.fromNow() + '\'}'}}{% endraw %}</p>
+<p>{% raw %}{{ 'USER_LOGGED_IN' | translate: { name: user.name, lastLogin: user.lastLogin.fromNow() } }}{% endraw %}</p>
 ```
 
-Because pipes only accept predefined objects or string parameters we parse this parameter if it is string. That costs
-and is not readable. It also looks like logic in your view.
-
-Another - some bit more realistic - example for usage of pipes:
+To generate objects inside the view looks some bit like logic in templates. A more reasonable way will be to create
+the object inside the component and pass it to pipe or params:
 
 ```html
-<p>{% raw %}{{'USER_LOGGED_IN'|translate:user}}{% endraw %}</p>
+<p translate="USER_LOGGED_IN" [translateParams]="user"></p>
+<p>{% raw %}{{ 'USER_LOGGED_IN' | translate: user }}{% endraw %}</p>
 ```
 
-This works only if you define lastLogin in user as string, or use a method of moment in you translation.
- 
-Define as string:
+This works only if you define lastLogin in user as string, or use a method of moment in your translation.
 
 ```ts
-this.user = {name:'Thomas', lastLogin: moment('2016-03-06 22:13.31').format('LLL')}
+this.user = { name: 'Thomas', lastLogin: moment('2016-03-06 22:13.31').format('LLL') }
 ```
-
-Use method for formatting in translation:
 
 ```json
 {
-  "USER_LOGGED_IN": "[[GREET:name]], your last login was on {% raw %}{{lastLogin.format('LLL')}}{% endraw %}"
+  "USER_LOGGED_IN": "[[ GREET : name ]], your last login was on {% raw %}{{ lastLogin.format('LLL') }}{% endraw %}"
 }
 ```
 
 ## Performance
 
-Both examples in the view have by logic a higher cpu usage:
-1. The object needs to be generated
-2. The object has to be checked if it has changed
+To pass parameters to the pipe or the component have a slightly performance drawback because the objects needs to be
+checked every time if it has changes.
 
-To have it under your control we suggest to use `TranslateService.translate()` or `TranslateService.instant()`. You can
-then subscribe to `TranslateService.languageChanged` to change your translation when the language got changed. Also you
+To have it under your control we suggest to use `Translator.translate()` or `Translator.instant()`. You can
+then subscribe to `Translator.languageChanged` to change your translation when the language got changed. Also you
 will know when your values have changed.

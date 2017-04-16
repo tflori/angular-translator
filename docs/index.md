@@ -5,12 +5,13 @@ permalink: /
 ---
 # Angular Translator
 
-[![Build Status](https://travis-ci.org/tflori/angular-translator.svg?branch=master)](https://travis-ci.org/tflori/angular-translator)
-[![Coverage Status](https://coveralls.io/repos/github/tflori/angular-translator/badge.svg?branch=master)](https://coveralls.io/github/tflori/angular-translator?branch=master)
-[![npm version](https://badge.fury.io/js/angular-translator.svg)](https://badge.fury.io/js/angular-translator)
-
 `angular-translator` is a simple translation service for angular applications. It should support all necessary
 features for translation. Like interpolation, references to other translations, modules and loaders.
+
+## Demo
+
+[This project](https://github.com/tflori/angular-translator-demo) demonstrates how to use angular-translator. The
+production version is distributed [here](https://angular-translator-demo.my-first-domain.de/).
 
 ## Features
 
@@ -241,13 +242,13 @@ The `Translator` provides the core functionality for this module. You can transl
 and subscribe to language changes with this class.
 
 **[TranslatorContainer](TranslatorContainer.md)** -
-The `TranslatorContainer` holds the `Translator` instances - for each module one.
+The `TranslatorContainer` holds the `Translator` instances - one for each module one.
 
 **[TranslateComponent](TranslateComponent.md)** - 
 This is the component for the selector `[translate]`
 
 **[TranslatePipe](TranslatePipe.md)** - 
-The `TranslatePipe` is the easiest way for translation in templates but it has some drawbacks.
+The `TranslatePipe` is the easiest way for translation in templates.
 
 **[TranslationLoaderJson](TranslationLoaderJson.md)** - 
 For now this is the only existing TranslateLoader.
