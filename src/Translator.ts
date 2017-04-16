@@ -7,6 +7,8 @@ import {Injectable, Injector} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {Observer} from "rxjs/Observer";
 
+import "rxjs/add/operator/share";
+
 @Injectable()
 export class Translator {
     private _language: string = "en";
@@ -35,12 +37,12 @@ export class Translator {
             this._language = this.config.defaultLanguage;
         }
 
-        this.languageChangedObservable = new Observable<string>((observer: any) => {
+        this.languageChangedObservable = new Observable<string>((observer: Observer<string>) => {
             this.languageChangedObserver = observer;
-        });
+        }).share();
 
         translatorContainer.languageChanged.subscribe((language) => {
-            this._language = language;
+            this.language = language;
         });
     }
 
