@@ -26,6 +26,7 @@ describe("Translator", () => {
 
         beforeEach(() => {
             translatorConfig = new TranslatorConfig({
+                providedLanguages: ["de", "en"],
                 loader: TranslationLoaderMock,
                 detectLanguage: false,
             });
@@ -126,7 +127,7 @@ describe("Translator", () => {
         beforeEach(() => {
             translatorConfig = new TranslatorConfig({
                 loader: TranslationLoaderMock,
-                providedLanguages: [ "en", "de" ],
+                providedLanguages: ["de", "en"],
                 detectLanguage: false,
             });
             TestBed.configureTestingModule({
@@ -210,6 +211,17 @@ describe("Translator", () => {
 
                 expect(spy1).toHaveBeenCalledWith("de");
                 expect(spy2).toHaveBeenCalledWith("de");
+            });
+
+            it("fires next when container changes language", () => {
+                translatorConfig.setOptions({ providedLanguages: ["en", "de"]});
+                let translatorContainer: TranslatorContainer = TestBed.get(TranslatorContainer);
+                let spy = jasmine.createSpy("languageChanged");
+                translator.languageChanged.subscribe(spy);
+
+                translatorContainer.language = "de";
+
+                expect(spy).toHaveBeenCalledWith("de");
             });
         });
 
