@@ -1,15 +1,21 @@
-npm-debug.log
+# npm
 node_modules
+npm-debug.log
+
+# generated files
 coverage/*
 docs/_site
-*.map
-*.metadata.json
-*.d.ts
-!tests/helper/promise-matchers.d.ts
+/bundles
+/typings
+/src/**/*
+!/src/**/*.ts
+/src/**/*.d.ts
+/index.*
+!/index.ts
+/tests/**/*
+!/tests/**/*.ts
+/tests/**/*.d.ts
+!/tests/helper/promise-matchers.d.ts
 
-*.js
-!/karma.conf.js
-!/webpack.config.js
-!/config/*.js
+# ide
 .editorconfig
-typings/**/typings.json

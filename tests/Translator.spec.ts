@@ -198,6 +198,19 @@ describe("Translator", () => {
 
                 expect(translator.language).toBe("de");
             });
+
+            it("hits all subscribers when language change", () => {
+                translatorConfig.setOptions({ providedLanguages: ["en", "de"]});
+                let spy1 = jasmine.createSpy("languageChanged");
+                let spy2 = jasmine.createSpy("languageChanged");
+                translator.languageChanged.subscribe(spy1);
+                translator.languageChanged.subscribe(spy2);
+
+                translator.language = "de";
+
+                expect(spy1).toHaveBeenCalledWith("de");
+                expect(spy2).toHaveBeenCalledWith("de");
+            });
         });
 
         describe("waiting for translation", () => {
