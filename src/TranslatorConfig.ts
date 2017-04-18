@@ -1,7 +1,9 @@
 import {TranslationLoader} from "./TranslationLoader";
 import {TranslationLoaderJson} from "./TranslationLoader/Json";
 
-import {Injectable, Optional, Type} from "@angular/core";
+import {DatePipe} from "@angular/common";
+import {Injectable, Optional, PipeTransform, Type} from "@angular/core";
+import {PipeResolver} from "@angular/compiler";
 
 @Injectable()
 export class TranslatorConfig {
@@ -38,6 +40,8 @@ export class TranslatorConfig {
     };
 
     private moduleName: string;
+
+    private _pipeMap: any;
 
     constructor(
         @Optional() options?: any,
@@ -90,6 +94,20 @@ export class TranslatorConfig {
 
     get navigatorLanguages(): string[] {
         return this.options.navigatorLanguages;
+    }
+
+    get pipeMap(): any {
+        if (!this._pipeMap) {
+            this._pipeMap = {};
+
+            const pipeResolver = new PipeResolver();
+
+            let i = this.options.pipes.length;
+            while (i--) {
+                this._pipeMap[pipeResolver.resolve(this.options.pipes[i]).name] = this.options.pipes[i];
+            }
+        }
+        return this._pipeMap;
     }
 
     /**

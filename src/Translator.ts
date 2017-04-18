@@ -3,7 +3,8 @@ import {TranslationLoader} from "./TranslationLoader";
 import {TranslatorConfig} from "./TranslatorConfig";
 import {TranslatorContainer} from "./TranslatorContainer";
 
-import {Injectable, Injector} from "@angular/core";
+import {DatePipe} from "@angular/common";
+import {Injectable, Injector, PipeTransform} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {Observer} from "rxjs/Observer";
 
@@ -151,7 +152,7 @@ export class Translator {
             // simple interpolation
             t = t.replace(/{{\s*(.*?)\s*}}/g, (sub: string, expression: string) => {
                 try {
-                    return this.parse(expression, params) || "";
+                    return String(this.interpolate(expression, params)) || "";
                 } catch (e) {
                     if (e && e.message && e.message.indexOf("is not defined") === -1) {
                         this.logHandler.error("Parsing error for expression '" + sub + "'");
@@ -217,16 +218,26 @@ export class Translator {
         return this.loadedLanguages[language];
     }
 
+    private interpolate(expression: string, __context: any): any {
+        let parts: string[] = expression.split("|");
+        let result = this.parse(parts.shift(), __context);
+        while (parts.length) {
+            let part: string = parts.shift();
+            result = this.pipeTransform(result, part.trim(), __context);
+        }
+        return result;
+    }
+
     /* tslint:disable:variable-name */
     /**
      * Parses the expression in the given __context.
      *
      * @param   {string} expression
      * @param   {object} __context
-     * @returns {string}
+     * @returns {any}
      * @private
      */
-    private parse(expression: string, __context: any): string {
+    private parse(expression: string, __context: any): any {
         let func: string[] = [];
         let varName: string;
         func.push("(function() {");
@@ -245,9 +256,35 @@ export class Translator {
             }
         }
         func.push("return (" + expression + "); })()");
-        return String(eval(func.join("\n")));
+        return eval(func.join("\n"));
     }
     /* tslint:enable:variable-name */
+
+    private pipeTransform(value: any, pipe: string, __context: any): any {
+        let parts = pipe.split(":");
+        let pipeName = parts.shift();
+        let args = [];
+        let part: string = "";
+        while (parts.length) {
+             part += parts.shift();
+             try {
+                 let arg: any = this.parse(part, __context);
+                 part = "";
+                 args.push(arg);
+             } catch(e) {
+                 part += ":";
+             }
+        }
+
+        return this.getPipe(pipeName).transform(value, ...args);
+    }
+
+    private getPipe(pipeName): PipeTransform {
+        if (!this.config.pipeMap[pipeName]) {
+            throw new Error("Pipe " + pipeName + " unknown");
+        }
+        return this.injector.get(this.config.pipeMap[pipeName]);
+    }
 
     /**
      * Outputs a parse error for an error in translation references.

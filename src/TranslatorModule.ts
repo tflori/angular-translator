@@ -6,11 +6,34 @@ import {Translator} from "./Translator";
 import {TranslatorConfig} from "./TranslatorConfig";
 import {TranslatorContainer} from "./TranslatorContainer";
 
-import {Inject, InjectionToken, ModuleWithProviders, NgModule, Optional, Provider, SkipSelf} from "@angular/core";
+import {
+    CurrencyPipe,
+    DatePipe,
+    DecimalPipe,
+    JsonPipe,
+    LowerCasePipe,
+    PercentPipe,
+    SlicePipe,
+    TitleCasePipe,
+    UpperCasePipe,
+} from "@angular/common";
+import { InjectionToken, ModuleWithProviders, NgModule, Provider } from "@angular/core";
 import {HttpModule} from "@angular/http";
 
 export const TRANSLATOR_OPTIONS: InjectionToken<object> = new InjectionToken("TRANSLATOR_OPTIONS");
 export const TRANSLATOR_MODULE: InjectionToken<string> = new InjectionToken("TRANSLATOR_MODULE");
+
+const defaultPipes = [
+    CurrencyPipe,
+    DatePipe,
+    DecimalPipe,
+    JsonPipe,
+    LowerCasePipe,
+    PercentPipe,
+    SlicePipe,
+    TitleCasePipe,
+    UpperCasePipe,
+];
 
 @NgModule({
     declarations: [
@@ -30,12 +53,18 @@ export const TRANSLATOR_MODULE: InjectionToken<string> = new InjectionToken("TRA
 })
 export class TranslatorModule {
     public static forRoot(options: any = {}, module: string = "default"): ModuleWithProviders {
+        if (!options.pipes) {
+            options.pipes = defaultPipes;
+        } else {
+            Array.prototype.push.apply(options.pipes, defaultPipes);
+        }
         return {
             ngModule: TranslatorModule,
             providers: [
                 { provide: TRANSLATOR_OPTIONS, useValue: options },
                 { provide: TranslatorConfig, useFactory: createTranslatorConfig, deps: [ TRANSLATOR_OPTIONS ] },
                 provideTranslator(module),
+                options.pipes,
             ],
         };
     }
