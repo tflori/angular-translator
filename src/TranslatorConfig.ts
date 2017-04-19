@@ -1,9 +1,31 @@
 import {TranslationLoader} from "./TranslationLoader";
 import {TranslationLoaderJson} from "./TranslationLoader/Json";
 
-import {DatePipe} from "@angular/common";
-import {Injectable, Optional, PipeTransform, Type} from "@angular/core";
+import {
+    CurrencyPipe,
+    DatePipe,
+    DecimalPipe,
+    JsonPipe,
+    LowerCasePipe,
+    PercentPipe,
+    SlicePipe,
+    TitleCasePipe,
+    UpperCasePipe,
+} from "@angular/common";
 import {PipeResolver} from "@angular/compiler";
+import {Injectable, Optional, PipeTransform, Type} from "@angular/core";
+
+export const COMMON_PURE_PIPES: Array<Type<PipeTransform>> = [
+    CurrencyPipe,
+    DatePipe,
+    DecimalPipe,
+    JsonPipe,
+    LowerCasePipe,
+    PercentPipe,
+    SlicePipe,
+    TitleCasePipe,
+    UpperCasePipe,
+];
 
 @Injectable()
 export class TranslatorConfig {
@@ -37,6 +59,7 @@ export class TranslatorConfig {
         preferExactMatches: false,
         navigatorLanguages: [ "en" ],
         loader: TranslationLoaderJson,
+        pipes: COMMON_PURE_PIPES,
     };
 
     private moduleName: string;
@@ -117,10 +140,15 @@ export class TranslatorConfig {
      */
     public setOptions(options: any): void {
         for (let key in options) {
-            if (!{}.hasOwnProperty.call(options, key)) {
+            if (!options.hasOwnProperty(key)) {
                 continue;
             }
-            this.options[key] = options[key];
+
+            if (key === "pipe") {
+                this.options[key].push(...options[key]);
+            } else {
+                this.options[key] = options[key];
+            }
         }
 
         if (this.options.providedLanguages.indexOf(this.options.defaultLanguage) === -1) {
