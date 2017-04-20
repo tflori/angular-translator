@@ -1,4 +1,16 @@
-import {TranslatorConfig} from "../index";
+import { COMMON_PURE_PIPES, TranslatePipe, TranslatorConfig } from "../index";
+
+import {
+    CurrencyPipe,
+    DatePipe,
+    DecimalPipe,
+    JsonPipe,
+    LowerCasePipe,
+    PercentPipe,
+    SlicePipe,
+    TitleCasePipe,
+    UpperCasePipe,
+} from "@angular/common";
 
 describe("TranslatorConfig", () => {
     it("is defined", () => {
@@ -218,6 +230,61 @@ describe("TranslatorConfig", () => {
 
             expect(moduleConfig.providedLanguages).toEqual([ "en" ]);
             expect(moduleConfig.defaultLanguage).toEqual("en");
+        });
+    });
+
+    describe("pipes", () => {
+        it("contains the pure pipes from common module by default", () => {
+            let translatorConfig = new TranslatorConfig();
+
+            expect(translatorConfig.pipeMap).toEqual({
+                currency: CurrencyPipe,
+                date: DatePipe,
+                number: DecimalPipe,
+                json: JsonPipe,
+                lowercase: LowerCasePipe,
+                percent: PercentPipe,
+                slice: SlicePipe,
+                titlecase: TitleCasePipe,
+                uppercase: UpperCasePipe,
+            });
+        });
+
+        it("appends pipes defined in options", () => {
+            let translatorConfig = new TranslatorConfig({
+                pipes: [ TranslatePipe ],
+            });
+
+            expect(translatorConfig.pipeMap).toEqual({
+                currency: CurrencyPipe,
+                date: DatePipe,
+                number: DecimalPipe,
+                json: JsonPipe,
+                lowercase: LowerCasePipe,
+                percent: PercentPipe,
+                slice: SlicePipe,
+                titlecase: TitleCasePipe,
+                uppercase: UpperCasePipe,
+                translate: TranslatePipe,
+            });
+        });
+
+        it("does not modify the constant", () => {
+            let translatorConfig = new TranslatorConfig({
+                pipes: [ TranslatePipe ],
+            });
+
+            expect(COMMON_PURE_PIPES).toEqual([
+                CurrencyPipe,
+                DatePipe,
+                DecimalPipe,
+                JsonPipe,
+                LowerCasePipe,
+                PercentPipe,
+                SlicePipe,
+                TitleCasePipe,
+                UpperCasePipe,
+            ]);
         });
     });
 });

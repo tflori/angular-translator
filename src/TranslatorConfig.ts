@@ -1,5 +1,5 @@
-import {TranslationLoader} from "./TranslationLoader";
-import {TranslationLoaderJson} from "./TranslationLoader/Json";
+import { TranslationLoader } from "./TranslationLoader";
+import { TranslationLoaderJson } from "./TranslationLoader/Json";
 
 import {
     CurrencyPipe,
@@ -12,8 +12,8 @@ import {
     TitleCasePipe,
     UpperCasePipe,
 } from "@angular/common";
-import {PipeResolver} from "@angular/compiler";
-import {Injectable, Optional, PipeTransform, Type} from "@angular/core";
+import { PipeResolver } from "@angular/compiler";
+import { Injectable, Optional, PipeTransform, Type } from "@angular/core";
 
 export const COMMON_PURE_PIPES: Array<Type<PipeTransform>> = [
     CurrencyPipe,
@@ -59,7 +59,7 @@ export class TranslatorConfig {
         preferExactMatches: false,
         navigatorLanguages: [ "en" ],
         loader: TranslationLoaderJson,
-        pipes: COMMON_PURE_PIPES,
+        pipes: COMMON_PURE_PIPES.slice(0),
     };
 
     private moduleName: string;
@@ -144,8 +144,10 @@ export class TranslatorConfig {
                 continue;
             }
 
-            if (key === "pipe") {
-                this.options[key].push(...options[key]);
+            if (key === "pipes") {
+                this.options.pipes.push(...options.pipes.filter((pipe) => {
+                    return this.options.pipes.indexOf(pipe) === -1;
+                }));
             } else {
                 this.options[key] = options[key];
             }

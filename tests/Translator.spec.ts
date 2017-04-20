@@ -3,16 +3,18 @@ import {
     Translator,
     TranslatorConfig,
     TranslatorContainer,
+    TranslatorModule,
 } from "../index";
-import {TranslationLoader} from "../src/TranslationLoader";
+import { TranslationLoader } from "../src/TranslationLoader";
 
-import {JasmineHelper} from "./helper/JasmineHelper";
-import {JasminePromise, PromiseMatcher} from "./helper/promise-matcher";
-import {TranslateLogHandlerMock, TranslationLoaderMock} from "./helper/TranslatorMocks";
+import { JasmineHelper } from "./helper/JasmineHelper";
+import { JasminePromise, PromiseMatcher } from "./helper/promise-matcher";
+import { TranslateLogHandlerMock, TranslationLoaderMock } from "./helper/TranslatorMocks";
 
-import {Injector} from "@angular/core";
-import {fakeAsync, TestBed} from "@angular/core/testing";
-import {Observable} from "rxjs/Observable";
+import { DatePipe, UpperCasePipe } from "@angular/common";
+import { Injector } from "@angular/core";
+import { fakeAsync, TestBed } from "@angular/core/testing";
+import { Observable } from "rxjs/Observable";
 
 describe("Translator", () => {
     it("is defined", () => {
@@ -125,20 +127,22 @@ describe("Translator", () => {
         let translateLogHandler: TranslateLogHandler;
 
         beforeEach(() => {
-            translatorConfig = new TranslatorConfig({
-                loader: TranslationLoaderMock,
-                providedLanguages: ["de", "en"],
-                detectLanguage: false,
-            });
+            translatorConfig = new TranslatorConfig();
             TestBed.configureTestingModule({
+                imports: [
+                    TranslatorModule.forRoot({
+                        loader: TranslationLoaderMock,
+                        providedLanguages: ["de", "en"],
+                        detectLanguage: false,
+                    }),
+                ],
                 providers: [
-                    { provide: TranslatorConfig, useValue: translatorConfig},
-                    { provide: TranslationLoaderMock, useValue: new TranslationLoaderMock() },
                     { provide: TranslateLogHandler, useClass: TranslateLogHandlerMock },
-                    TranslatorContainer,
+                    TranslationLoaderMock,
                 ],
             });
 
+            translatorConfig = TestBed.get(TranslatorConfig);
             translationLoader = TestBed.get(TranslationLoaderMock);
             translateLogHandler = TestBed.get(TranslateLogHandler);
             translator = new Translator("default", TestBed.get(Injector));
@@ -511,6 +515,128 @@ describe("Translator", () => {
                 translator.instant(["VAR", "PROP"]);
 
                 expect(translateLogHandler.error).not.toHaveBeenCalled();
+            }));
+
+            it("shows error when parsing throws error", fakeAsync(() => {
+                translator.waitForTranslation();
+                loaderPromiseResolve({
+                    BROKEN: 'This "{{throw}}" is empty string',
+                });
+                JasminePromise.flush();
+                spyOn(translateLogHandler, "error").and.callFake(() => {});
+
+                translator.instant("BROKEN");
+
+                expect(translateLogHandler.error)
+                    .toHaveBeenCalledWith("Parse error for expression \'{{throw}}\'");
+                expect(translateLogHandler.error)
+                    .toHaveBeenCalledWith(jasmine.any(Error));
+            }));
+
+            it("informs about missing translation", () => {
+                spyOn(translateLogHandler, "info");
+
+                translator.instant("UNDEFINED");
+
+                expect(translateLogHandler.info)
+                    .toHaveBeenCalledWith("Translation for \'UNDEFINED\' in language en not found");
+            });
+
+            it("can not get __context as parameter", fakeAsync(() => {
+                translator.waitForTranslation();
+                loaderPromiseResolve({
+                    INTERPOLATION: "The sum from 1+2 is {{1+2}}",
+                });
+                JasminePromise.flush();
+                spyOn(translateLogHandler, "error").and.callFake(() => {});
+
+                translator.instant("INTERPOLATION", {__context: "at work"});
+
+                expect(translateLogHandler.error).toHaveBeenCalledWith("Parameter \'__context\' is not allowed.");
+            }));
+
+            it("can not get numeric keys in parameter", fakeAsync(() => {
+                translator.waitForTranslation();
+                loaderPromiseResolve({
+                    INTERPOLATION: "The sum from 1+2 is {{1+2}}",
+                });
+                JasminePromise.flush();
+                spyOn(translateLogHandler, "error").and.callFake(() => {});
+
+                translator.instant("INTERPOLATION", {
+                    42: "the answer",
+                });
+
+                expect(translateLogHandler.error).toHaveBeenCalledWith("Parameter \'42\' is not allowed.");
+            }));
+
+            it("ignores prototyped properties in parameters", fakeAsync(() => {
+                translator.waitForTranslation();
+
+                loaderPromiseResolve({
+                    INTERPOLATION: "{{something}}",
+                });
+                JasminePromise.flush();
+
+                // tslint:disable-next-line
+                let MyObject = function MyOption(): void {};
+                MyObject.prototype.something = 42;
+
+                let result = translator.instant("INTERPOLATION", new MyObject());
+
+                expect(result).toBe("");
+            }));
+
+            it("continues with other parameters after __context", fakeAsync(() => {
+                translator.waitForTranslation();
+                loaderPromiseResolve({
+                    VARIABLES_TEST: "This {{count > 5 ? 'is interesting' : 'is boring'}}",
+                });
+                JasminePromise.flush();
+                translateLogHandler.error = () => {};
+
+                let translation = translator.instant("VARIABLES_TEST", {__context: "at work", count: 6});
+
+                expect(translation).toBe("This is interesting");
+            }));
+
+            it("continues with other parameters after numeric", fakeAsync(() => {
+                translator.waitForTranslation();
+                loaderPromiseResolve({
+                    VARIABLES_TEST: "This {{count > 5 ? 'is interesting' : 'is boring'}}",
+                });
+                JasminePromise.flush();
+                translateLogHandler.error = () => {};
+
+                let translation = translator.instant("VARIABLES_TEST", {42: "the answer", count: 6});
+
+                expect(translation).toBe("This is interesting");
+            }));
+
+            it("ignores array as parameters", fakeAsync(() => {
+                translator.waitForTranslation();
+                loaderPromiseResolve({
+                    INTERPOLATION: "The sum from 1+2 is {{1+2}}",
+                });
+                JasminePromise.flush();
+                spyOn(translateLogHandler, "error").and.callFake(() => {});
+
+                let translation = translator.instant("INTERPOLATION", [1, 2, 3]);
+
+                expect(translation).toBe("The sum from 1+2 is 3");
+                expect(translateLogHandler.error).toHaveBeenCalledWith("Parameters can not be an array.");
+            }));
+
+            it("resolves 0 number as '0'", fakeAsync(() => {
+                translator.waitForTranslation();
+                loaderPromiseResolve({
+                    INTERPOLATION: "The count is {{count}}",
+                });
+                JasminePromise.flush();
+
+                let translation = translator.instant("INTERPOLATION", { count: 0 });
+
+                expect(translation).toBe("The count is 0");
             }));
 
             describe("referenced translations", () => {
@@ -1108,126 +1234,89 @@ describe("Translator", () => {
                 }));
             });
 
-            it("informs about missing translation", () => {
-                spyOn(translateLogHandler, "info");
+            describe("interpolation of pipes", () => {
+                it("parses expression and sends parsed content to pipe", fakeAsync(() => {
+                    translator.waitForTranslation();
+                    loaderPromiseResolve({
+                        TEST: "{{varA|uppercase}}",
+                    });
+                    JasminePromise.flush();
+                    let uppercasePipe: UpperCasePipe = TestBed.get(UpperCasePipe);
+                    spyOn(uppercasePipe, "transform").and.returnValue("transformed");
 
-                translator.instant("UNDEFINED");
+                    let translation = translator.instant("TEST", { varA: "anything" });
 
-                expect(translateLogHandler.info)
-                    .toHaveBeenCalledWith("Translation for \'UNDEFINED\' in language en not found");
+                    expect(uppercasePipe.transform).toHaveBeenCalledWith("anything");
+                }));
+
+                it("throws an error when pipe does not exist", fakeAsync(() => {
+                    translator.waitForTranslation();
+                    loaderPromiseResolve({
+                        TEST: "{{varA|non-existing}}",
+                    });
+                    JasminePromise.flush();
+                    spyOn(translateLogHandler, "error");
+
+                    let translation = translator.instant("TEST", { varA: "anything" });
+
+                    expect(translateLogHandler.error).toHaveBeenCalledWith(new Error("Pipe non-existing unknown"));
+                }));
+
+                it("parses and provides arguments for pipes", fakeAsync(() => {
+                    translator.waitForTranslation();
+                    loaderPromiseResolve({
+                        TEST: "{{'string'|uppercase:varA:varB}}",
+                    });
+                    JasminePromise.flush();
+                    let uppercasePipe: UpperCasePipe = TestBed.get(UpperCasePipe);
+                    spyOn(uppercasePipe, "transform").and.returnValue("transformed");
+
+                    let translation = translator.instant("TEST", { varA: "anything", varB: "something" });
+
+                    expect(uppercasePipe.transform).toHaveBeenCalledWith("string", "anything", "something");
+                }));
+
+                it("allows colons in arguments for pipes", fakeAsync(() => {
+                    translator.waitForTranslation();
+                    loaderPromiseResolve({
+                        TEST: "{{'2014-01-01 23:21:25'|date:'HH:mm'}}",
+                    });
+                    JasminePromise.flush();
+                    let datePipe: DatePipe = TestBed.get(DatePipe);
+                    spyOn(datePipe, "transform").and.returnValue("transformed");
+
+                    let translation = translator.instant("TEST");
+
+                    expect(datePipe.transform).toHaveBeenCalledWith("2014-01-01 23:21:25", "HH:mm");
+                }));
+
+                it("throws an error when pipe arguments invalid", fakeAsync(() => {
+                    translator.waitForTranslation();
+                    loaderPromiseResolve({
+                        TEST: "{{ varA|uppercase:'unparsable }}",
+                    });
+                    JasminePromise.flush();
+                    spyOn(translateLogHandler, "error");
+
+                    let translation = translator.instant("TEST", { varA: "anything" });
+
+                    expect(translateLogHandler.error).toHaveBeenCalledWith(jasmine.any(Error));
+                }));
+
+                it("calls pipe without params when args can't be parsed", fakeAsync(() => {
+                    translator.waitForTranslation();
+                    loaderPromiseResolve({
+                        TEST: "{{ varA|uppercase:'unparsable }}",
+                    });
+                    JasminePromise.flush();
+                    let uppercasePipe: UpperCasePipe = TestBed.get(UpperCasePipe);
+                    spyOn(uppercasePipe, "transform").and.returnValue("transformed");
+
+                    let translation = translator.instant("TEST", { varA: "anything" });
+
+                    expect(uppercasePipe.transform).toHaveBeenCalledWith("anything");
+                }));
             });
-
-            it("shows error when parsing throws error", fakeAsync(() => {
-                translator.waitForTranslation();
-                loaderPromiseResolve({
-                    BROKEN: 'This "{{throw}}" is empty string',
-                });
-                JasminePromise.flush();
-                spyOn(translateLogHandler, "error").and.callFake(() => {});
-
-                translator.instant("BROKEN");
-
-                expect(translateLogHandler.error)
-                    .toHaveBeenCalledWith("Parsing error for expression \'{{throw}}\'");
-
-            }));
-
-            it("can not get __context as parameter", fakeAsync(() => {
-                translator.waitForTranslation();
-                loaderPromiseResolve({
-                    INTERPOLATION: "The sum from 1+2 is {{1+2}}",
-                });
-                JasminePromise.flush();
-                spyOn(translateLogHandler, "error").and.callFake(() => {});
-
-                translator.instant("INTERPOLATION", {__context: "at work"});
-
-                expect(translateLogHandler.error).toHaveBeenCalledWith("Parameter \'__context\' is not allowed.");
-            }));
-
-            it("can not get numeric keys in parameter", fakeAsync(() => {
-                translator.waitForTranslation();
-                loaderPromiseResolve({
-                    INTERPOLATION: "The sum from 1+2 is {{1+2}}",
-                });
-                JasminePromise.flush();
-                spyOn(translateLogHandler, "error").and.callFake(() => {});
-
-                translator.instant("INTERPOLATION", {
-                    42: "the answer",
-                });
-
-                expect(translateLogHandler.error).toHaveBeenCalledWith("Parameter \'42\' is not allowed.");
-            }));
-
-            it("ignores prototyped properties in parameters", fakeAsync(() => {
-                translator.waitForTranslation();
-
-                loaderPromiseResolve({
-                    INTERPOLATION: "{{something}}",
-                });
-                JasminePromise.flush();
-
-                // tslint:disable-next-line
-                let MyObject = function MyOption(): void {};
-                MyObject.prototype.something = 42;
-
-                let result = translator.instant("INTERPOLATION", new MyObject());
-
-                expect(result).toBe("");
-            }));
-
-            it("continues with other parameters after __context", fakeAsync(() => {
-                translator.waitForTranslation();
-                loaderPromiseResolve({
-                    VARIABLES_TEST: "This {{count > 5 ? 'is interesting' : 'is boring'}}",
-                });
-                JasminePromise.flush();
-                translateLogHandler.error = () => {};
-
-                let translation = translator.instant("VARIABLES_TEST", {__context: "at work", count: 6});
-
-                expect(translation).toBe("This is interesting");
-            }));
-
-            it("continues with other parameters after numeric", fakeAsync(() => {
-                translator.waitForTranslation();
-                loaderPromiseResolve({
-                    VARIABLES_TEST: "This {{count > 5 ? 'is interesting' : 'is boring'}}",
-                });
-                JasminePromise.flush();
-                translateLogHandler.error = () => {};
-
-                let translation = translator.instant("VARIABLES_TEST", {42: "the answer", count: 6});
-
-                expect(translation).toBe("This is interesting");
-            }));
-
-            it("ignores array as parameters", fakeAsync(() => {
-                translator.waitForTranslation();
-                loaderPromiseResolve({
-                    INTERPOLATION: "The sum from 1+2 is {{1+2}}",
-                });
-                JasminePromise.flush();
-                spyOn(translateLogHandler, "error").and.callFake(() => {});
-
-                let translation = translator.instant("INTERPOLATION", [1, 2, 3]);
-
-                expect(translation).toBe("The sum from 1+2 is 3");
-                expect(translateLogHandler.error).toHaveBeenCalledWith("Parameters can not be an array.");
-            }));
-
-            it("resolves 0 number as '0'", fakeAsync(() => {
-                translator.waitForTranslation();
-                loaderPromiseResolve({
-                    INTERPOLATION: "The count is {{count}}",
-                });
-                JasminePromise.flush();
-
-                let translation = translator.instant("INTERPOLATION", { count: 0 });
-
-                expect(translation).toBe("The count is 0");
-            }));
         });
     });
 
