@@ -18,29 +18,47 @@ production version is distributed [here](https://angular-translator-demo.my-firs
 ### Interpolation
 
 It supports interpolation so you can:
+ * output variables in your translations  
+ * calculate in your translations  
+ * pluralize in your translations  
+ * execute functions in your translations
 
 {% raw %}
-- output variables in your translations  
-  `"HELLO":"Hello {{name}}!"`
-- calculate in your translations  
-  `"ANSWER":"The answer is {{7*6}}"`
-- pluralize in your translations  
-  `"MESSAGES":"You have {{count}} new message{{count != 1 ? 's' : ''}}"`
-- execute functions in your translations  
-  `"LAST_LOGIN":"Your last login was on {{lastLogin.format('MM/DD/YYYY')}}"`
+```json
+{
+  "HELLO":      "Hello {{ name }}!",
+  "ANSWER":     "The answer is {{ 7 * 6 }}",
+  "MESSAGES":   "You have {{ count }} new message{{ count != 1 ? 's' : '' }}",
+  "LAST_LOGIN": "Your last login was on {{ lastLogin.format('MM/DD/YYYY') }}"
+}
+```
 {% endraw %}
   
 ### Refer to other translations
 
 By referring to other translations you can make it easy to have everywhere the same text without copy and paste.
 
+{% raw %}
 ```json
 {
-  "GREETING": "Hello {% raw %}{{name}}{% endraw %}!",
-  "REGISTERED": "[[GREETING:name]] Thanks for registering at this service.",
-  "LOGIN_CONFIRM": "[[GREETING:name]] Your last login was on {% raw %}{{lastLogin.format('L')}}{% endraw %}."
+  "GREETING":      "Hello {{ name }}!",
+  "REGISTERED":    "[[ GREETING : name ]] Thanks for registering at this service.",
+  "LOGIN_CONFIRM": "[[ GREETING : name ]] Your last login was on {{ lastLogin.format('L') }}."
 }
 ```
+{% endraw %}
+
+### Use pipes in translations
+
+Pure pipes can be used inside translations. This makes formatting easier and localized.
+
+{% raw %}
+```json
+{
+  "DISCOUNT": "Save {{ original - price | currency:'USD':true }} when you order now!"
+}
+```
+{% endraw %}
 
 ### Modules
 

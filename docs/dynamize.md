@@ -130,8 +130,65 @@ this.user = { name: 'Thomas', lastLogin: moment('2016-03-06 22:13.31').format('L
 ## Performance
 
 To pass parameters to the pipe or the component have a slightly performance drawback because the objects needs to be
-checked every time if it has changes.
+checked every time if they changed.
 
 To have it under your control we suggest to use `Translator.translate()` or `Translator.instant()`. You can
 then subscribe to `Translator.languageChanged` to change your translation when the language got changed. Also you
 will know when your values have changed.
+
+## Use pipes in translations
+
+By default you can use the pipes `CurrencyPipe`, `DatePipe`, `DecimalPipe`, `JsonPipe`, `LowerCasePipe`, `PercentPipe`,
+`SlicePipe`, `TitleCasePipe` and `UpperCasePipe`. If you want to add more you need to pass them to your configuration
+for root module:
+
+```ts
+// the pipe
+@Pipe({
+  name: 'random',
+  pure: true
+})
+export class RandomPipe implements PipeTransform {
+  transform(type: string, ...args: any[]): any {
+    if (!args[0] || !args[0][value]) {
+      return 'unknown';
+    }
+
+    return args[0][type][Math.floor(Math.random() * args[0][value].length)];
+  }
+}
+
+@NgModule({
+  declarations: [
+    AppComponent,
+  ],
+  imports: [
+    BrowserModule,
+    TranslatorModule.forRoot({
+      pipes: [ RandomPipe ],
+    })
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+```
+
+Then you can also use this pipe:
+
+{% raw %}
+```json
+{
+    "FUN": [
+        "{{ type | random: { joke: [",
+            "'What\\'s the difference between snowmen and snowladies? Snowballs',",
+            "'How do you make holy water? You boil the hell out of it.',",
+            "'I say no to alcohol, it just doesn\\'t listen.',",
+        "] } }}"
+    ]
+}
+```
+{% endraw %}
+
+For the default pipes you can get more information in 
+[the official API reference](https://angular.io/docs/ts/latest/api/#!?query=pipe)
