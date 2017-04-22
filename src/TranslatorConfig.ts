@@ -1,9 +1,33 @@
-import {TranslationLoader} from "./TranslationLoader";
-import {TranslationLoaderJson} from "./TranslationLoader/Json";
+import { TranslateLogHandler } from "./TranslateLogHandler";
+import { TranslationLoader } from "./TranslationLoader";
+import { TranslationLoaderJson } from "./TranslationLoader/Json";
 
-import {Injectable, Optional, Type} from "@angular/core";
+import {
+    CurrencyPipe,
+    DatePipe,
+    DecimalPipe,
+    JsonPipe,
+    LowerCasePipe,
+    PercentPipe,
+    SlicePipe,
+    TitleCasePipe,
+    UpperCasePipe,
+} from "@angular/common";
+import { PipeResolver } from "@angular/compiler";
+import { PipeTransform, Type } from "@angular/core";
 
-@Injectable()
+export const COMMON_PURE_PIPES: Array<Type<PipeTransform>> = [
+    CurrencyPipe,
+    DatePipe,
+    DecimalPipe,
+    JsonPipe,
+    LowerCasePipe,
+    PercentPipe,
+    SlicePipe,
+    TitleCasePipe,
+    UpperCasePipe,
+];
+
 export class TranslatorConfig {
     public static navigator: any = window && window.navigator ? window.navigator : {};
 
@@ -28,20 +52,32 @@ export class TranslatorConfig {
         );
     }
 
-    private options: any = {
-        defaultLanguage: "en",
-        providedLanguages: [ "en" ],
-        detectLanguage: true,
+    private options: { [key: string]: any } = {
+        defaultLanguage:    "en",
+        providedLanguages:  ["en"],
+        detectLanguage:     true,
         preferExactMatches: false,
-        navigatorLanguages: [ "en" ],
-        loader: TranslationLoaderJson,
+        navigatorLanguages: ["en"],
+        loader:             TranslationLoaderJson,
+        pipes:              COMMON_PURE_PIPES.slice(0),
+        pipeMap:            (() => {
+            const pipeResolver = new PipeResolver();
+            let pipes = {};
+            COMMON_PURE_PIPES.map((pipe) => {
+                pipes[pipeResolver.resolve(pipe).name] = pipe;
+            });
+            return pipes;
+        })(),
     };
 
     private moduleName: string;
 
+    private pipeMap: { [key: string]: Type<PipeTransform> };
+
     constructor(
-        @Optional() options?: any,
-        @Optional() module?: string,
+        private logHandler: TranslateLogHandler,
+        options?: any,
+        module?: string,
     ) {
         this.options.navigatorLanguages = ((): string[] => {
             let navigator: any = TranslatorConfig.navigator;
@@ -92,17 +128,54 @@ export class TranslatorConfig {
         return this.options.navigatorLanguages;
     }
 
+    get pipes(): { [key: string]: Type<PipeTransform> } {
+        if (!this.pipeMap) {
+            this.pipeMap = this.options.pipeMap;
+            const pipeResolver = new PipeResolver();
+            const mappedPipes = Object.keys(this.pipeMap).map((key) => this.pipeMap[key]);
+            const unmappedPipes = this.options.pipes.filter((pipe) => mappedPipes.indexOf(pipe) === -1);
+            while (unmappedPipes.length) {
+                let pipe = unmappedPipes.shift();
+                if (pipe.pipeName) {
+                    this.pipeMap[pipe.pipeName] = pipe;
+                } else {
+                    let pipeAnnotation = pipeResolver.resolve(pipe, false);
+                    if (pipeAnnotation) {
+                        this.pipeMap[pipeAnnotation.name] = pipe;
+                    } else {
+                        this.logHandler.error("Pipe name for " + pipe.name + " can not be resolved");
+                    }
+                }
+            }
+        }
+
+        return this.pipeMap;
+    }
+
     /**
      * Overwrite the options.
      *
      * @param {any} options
      */
-    public setOptions(options: any): void {
+    public setOptions(options: { [key: string]: any }): void {
         for (let key in options) {
-            if (!{}.hasOwnProperty.call(options, key)) {
+            if (!options.hasOwnProperty(key)) {
                 continue;
             }
-            this.options[key] = options[key];
+
+            if (key === "pipes") {
+                this.options.pipes.push(...options.pipes.filter((pipe) => {
+                    return this.options.pipes.indexOf(pipe) === -1;
+                }));
+            } else if (key === "pipeMap") {
+                for (let pipeName in options.pipeMap) {
+                    if (options.pipeMap.hasOwnProperty(pipeName)) {
+                        this.options.pipeMap[pipeName] = options.pipeMap[pipeName];
+                    }
+                }
+            } else {
+                this.options[key] = options[key];
+            }
         }
 
         if (this.options.providedLanguages.indexOf(this.options.defaultLanguage) === -1) {
@@ -122,8 +195,8 @@ export class TranslatorConfig {
      * @param {boolean?} strict
      * @returns {string|boolean}
      */
-    public providedLanguage(language: string, strict: boolean = false): string|boolean {
-        let provided: string|boolean = false;
+    public providedLanguage(language: string, strict: boolean = false): string | boolean {
+        let provided: string | boolean = false;
         let p: number;
 
         let providedLanguagesNormalized = this.providedLanguages.map(TranslatorConfig.normalizeLanguage);
@@ -163,7 +236,7 @@ export class TranslatorConfig {
             throw new Error("Module configs can not be stacked");
         }
 
-        let moduleConfig = new TranslatorConfig(this.options, module);
+        let moduleConfig = new TranslatorConfig(this.logHandler, this.options, module);
 
         if (this.options.modules && this.options.modules[module]) {
             moduleConfig.setOptions(this.options.modules[module]);

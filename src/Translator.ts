@@ -1,15 +1,14 @@
-import {TranslateLogHandler} from "./TranslateLogHandler";
-import {TranslationLoader} from "./TranslationLoader";
-import {TranslatorConfig} from "./TranslatorConfig";
-import {TranslatorContainer} from "./TranslatorContainer";
+import { TranslateLogHandler } from "./TranslateLogHandler";
+import { TranslationLoader } from "./TranslationLoader";
+import { TranslatorConfig } from "./TranslatorConfig";
+import { TranslatorContainer } from "./TranslatorContainer";
 
-import {Injectable, Injector} from "@angular/core";
-import {Observable} from "rxjs/Observable";
-import {Observer} from "rxjs/Observer";
+import { Injectable, Injector, PipeTransform } from "@angular/core";
+import { Observable } from "rxjs/Observable";
+import { Observer } from "rxjs/Observer";
 
 import "rxjs/add/operator/share";
 
-@Injectable()
 export class Translator {
     private _language: string = "en";
     private config: TranslatorConfig;
@@ -97,8 +96,8 @@ export class Translator {
      * @param {string?} language
      * @returns {Promise<string|string[]>|Promise}
      */
-    public translate(keys: string|string[], params: any = {}, language?: string): Promise<string|string[]> {
-        return new Promise<string|string[]>((resolve) => {
+    public translate(keys: string | string[], params: any = {}, language?: string): Promise<string | string[]> {
+        return new Promise<string | string[]>((resolve) => {
             language = this.getSelectedLanguage(language);
             if (!language) {
                 resolve(keys);
@@ -123,7 +122,7 @@ export class Translator {
      * @param {string?} language
      * @returns {string|string[]}
      */
-    public instant(keys: string|string[], params: any = {}, language?: string): string|string[] {
+    public instant(keys: string | string[], params: any = {}, language?: string): string | string[] {
         if (typeof keys === "string") {
             return this.instant([keys], params, language)[0];
         }
@@ -151,10 +150,11 @@ export class Translator {
             // simple interpolation
             t = t.replace(/{{\s*(.*?)\s*}}/g, (sub: string, expression: string) => {
                 try {
-                    return this.parse(expression, params) || "";
+                    return String(this.interpolate(expression, params)) || "";
                 } catch (e) {
                     if (e && e.message && e.message.indexOf("is not defined") === -1) {
-                        this.logHandler.error("Parsing error for expression '" + sub + "'");
+                        this.logHandler.error("Parse error for expression '" + sub + "'");
+                        this.logHandler.error(e);
                     }
                     return "";
                 }
@@ -217,16 +217,24 @@ export class Translator {
         return this.loadedLanguages[language];
     }
 
-    /* tslint:disable:variable-name */
+    private interpolate(expression: string, __context: any): any {
+        let expressions: string[] = expression.split("|");
+        let result = this.parse(expressions.shift(), __context);
+        while (expressions.length) {
+            result = this.pipeTransform(result, expressions.shift().trim(), __context);
+        }
+        return result;
+    }
+
     /**
      * Parses the expression in the given __context.
      *
      * @param   {string} expression
      * @param   {object} __context
-     * @returns {string}
+     * @returns {any}
      * @private
      */
-    private parse(expression: string, __context: any): string {
+    private parse(expression: string, __context: any): any {
         let func: string[] = [];
         let varName: string;
         func.push("(function() {");
@@ -245,9 +253,50 @@ export class Translator {
             }
         }
         func.push("return (" + expression + "); })()");
-        return String(eval(func.join("\n")));
+        return eval(func.join("\n"));
     }
-    /* tslint:enable:variable-name */
+
+    /**
+     * Transforms value with pipeExpression in given __context.
+     *
+     * @param {any} value
+     * @param {string} pipeExpression
+     * @param {any} __context
+     * @returns {any}
+     */
+    private pipeTransform(value: any, pipeExpression: string, __context: any): any {
+        let [pipeName, ...argExpressions] = pipeExpression.split(":");
+        let args = [];
+        let argExpression: string = "";
+        while (argExpressions.length) {
+            argExpression += argExpressions.shift();
+            try {
+                let arg: any = this.parse(argExpression, __context);
+                argExpression = "";
+                args.push(arg);
+            } catch (e) {
+                if (argExpressions.length === 0) {
+                    this.logHandler.error(e);
+                }
+                argExpression += ":";
+            }
+        }
+
+        return this.getPipe(pipeName).transform(value, ...args);
+    }
+
+    /**
+     * Get a pipe from injector
+     *
+     * @param pipeName
+     * @returns {PipeTransform}
+     */
+    private getPipe(pipeName): PipeTransform {
+        if (!this.config.pipes[pipeName]) {
+            throw new Error("Pipe " + pipeName + " unknown");
+        }
+        return this.injector.get(this.config.pipes[pipeName]);
+    }
 
     /**
      * Outputs a parse error for an error in translation references.
@@ -365,7 +414,7 @@ export class Translator {
                     if (expression[j].match(/\s/)) {
                         // nothing to do here
                     } else if (expression[j].match(/[A-Za-z0-9_]/)) {
-                        status    = "read_param_key";
+                        status = "read_param_key";
                         paramKey = expression[j];
                     } else if (expression[j] === "=") {
                         if (Object.keys(translateParams).length > 0) {

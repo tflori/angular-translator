@@ -1,14 +1,14 @@
-import {TranslateLogHandler} from "./TranslateLogHandler";
-import {Translator} from "./Translator";
-import {TranslatorContainer} from "./TranslatorContainer";
+import { TranslateLogHandler } from "./TranslateLogHandler";
+import { Translator } from "./Translator";
+import { TranslatorContainer } from "./TranslatorContainer";
 
-import {Component, Input} from "@angular/core";
-import {Subscription} from "rxjs/Subscription";
+import { Component, Input } from "@angular/core";
+import { Subscription } from "rxjs/Subscription";
 
 @Component({
     selector: "[translate]",
     template: "{{translation}}",
-    inputs: [
+    inputs:   [
         "params:translateParams",
         "module:translatorModule",
     ],

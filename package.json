@@ -10,8 +10,9 @@
     "test": "karma start",
     "tslint": "tslint -c tslint.json --exclude=\"**/*.d.ts\" --exclude=\"node_modules/**/*.ts\" \"**/*.ts\"",
     "prepare": "typings install",
-    "prepublishOnly": "npm test && ngc && webpack",
-    "coveralls": "cat coverage/lcov.info | coveralls"
+    "prepublishOnly": "npm test && npm run build",
+    "coveralls": "cat coverage/lcov.info | coveralls",
+    "build": "ngc && webpack"
   },
   "keywords": [
     "angular2",
@@ -38,6 +39,7 @@
   "homepage": "https://github.com/tflori/angular-translator",
   "peerDependencies": {
     "@angular/common": "*",
+    "@angular/compiler": "*",
     "@angular/core": "*",
     "@angular/http": "*"
   },

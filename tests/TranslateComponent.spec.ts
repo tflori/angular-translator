@@ -31,7 +31,7 @@ describe("TranslateComponent", () => {
         });
 
         it("requires a TranslateLogHandler", () => {
-            let translatorConfig: TranslatorConfig = new TranslatorConfig({
+            let translatorConfig: TranslatorConfig = new TranslatorConfig(new TranslateLogHandlerMock(), {
                 loader: TranslationLoaderMock,
                 providedLanguages: [ "en", "de" ],
             });
@@ -55,7 +55,7 @@ describe("TranslateComponent", () => {
         });
 
         it("subscribes on language changes", () => {
-            let translatorConfig: TranslatorConfig = new TranslatorConfig({
+            let translatorConfig: TranslatorConfig = new TranslatorConfig(new TranslateLogHandlerMock(), {
                 loader: TranslationLoaderMock,
                 providedLanguages: [ "en", "de" ],
             });
@@ -85,7 +85,7 @@ describe("TranslateComponent", () => {
         let translateContainer: TranslatorContainer;
 
         beforeEach(() => {
-            translatorConfig = new TranslatorConfig({
+            translatorConfig = new TranslatorConfig(new TranslateLogHandlerMock(), {
                 loader: TranslationLoaderMock,
                 providedLanguages: [ "en", "de" ],
             });

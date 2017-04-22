@@ -1,5 +1,5 @@
 export class TranslateLogHandler {
-    public error(message: string): void {
+    public error(message: string | Error): void {
         if (console && console.error) {
             console.error(message);
         }

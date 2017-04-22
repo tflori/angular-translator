@@ -1,7 +1,7 @@
-import {TranslationLoader} from "../TranslationLoader";
+import { TranslationLoader } from "../TranslationLoader";
 
-import {Injectable} from "@angular/core";
-import {Http} from "@angular/http";
+import { Injectable } from "@angular/core";
+import { Http } from "@angular/http";
 
 @Injectable()
 export class TranslationLoaderJson extends TranslationLoader {
@@ -10,14 +10,14 @@ export class TranslationLoaderJson extends TranslationLoader {
     }
 
     public load({
-            language,
-            module = "default",
-            path = "assets/i18n/{{ module }}/{{ language }}.json",
-        }: {
-            language?: string,
-            module?: string,
-            path?: string,
-        }): Promise<object> {
+                    language,
+                    module = "default",
+                    path = "assets/i18n/{{ module }}/{{ language }}.json",
+                }: {
+        language?: string,
+        module?: string,
+        path?: string,
+    }): Promise<object> {
         return new Promise((resolve, reject) => {
             let file = path.replace(/\{\{\s*([a-z]+)\s*\}\}/g, (substring: string, ...args: any[]) => {
                 switch (args[0]) {

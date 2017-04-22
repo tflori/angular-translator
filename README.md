@@ -12,16 +12,20 @@ features for translation. Like interpolation, references to other translations, 
 ### Interpolation
 
 It supports interpolation so you can:
+ * output variables in your translations  
+ * calculate in your translations  
+ * pluralize in your translations  
+ * execute functions in your translations
 
-- output variables in your translations  
-  `"HELLO":"Hello {{name}}!"`
-- calculate in your translations  
-  `"ANSWER":"The answer is {{7*6}}"`
-- pluralize in your translations  
-  `"MESSAGES":"You have {{count}} new message{{count != 1 ? 's' : ''}}"`
-- execute functions in your translations  
-  `"LAST_LOGIN":"Your last login was on {{lastLogin.format('MM/DD/YYYY')}}"`
-  
+```json
+{
+  "HELLO":      "Hello {{ name }}!",
+  "ANSWER":     "The answer is {{ 7 * 6 }}",
+  "MESSAGES":   "You have {{ count }} new message{{ count != 1 ? 's' : '' }}",
+  "LAST_LOGIN": "Your last login was on {{ lastLogin.format('MM/DD/YYYY') }}"
+}
+```
+
 [* dynamic translations](https://tflori.github.io/angular-translator/dynamize.html)
   
 ### Refer to other translations
@@ -30,9 +34,21 @@ By referring to other translations you can make it easy to have everywhere the s
 
 ```json
 {
-  "GREETING": "Hello {{name}}!",
-  "REGISTERED": "[[GREETING:name]] Thanks for registering at this service.",
-  "LOGIN_CONFIRM": "[[GREETING:name]] Your last login was on {{lastLogin.format('L')}}."
+  "GREETING":      "Hello {{ name }}!",
+  "REGISTERED":    "[[ GREETING : name ]] Thanks for registering at this service.",
+  "LOGIN_CONFIRM": "[[ GREETING : name ]] Your last login was on {{ lastLogin.format('L') }}."
+}
+```
+
+[* dynamic translations](https://tflori.github.io/angular-translator/dynamize.html)
+
+### Use pipes in translations
+
+Pure pipes can be used inside translations. This makes formatting easier and localized.
+
+```json
+{
+  "DISCOUNT": "Save {{ original - price | currency:'USD':true }} when you order now!"
 }
 ```
 
@@ -69,7 +85,7 @@ import { Translator } from "angular-translator";
 
 @Component({
     selector: "my-app",
-    template: "{TEXT|translate} is the same as <span translate=\"TEXT\"></span>"
+    template: "{{ TEXT | translate }} is the same as <span translate=\"TEXT\"></span>"
 })
 export class AppComponent {
     constructor(translator: Translator) {

@@ -1,13 +1,13 @@
-import {TranslateComponent} from "./TranslateComponent";
-import {TranslateLogHandler} from "./TranslateLogHandler";
-import {TranslatePipe} from "./TranslatePipe";
-import {TranslationLoaderJson} from "./TranslationLoader/Json";
-import {Translator} from "./Translator";
-import {TranslatorConfig} from "./TranslatorConfig";
-import {TranslatorContainer} from "./TranslatorContainer";
+import { TranslateComponent } from "./TranslateComponent";
+import { TranslateLogHandler } from "./TranslateLogHandler";
+import { TranslatePipe } from "./TranslatePipe";
+import { TranslationLoaderJson } from "./TranslationLoader/Json";
+import { Translator } from "./Translator";
+import { COMMON_PURE_PIPES, TranslatorConfig } from "./TranslatorConfig";
+import { TranslatorContainer } from "./TranslatorContainer";
 
-import {Inject, InjectionToken, ModuleWithProviders, NgModule, Optional, Provider, SkipSelf} from "@angular/core";
-import {HttpModule} from "@angular/http";
+import { InjectionToken, ModuleWithProviders, NgModule, PipeTransform, Provider, Type } from "@angular/core";
+import { HttpModule } from "@angular/http";
 
 export const TRANSLATOR_OPTIONS: InjectionToken<object> = new InjectionToken("TRANSLATOR_OPTIONS");
 export const TRANSLATOR_MODULE: InjectionToken<string> = new InjectionToken("TRANSLATOR_MODULE");
@@ -17,25 +17,32 @@ export const TRANSLATOR_MODULE: InjectionToken<string> = new InjectionToken("TRA
         TranslatePipe,
         TranslateComponent,
     ],
-    exports: [
+    exports:      [
         TranslatePipe,
         TranslateComponent,
     ],
-    imports: [HttpModule],
-    providers: [
+    imports:      [HttpModule],
+    providers:    [
         TranslationLoaderJson,
         TranslateLogHandler,
         TranslatorContainer,
+        COMMON_PURE_PIPES,
     ],
 })
 export class TranslatorModule {
     public static forRoot(options: any = {}, module: string = "default"): ModuleWithProviders {
         return {
-            ngModule: TranslatorModule,
+            ngModule:  TranslatorModule,
             providers: [
                 { provide: TRANSLATOR_OPTIONS, useValue: options },
-                { provide: TranslatorConfig, useFactory: createTranslatorConfig, deps: [ TRANSLATOR_OPTIONS ] },
+                {
+                    provide: TranslatorConfig, useFactory: createTranslatorConfig, deps: [
+                    TranslateLogHandler,
+                    TRANSLATOR_OPTIONS,
+                ],
+                },
                 provideTranslator(module),
+                options.pipes || [],
             ],
         };
     }
@@ -44,14 +51,14 @@ export class TranslatorModule {
 export function provideTranslator(module: string): Provider[] {
     return [
         { provide: TRANSLATOR_MODULE, useValue: module },
-        { provide: Translator, useFactory: createTranslator, deps: [ TranslatorContainer, TRANSLATOR_MODULE ] },
+        { provide: Translator, useFactory: createTranslator, deps: [TranslatorContainer, TRANSLATOR_MODULE] },
     ];
 }
 
-export function createTranslatorConfig(config: any = {}) {
-    return new TranslatorConfig(config);
+export function createTranslatorConfig(logHandler: TranslateLogHandler, options: any = {}): TranslatorConfig {
+    return new TranslatorConfig(logHandler, options);
 }
 
-export function createTranslator(translatorContainer: TranslatorContainer, module: string) {
+export function createTranslator(translatorContainer: TranslatorContainer, module: string): Translator {
     return translatorContainer.getTranslator(module);
 }

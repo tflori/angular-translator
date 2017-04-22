@@ -1,8 +1,36 @@
-import {TranslatorConfig} from "../index";
+import { COMMON_PURE_PIPES, TranslateLogHandler, TranslatePipe, TranslatorConfig } from "../index";
+
+import {
+    CurrencyPipe,
+    DatePipe,
+    DecimalPipe,
+    JsonPipe,
+    LowerCasePipe,
+    PercentPipe,
+    SlicePipe,
+    TitleCasePipe,
+    UpperCasePipe,
+} from "@angular/common";
+import { PipeTransform } from "@angular/core";
+import { TranslateLogHandlerMock } from "./helper/TranslatorMocks";
+
+class AnotherPipe implements PipeTransform {
+    public static pipeName = "another";
+
+    public transform(value: any, ...args: any[]) {
+        throw new Error("Method not implemented.");
+    }
+}
 
 describe("TranslatorConfig", () => {
+    let logHandler: TranslateLogHandler;
+
+    beforeEach(() => {
+        logHandler = new TranslateLogHandlerMock();
+    });
+
     it("is defined", () => {
-        let translatorConfig = new TranslatorConfig();
+        let translatorConfig = new TranslatorConfig(logHandler);
 
         expect(TranslatorConfig).toBeDefined();
         expect(translatorConfig).toBeDefined();
@@ -10,7 +38,7 @@ describe("TranslatorConfig", () => {
     });
 
     it("gets default language from parameter defaultLanguage", () => {
-        let translatorConfig = new TranslatorConfig({
+        let translatorConfig = new TranslatorConfig(logHandler, {
             defaultLanguage: "cn",
             providedLanguages: [ "en", "cn" ],
         });
@@ -25,26 +53,26 @@ describe("TranslatorConfig", () => {
         let config = new MyObject();
         config.providedLanguages = ["en", "de"];
 
-        let translatorConfig = new TranslatorConfig(config);
+        let translatorConfig = new TranslatorConfig(logHandler, config);
 
         expect(translatorConfig.defaultLanguage).toBe("en");
         expect(translatorConfig.providedLanguages).toEqual(["en", "de"]);
     });
 
     it("defines a list of provided languages", () => {
-        let translatorConfig = new TranslatorConfig();
+        let translatorConfig = new TranslatorConfig(logHandler);
 
         expect(translatorConfig.providedLanguages).toEqual(["en"]);
     });
 
     it("gets provided languages from parameter providedLanguages", () => {
-        let translatorConfig = new TranslatorConfig({ providedLanguages: [ "cn" ] });
+        let translatorConfig = new TranslatorConfig(logHandler, { providedLanguages: [ "cn" ] });
 
         expect(translatorConfig.providedLanguages).toEqual([ "cn" ]);
     });
 
     it("uses first provided language", () => {
-        let translatorConfig = new TranslatorConfig({
+        let translatorConfig = new TranslatorConfig(logHandler, {
             defaultLanguage: "en", // default - unnecessary
             providedLanguages: [ "cn" ],
         });
@@ -56,7 +84,7 @@ describe("TranslatorConfig", () => {
         let translatorConfig: TranslatorConfig;
 
         it("returns the language if provided", () => {
-            translatorConfig = new TranslatorConfig({
+            translatorConfig = new TranslatorConfig(logHandler, {
                 providedLanguages: [ "bm", "en" ],
             });
 
@@ -66,7 +94,7 @@ describe("TranslatorConfig", () => {
         });
 
         it("returns false when it is not provided", () => {
-            translatorConfig = new TranslatorConfig({
+            translatorConfig = new TranslatorConfig(logHandler, {
                 providedLanguages: [ "en" ],
             });
 
@@ -76,7 +104,7 @@ describe("TranslatorConfig", () => {
         });
 
         it("returns provided language when we search with country", () => {
-            translatorConfig = new TranslatorConfig({
+            translatorConfig = new TranslatorConfig(logHandler, {
                 providedLanguages: [ "en" ],
             });
 
@@ -86,7 +114,7 @@ describe("TranslatorConfig", () => {
         });
 
         it("returns the first provided country specific language", () => {
-            translatorConfig = new TranslatorConfig({
+            translatorConfig = new TranslatorConfig(logHandler, {
                 providedLanguages: [ "de-DE", "de-AT" ],
             });
 
@@ -96,7 +124,7 @@ describe("TranslatorConfig", () => {
         });
 
         it("normalizes provided languages for checks", () => {
-            translatorConfig = new TranslatorConfig({
+            translatorConfig = new TranslatorConfig(logHandler, {
                 providedLanguages: [ "DE", "DE_AT" ],
             });
 
@@ -106,7 +134,7 @@ describe("TranslatorConfig", () => {
         });
 
         it("normalizes searched language", () => {
-            translatorConfig = new TranslatorConfig({
+            translatorConfig = new TranslatorConfig(logHandler, {
                 providedLanguages: [ "de-DE", "de-AT" ],
             });
 
@@ -116,7 +144,7 @@ describe("TranslatorConfig", () => {
         });
 
         it("only finds direct matches", () => {
-            translatorConfig = new TranslatorConfig({
+            translatorConfig = new TranslatorConfig(logHandler, {
                 providedLanguages: [ "de-DE" ],
             });
 
@@ -126,7 +154,7 @@ describe("TranslatorConfig", () => {
         });
 
         it("only takes valid matches", () => {
-            translatorConfig = new TranslatorConfig({
+            translatorConfig = new TranslatorConfig(logHandler, {
                 providedLanguages: [ "br", "en" ],
             });
 
@@ -138,7 +166,7 @@ describe("TranslatorConfig", () => {
 
     describe("navigatorLanguages", () => {
         it("is always an array", () => {
-            let translateConfig = new TranslatorConfig();
+            let translateConfig = new TranslatorConfig(logHandler);
 
             expect(translateConfig.navigatorLanguages instanceof Array).toBe(true);
         });
@@ -146,7 +174,7 @@ describe("TranslatorConfig", () => {
         it("uses navigator.languages when given", () => {
             TranslatorConfig.navigator = { languages: [ "bm", "de", "fr", "en" ] };
 
-            let translateConfig = new TranslatorConfig();
+            let translateConfig = new TranslatorConfig(logHandler);
 
             expect(translateConfig.navigatorLanguages).toEqual([ "bm", "de", "fr", "en" ]);
         });
@@ -154,7 +182,7 @@ describe("TranslatorConfig", () => {
         it("transforms navigator.languages to Array if it is String", () => {
             TranslatorConfig.navigator = { languages: "bm" };
 
-            let translateConfig = new TranslatorConfig();
+            let translateConfig = new TranslatorConfig(logHandler);
 
             expect(translateConfig.navigatorLanguages).toEqual([ "bm" ]);
         });
@@ -162,7 +190,7 @@ describe("TranslatorConfig", () => {
         it("falls back to navigator.language", () => {
             TranslatorConfig.navigator = {language: "fr"};
 
-            let translateConfig = new TranslatorConfig();
+            let translateConfig = new TranslatorConfig(logHandler);
 
             expect(translateConfig.navigatorLanguages).toEqual(["fr"]);
         });
@@ -170,7 +198,7 @@ describe("TranslatorConfig", () => {
         it("can be overwritten by options", () => {
             TranslatorConfig.navigator = {language: "fr"};
 
-            let translateConfig = new TranslatorConfig({
+            let translateConfig = new TranslatorConfig(logHandler, {
                 navigatorLanguages: ["de", "en"],
             });
 
@@ -179,7 +207,7 @@ describe("TranslatorConfig", () => {
     });
 
     describe("module", () => {
-        let main: TranslatorConfig = new TranslatorConfig({
+        let main: TranslatorConfig = new TranslatorConfig(logHandler, {
             defaultLanguage: "fr",
             providedLanguages: [ "fr", "de", "en", "it" ],
         });
@@ -218,6 +246,102 @@ describe("TranslatorConfig", () => {
 
             expect(moduleConfig.providedLanguages).toEqual([ "en" ]);
             expect(moduleConfig.defaultLanguage).toEqual("en");
+        });
+    });
+
+    describe("pipes", () => {
+        it("contains the pure pipes from common module by default", () => {
+            let translatorConfig = new TranslatorConfig(logHandler);
+
+            expect(translatorConfig.pipes).toEqual({
+                currency: CurrencyPipe,
+                date: DatePipe,
+                number: DecimalPipe,
+                json: JsonPipe,
+                lowercase: LowerCasePipe,
+                percent: PercentPipe,
+                slice: SlicePipe,
+                titlecase: TitleCasePipe,
+                uppercase: UpperCasePipe,
+            });
+        });
+
+        it("appends pipes defined in options", () => {
+            let translatorConfig = new TranslatorConfig(logHandler, {
+                pipes: [ TranslatePipe ],
+            });
+
+            expect(translatorConfig.pipes).toEqual({
+                currency: CurrencyPipe,
+                date: DatePipe,
+                number: DecimalPipe,
+                json: JsonPipe,
+                lowercase: LowerCasePipe,
+                percent: PercentPipe,
+                slice: SlicePipe,
+                titlecase: TitleCasePipe,
+                uppercase: UpperCasePipe,
+                translate: TranslatePipe,
+            });
+        });
+
+        it("uses pipeName for mapping if available", () => {
+            let translatorConfig = new TranslatorConfig(logHandler, {
+                pipes: [ AnotherPipe ],
+            });
+
+            expect(translatorConfig.pipes).toEqual({
+                currency: CurrencyPipe,
+                date: DatePipe,
+                number: DecimalPipe,
+                json: JsonPipe,
+                lowercase: LowerCasePipe,
+                percent: PercentPipe,
+                slice: SlicePipe,
+                titlecase: TitleCasePipe,
+                uppercase: UpperCasePipe,
+                another: AnotherPipe,
+            });
+        });
+
+        it("does not modify the constant", () => {
+            let translatorConfig = new TranslatorConfig(logHandler, {
+                pipes: [ TranslatePipe ],
+            });
+
+            expect(COMMON_PURE_PIPES).toEqual([
+                CurrencyPipe,
+                DatePipe,
+                DecimalPipe,
+                JsonPipe,
+                LowerCasePipe,
+                PercentPipe,
+                SlicePipe,
+                TitleCasePipe,
+                UpperCasePipe,
+            ]);
+        });
+
+        it("logs an error when pipeName can not be resolved", () => {
+            AnotherPipe.pipeName = null;
+            spyOn(logHandler, "error");
+
+            let translatorConfig = new TranslatorConfig(logHandler, {
+                pipes: [ AnotherPipe ],
+            });
+
+            expect(translatorConfig.pipes).toEqual({
+                currency: CurrencyPipe,
+                date: DatePipe,
+                number: DecimalPipe,
+                json: JsonPipe,
+                lowercase: LowerCasePipe,
+                percent: PercentPipe,
+                slice: SlicePipe,
+                titlecase: TitleCasePipe,
+                uppercase: UpperCasePipe,
+            });
+            expect(logHandler.error).toHaveBeenCalledWith("Pipe name for AnotherPipe can not be resolved");
         });
     });
 });

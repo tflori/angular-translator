@@ -1,9 +1,9 @@
-import {TranslateLogHandler} from "./TranslateLogHandler";
-import {Translator} from "./Translator";
-import {TranslatorContainer} from "./TranslatorContainer";
+import { TranslateLogHandler } from "./TranslateLogHandler";
+import { Translator } from "./Translator";
+import { TranslatorContainer } from "./TranslatorContainer";
 
-import {Inject, Pipe, PipeTransform} from "@angular/core";
-import {Subscription} from "rxjs/Subscription";
+import { Inject, Pipe, PipeTransform } from "@angular/core";
+import { Subscription } from "rxjs/Subscription";
 
 @Pipe({
     name: "translate",
@@ -16,11 +16,12 @@ export class TranslatePipe implements PipeTransform {
             if (typeof o === "object") {
                 return o;
             }
-        } catch (e) {}
+        } catch (e) {
+        }
         return {};
     }
 
-    private promise: Promise<string|string[]>;
+    private promise: Promise<string | string[]>;
     private translation: string = "";
     private translated: { key: string, params: any, module: string };
     private subscription: Subscription;
@@ -79,7 +80,7 @@ export class TranslatePipe implements PipeTransform {
         return this.translation;
     }
 
-     set module(module: string) {
+    set module(module: string) {
         if (this.subscription) {
             this.subscription.unsubscribe();
         }
@@ -87,7 +88,7 @@ export class TranslatePipe implements PipeTransform {
         this.subscription = this.translator.languageChanged.subscribe(() => {
             this.startTranslation();
         });
-     }
+    }
 
     private startTranslation() {
         if (!this.translated || !this.translated.key) {
