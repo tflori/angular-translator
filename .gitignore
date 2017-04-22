@@ -7,13 +7,11 @@ coverage/*
 docs/_site
 /bundles
 /typings
-/src/**/*
-!/src/**/*.ts
+/src/**/*.js*
 /src/**/*.d.ts
 /index.*
 !/index.ts
-/tests/**/*
-!/tests/**/*.ts
+/tests/**/*.js*
 /tests/**/*.d.ts
 !/tests/helper/promise-matchers.d.ts
 
