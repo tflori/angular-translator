@@ -139,8 +139,13 @@ will know when your values have changed.
 ## Use pipes in translations
 
 By default you can use the pipes `CurrencyPipe`, `DatePipe`, `DecimalPipe`, `JsonPipe`, `LowerCasePipe`, `PercentPipe`,
-`SlicePipe`, `TitleCasePipe` and `UpperCasePipe`. If you want to add more you need to pass them to your configuration
-for root module:
+`SlicePipe`, `TitleCasePipe` and `UpperCasePipe`. 
+
+Custom pipes can get tricky because we can't get the annotations. And therefore we don't know the name. There are two
+workarounds. First (recommended): you can add a `public static pipeName` property to your pipe. Second: you provide a 
+pipe map to configuration.
+
+Anyway you need to pass them to the configuration. Here we use both methods to ge the custom pipe working:
 
 ```ts
 // the pipe
@@ -149,6 +154,8 @@ for root module:
   pure: true
 })
 export class RandomPipe implements PipeTransform {
+  public static pipeName = 'random';
+
   transform(type: string, ...args: any[]): any {
     if (!args[0] || !args[0][value]) {
       return 'unknown';
@@ -166,12 +173,12 @@ export class RandomPipe implements PipeTransform {
     BrowserModule,
     TranslatorModule.forRoot({
       pipes: [ RandomPipe ],
+      pipeMap: { random: RandomPipe }
     })
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
-
+export class AppModule {}
 ```
 
 Then you can also use this pipe:

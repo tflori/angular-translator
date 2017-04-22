@@ -35,7 +35,7 @@ describe("TranslatorContainer", () => {
     });
 
     it("requires a TranslateLogHandler", () => {
-        let translatorConfig = new TranslatorConfig({
+        let translatorConfig = new TranslatorConfig(new TranslateLogHandlerMock(), {
             loader: TranslationLoaderMock,
         });
         let injector = ReflectiveInjector.resolveAndCreate([
@@ -61,7 +61,7 @@ describe("TranslatorContainer", () => {
         let translatorContainer: TranslatorContainer;
 
         beforeEach(() => {
-            translatorConfig = new TranslatorConfig({
+            translatorConfig = new TranslatorConfig(new TranslateLogHandlerMock(), {
                 loader: TranslationLoaderMock,
             });
             TestBed.configureTestingModule({
@@ -147,7 +147,7 @@ describe("TranslatorContainer", () => {
         let translatorConfig: TranslatorConfig;
 
         beforeEach(() => {
-            translatorConfig = new TranslatorConfig({
+            translatorConfig = new TranslatorConfig(new TranslateLogHandlerMock(), {
                 loader: TranslationLoaderMock,
                 providedLanguages: [ "en", "de" ],
                 detectLanguage: false,

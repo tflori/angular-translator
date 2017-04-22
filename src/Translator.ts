@@ -9,7 +9,6 @@ import { Observer } from "rxjs/Observer";
 
 import "rxjs/add/operator/share";
 
-@Injectable()
 export class Translator {
     private _language: string = "en";
     private config: TranslatorConfig;
@@ -97,8 +96,8 @@ export class Translator {
      * @param {string?} language
      * @returns {Promise<string|string[]>|Promise}
      */
-    public translate(keys: string|string[], params: any = {}, language?: string): Promise<string|string[]> {
-        return new Promise<string|string[]>((resolve) => {
+    public translate(keys: string | string[], params: any = {}, language?: string): Promise<string | string[]> {
+        return new Promise<string | string[]>((resolve) => {
             language = this.getSelectedLanguage(language);
             if (!language) {
                 resolve(keys);
@@ -123,7 +122,7 @@ export class Translator {
      * @param {string?} language
      * @returns {string|string[]}
      */
-    public instant(keys: string|string[], params: any = {}, language?: string): string|string[] {
+    public instant(keys: string | string[], params: any = {}, language?: string): string | string[] {
         if (typeof keys === "string") {
             return this.instant([keys], params, language)[0];
         }
@@ -293,10 +292,10 @@ export class Translator {
      * @returns {PipeTransform}
      */
     private getPipe(pipeName): PipeTransform {
-        if (!this.config.pipeMap[pipeName]) {
+        if (!this.config.pipes[pipeName]) {
             throw new Error("Pipe " + pipeName + " unknown");
         }
-        return this.injector.get(this.config.pipeMap[pipeName]);
+        return this.injector.get(this.config.pipes[pipeName]);
     }
 
     /**

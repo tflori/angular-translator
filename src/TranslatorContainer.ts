@@ -1,10 +1,10 @@
-import {TranslateLogHandler} from "./TranslateLogHandler";
-import {TranslatorConfig} from "./TranslatorConfig";
+import { TranslateLogHandler } from "./TranslateLogHandler";
+import { TranslatorConfig } from "./TranslatorConfig";
 
-import {Injectable, Injector} from "@angular/core";
-import {Observable} from "rxjs/Observable";
-import {Observer} from "rxjs/Observer";
-import {Translator} from "./Translator";
+import { Injectable, Injector } from "@angular/core";
+import { Observable } from "rxjs/Observable";
+import { Observer } from "rxjs/Observer";
+import { Translator } from "./Translator";
 
 import "rxjs/add/operator/share";
 
@@ -68,7 +68,7 @@ export class TranslatorContainer {
      * @returns {boolean}
      */
     private detectLanguage(): boolean {
-        let providedLanguage: string|boolean;
+        let providedLanguage: string | boolean;
         let i: number;
 
         const detected = (language): boolean => {

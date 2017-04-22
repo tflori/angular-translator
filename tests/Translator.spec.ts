@@ -27,7 +27,7 @@ describe("Translator", () => {
         let translatorContainer: TranslatorContainer;
 
         beforeEach(() => {
-            translatorConfig = new TranslatorConfig({
+            translatorConfig = new TranslatorConfig(new TranslateLogHandlerMock(), {
                 providedLanguages: ["de", "en"],
                 loader: TranslationLoaderMock,
                 detectLanguage: false,
@@ -127,7 +127,7 @@ describe("Translator", () => {
         let translateLogHandler: TranslateLogHandler;
 
         beforeEach(() => {
-            translatorConfig = new TranslatorConfig();
+            translatorConfig = new TranslatorConfig(new TranslateLogHandlerMock());
             TestBed.configureTestingModule({
                 imports: [
                     TranslatorModule.forRoot({
@@ -1329,7 +1329,7 @@ describe("Translator", () => {
         let loaderPromiseReject: (reason?: string) => void;
 
         beforeEach(() => {
-            translatorConfig = new TranslatorConfig({
+            translatorConfig = new TranslatorConfig(new TranslateLogHandlerMock(), {
                 loader: TranslationLoaderMock,
                 providedLanguages: [ "en", "de" ],
                 detectLanguage: false,
