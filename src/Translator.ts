@@ -113,6 +113,31 @@ export class Translator {
     }
 
     /**
+     * Translate keys for current language and return an observable.
+     *
+     * The observable gets new translations if the language get changed.
+     *
+     * @param {string|string[]} keys
+     * @param {any?} params
+     * @returns {Observable<string|string[]>}
+     */
+    public observeTranslate(
+        keys: string | string[],
+        params: any = {},
+    ): Observable<string | string[]> {
+        return new Observable<string | string[]>((observer: Observer<string | string[]>) => {
+            this.translate(keys, params).then((translations: string | string[]) => {
+                observer.next(translations);
+            });
+            this.languageChangedObservable.subscribe(() => {
+                this.translate(keys, params).then((translations: string | string[]) => {
+                    observer.next(translations);
+                });
+            });
+        });
+    }
+
+    /**
      * Translate keys for current language or given language (lang) synchronously.
      *
      * Optionally you can pass params for translation to be interpolated.
