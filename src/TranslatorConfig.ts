@@ -13,8 +13,12 @@ import {
     TitleCasePipe,
     UpperCasePipe,
 } from "@angular/common";
-import { PipeResolver } from "@angular/compiler";
+import * as compiler from "@angular/compiler";
 import { PipeTransform, Type } from "@angular/core";
+
+const PipeResolver = compiler.PipeResolver;
+// tslint:disable-next-line:no-string-literal
+const JitReflector = compiler["JitReflector"] ? compiler["JitReflector"] : void(0);
 
 export const COMMON_PURE_PIPES: Array<Type<PipeTransform>> = [
     CurrencyPipe,
@@ -61,7 +65,7 @@ export class TranslatorConfig {
         loader:             TranslationLoaderJson,
         pipes:              COMMON_PURE_PIPES.slice(0),
         pipeMap:            (() => {
-            const pipeResolver = new PipeResolver();
+            const pipeResolver = new PipeResolver(JitReflector ? new JitReflector() : void(0));
             let pipes = {};
             COMMON_PURE_PIPES.map((pipe) => {
                 pipes[pipeResolver.resolve(pipe).name] = pipe;
@@ -131,7 +135,7 @@ export class TranslatorConfig {
     get pipes(): { [key: string]: Type<PipeTransform> } {
         if (!this.pipeMap) {
             this.pipeMap = this.options.pipeMap;
-            const pipeResolver = new PipeResolver();
+            const pipeResolver = new PipeResolver(JitReflector ? new JitReflector() : void(0));
             const mappedPipes = Object.keys(this.pipeMap).map((key) => this.pipeMap[key]);
             const unmappedPipes = this.options.pipes.filter((pipe) => mappedPipes.indexOf(pipe) === -1);
             while (unmappedPipes.length) {
