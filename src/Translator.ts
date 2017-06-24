@@ -121,10 +121,7 @@ export class Translator {
      * @param {any?} params
      * @returns {Observable<string|string[]>}
      */
-    public observeTranslate(
-        keys: string | string[],
-        params: any = {},
-    ): Observable<string | string[]> {
+    public observe(keys: string | string[], params: any = {}): Observable<string | string[]> {
         return new Observable<string | string[]>((observer: Observer<string | string[]>) => {
             this.translate(keys, params).then((translations: string | string[]) => {
                 observer.next(translations);
@@ -290,7 +287,8 @@ export class Translator {
      * @returns {any}
      */
     private pipeTransform(value: any, pipeExpression: string, __context: any): any {
-        let [pipeName, ...argExpressions] = pipeExpression.split(":");
+        let argExpressions = pipeExpression.split(":");
+        let pipeName = argExpressions.shift();
         let args = [];
         let argExpression: string = "";
         while (argExpressions.length) {
