@@ -27,7 +27,7 @@ resolved once language got loaded.
 Example:
 
 ```ts
-translateService.waitForTranslation().then(() => this.translation = translateService.instant('TEXT'));
+translator.waitForTranslation().then(() => this.translation = translator.instant('TEXT'));
 ```
 
 ### translate(keys: string|string[], params?: any, lang?: string): Promise<string|string[]>
@@ -42,7 +42,19 @@ case the promise get resolved with the keys itself.
 If keys is an array you get an array with the same order back.
 
 ```ts
-translateService.translate(['STATUS_OPEN', 'STATUS_CLOSED']).then((translations) => {
+translator.translate(['STATUS_OPEN', 'STATUS_CLOSED']).then((translations) => {
+  this.translations['open'] = translations[0];
+  this.translations['closed'] = translations[1];
+});
+```
+
+### observe(keys: string|string[], params?: any): Observable<string|string[]>
+
+Instead of using the language given it is using the current language and pushes the translation for the new language
+every time when the language got changed.
+
+```ts
+translator.observe(['STATUS_OPEN', 'STATUS_CLOSED']).subscribe((translations) => {
   this.translations['open'] = translations[0];
   this.translations['closed'] = translations[1];
 });
@@ -54,11 +66,11 @@ Basically it is the same like `translate` but it does not wait for translation a
 you take a look in the code you will see that `translate` is using `instant` after translations got loaded.
 
 ```ts
-translateService.waitForTranslation().then(() => {
+translator.waitForTranslation().then(() => {
   this.translations = {
     statuses: {
-      open: translateService.instant('STATUS_OPEN'),
-      closed: translateService.instant('STATUS_CLOSED')
+      open: translator.instant('STATUS_OPEN'),
+      closed: translator.instant('STATUS_CLOSED')
     }
   }
 });

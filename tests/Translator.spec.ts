@@ -420,6 +420,59 @@ describe("Translator", () => {
             }));
         });
 
+        describe("observe", () => {
+            let translateSpy: jasmine.Spy;
+
+            beforeEach(() => {
+                translateSpy = spyOn(translator, "translate").and.callFake((keys: string|string[], params?: any) => {
+                    return Promise.resolve(keys);
+                });
+            });
+
+            it("returns an observable", () => {
+                let result = translator.observe("HELLO");
+
+                expect(result).toEqual(jasmine.any(Observable));
+            });
+
+            it("is using translate", () => {
+                translator.observe("HELLO").subscribe();
+
+                expect(translator.translate).toHaveBeenCalledWith("HELLO", {});
+            });
+
+            it("pushes the result from translate to observable", fakeAsync(() => {
+                let spy = jasmine.createSpy("subscriber");
+                translator.observe("HELLO").subscribe(spy);
+
+                JasminePromise.flush();
+
+                expect(spy).toHaveBeenCalledWith("HELLO");
+            }));
+
+            it("translates again when language got changed", () => {
+                translatorConfig.setOptions({ providedLanguages: ["en", "de"]});
+
+                translator.observe("HELLO").subscribe();
+                translator.language = "de";
+
+                expect(translator.translate).toHaveBeenCalledTimes(2);
+            });
+
+            it("pushes the result for the new language", fakeAsync(() => {
+                let spy = jasmine.createSpy("subscriber");
+                translator.observe("HELLO").subscribe(spy);
+
+                JasminePromise.flush();
+                translateSpy.and.returnValue(Promise.resolve("Hallo"));
+                translator.language = "de";
+                JasminePromise.flush();
+
+                expect(spy).toHaveBeenCalledWith("HELLO");
+                expect(spy).toHaveBeenCalledWith("Hallo");
+            }));
+        });
+
         describe("instant", () => {
             let loaderPromiseResolve: (...params: any[]) => void;
 
