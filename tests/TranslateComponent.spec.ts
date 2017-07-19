@@ -232,7 +232,8 @@ describe("TranslateComponent", () => {
 
         @Component({
             selector: "my-component",
-            template: `<p translate="TEXT" [translateParams]="{ some: 'value' }"></p>`,
+            template: `<p><translate [translate]="'TEXT'" [translateParams]="{ some: 'value' }">
+                       </translate></p>`,
         })
         class MyComponent {}
 
