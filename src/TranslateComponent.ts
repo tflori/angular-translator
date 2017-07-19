@@ -7,7 +7,7 @@ import { Subscription } from "rxjs/Subscription";
 
 @Component({
     selector: "translate",
-    template: "{{ translation }}"
+    template: "{{ translation }}",
 })
 export class TranslateComponent {
     public translation: string = "";
