@@ -6,12 +6,8 @@ import { Component, Input } from "@angular/core";
 import { Subscription } from "rxjs/Subscription";
 
 @Component({
-    selector: "[translate]",
-    template: "{{translation}}",
-    inputs:   [
-        "params:translateParams",
-        "module:translatorModule",
-    ],
+    selector: "translate",
+    template: "{{ translation }}",
 })
 export class TranslateComponent {
     public translation: string = "";
@@ -35,7 +31,7 @@ export class TranslateComponent {
         this.startTranslation();
     }
 
-    set params(params: any) {
+    @Input("translateParams") set params(params: any) {
         if (typeof params !== "object") {
             this.logHandler.error("Params have to be an object");
             return;
@@ -45,7 +41,7 @@ export class TranslateComponent {
         this.startTranslation();
     }
 
-    set module(module: string) {
+    @Input("translatorModule") set module(module: string) {
         if (this.subscription) {
             this.subscription.unsubscribe();
         }
