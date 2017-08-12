@@ -7,8 +7,7 @@ import { Injectable } from "@angular/core";
 export class TranslationLoaderFake extends TranslationLoader {
     protected translations: any = {};
 
-    constructor(translations: any = {}) {
-        super();
+    public addTranslations(translations: any = {}) {
         this.flattenTranslations(this.translations, translations);
     }
 
