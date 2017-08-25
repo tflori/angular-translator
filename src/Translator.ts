@@ -360,7 +360,7 @@ export class Translator {
         } else {
             let key = getter.substr(0, pos);
             return params.hasOwnProperty(key) && typeof params[key] === "object" ?
-                this.getParam(params[key], getter.substr(pos + 1)) : undefined;
+                   this.getParam(params[key], getter.substr(pos + 1)) : undefined;
         }
     }
 
