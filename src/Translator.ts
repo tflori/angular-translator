@@ -23,7 +23,7 @@ export class Translator {
         private _module: string,
         private injector: Injector,
     ) {
-        let translatorConfig = injector.get(TranslatorConfig);
+        let translatorConfig = injector.get(TranslatorConfig) as TranslatorConfig;
         this.logHandler = injector.get(TranslateLogHandler);
         let translatorContainer = injector.get(TranslatorContainer);
 
