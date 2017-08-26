@@ -1,6 +1,6 @@
 {
   "name": "angular-translator",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "description": "A translate-service, translate-pipe and translate-component for angular2",
   "repository": {
     "type": "git",
@@ -44,14 +44,14 @@
     "@angular/http": "*"
   },
   "devDependencies": {
-    "@angular/common": "^4.3.3",
-    "@angular/compiler": "^4.3.3",
-    "@angular/compiler-cli": "^4.3.3",
-    "@angular/core": "^4.3.3",
-    "@angular/http": "^4.3.3",
-    "@angular/platform-browser": "^4.3.3",
-    "@angular/platform-browser-dynamic": "^4.3.3",
-    "awesome-typescript-loader": "^3.2.2",
+    "@angular/common": "^4.3.6",
+    "@angular/compiler": "^4.3.6",
+    "@angular/compiler-cli": "^4.3.6",
+    "@angular/core": "^4.3.6",
+    "@angular/http": "^4.3.6",
+    "@angular/platform-browser": "^4.3.6",
+    "@angular/platform-browser-dynamic": "^4.3.6",
+    "awesome-typescript-loader": "^3.2.3",
     "istanbul-instrumenter-loader": "^3.0.0",
     "jasmine-core": "2.5.*",
     "karma": "*",
@@ -59,18 +59,18 @@
     "karma-coverage": "*",
     "karma-firefox-launcher": "*",
     "karma-jasmine": "*",
-    "karma-mocha-reporter": "*",
+    "karma-mocha-reporter": "^2.2.4",
     "karma-remap-coverage": "*",
     "karma-sourcemap-loader": "*",
     "karma-webpack": "^2.0.4",
     "reflect-metadata": "*",
-    "rxjs": "^5.4.2",
+    "rxjs": "^5.4.3",
     "source-map-loader": "*",
     "ts-helpers": "*",
     "tslint": "^4.5.1",
-    "typescript": "^2.4.2",
+    "typescript": "^2.5.1",
     "typings": "*",
     "webpack": "^2.7.0",
-    "zone.js": "^0.8.16"
+    "zone.js": "^0.8.17"
   }
 }
