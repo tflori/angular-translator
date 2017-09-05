@@ -34,10 +34,10 @@ module.exports = function(config) {
         // Webpack please don't spam the console when running in karma!
         webpackMiddleware: { stats: 'errors-only'},
 
-        reporters: [ 'mocha', 'coverage', 'remap-coverage' ],
+        reporters: [ 'spec', 'coverage', 'remap-coverage' ],
 
-        mochaReporter: {
-            ignoreSkipped: true
+        specReporter: {
+            showSpecTiming: true
         },
 
         // web server port

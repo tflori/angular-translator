@@ -59,7 +59,7 @@
     "karma-coverage": "*",
     "karma-firefox-launcher": "*",
     "karma-jasmine": "*",
-    "karma-mocha-reporter": "^2.2.4",
+    "karma-spec-reporter": "0.0.31",
     "karma-remap-coverage": "*",
     "karma-sourcemap-loader": "*",
     "karma-webpack": "^2.0.4",
