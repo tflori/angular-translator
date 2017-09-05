@@ -83,6 +83,7 @@ Directory structure:
 
 main.ts:
 
+{% raw %}
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
@@ -109,3 +110,4 @@ import { AppComponent } from './app.component';
 })
 export class AppModule { }
 ```
+{% endraw %}
