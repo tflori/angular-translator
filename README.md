@@ -221,9 +221,9 @@ export function translateConfigFactory() {
   imports: [
     BrowserModule,
     TranslatorModule.forRoot({
-      defaultLang: "de",
-      providedLangs: [ "de", "en" ],
-      detectLanguageOnStart: false
+      defaultLanguage: "de",
+      providedLanguages: [ "de", "en" ],
+      detectLanguage: false
     }),
   ],
   bootstrap: [AppComponent]

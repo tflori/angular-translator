@@ -126,9 +126,9 @@ export function translateConfigFactory() {
   imports: [
     BrowserModule,
     TranslatorModule.forRoot({
-      defaultLang: "de",
-      providedLangs: [ "de", "en" ],
-      detectLanguageOnStart: false
+      defaultLanguage: "de",
+      providedLanguages: [ "de", "en" ],
+      detectLanguage: false
     }),
   ],
   bootstrap: [AppComponent]
@@ -247,7 +247,7 @@ No, the `Translator` has the same observable that should be used now.
 
 > My configuration seems to be ignored after upgrade.
 
-May be you copied your previous config. The parameters have changed: defaultLang - defaultLanguage, providedLangs - 
+Maybe you copied your previous config. The parameters have changed: defaultLang - defaultLanguage, providedLangs - 
 providedLanguages, detectLanguageOnStart - detectLanguage.
 
 ## The Main Classes

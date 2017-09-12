@@ -53,7 +53,7 @@ Example:
 import { TranslatorConfig } from 'angular-translator';
 
 var translatorConfig = new TranslatorConfig({
-  providedLangs: ['EN', 'EN/usa']
+  providedLanguages: ['EN', 'EN/usa']
 });
 
 expect(translatorConfig.providedLanguage('en-US')).toBe('EN/usa');
@@ -77,9 +77,9 @@ import { AppComponent } from './app.component';
   imports: [
     BrowserModule,
     TranslatorModule.forRoot({
-        defaultLang: "de",
-        providedLangs: [ "de", "en" ],
-        detectLanguageOnStart: false
+        defaultLanguage: "de",
+        providedLanguages: [ "de", "en" ],
+        detectLanguage: false
     }),
   ],
   providers: [],
