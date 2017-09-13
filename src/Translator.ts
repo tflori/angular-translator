@@ -10,6 +10,17 @@ import { Observer } from "rxjs/Observer";
 import "rxjs/add/operator/share";
 
 export class Translator {
+    private static regExpFromPattern(pattern: string): RegExp {
+        return new RegExp(
+            "^" +
+            pattern.split(".").join("\\.")
+                   .replace(/[^a-z0-9.\\*?]/gi, ".")
+                   .split("*").join("(.*)")
+                   .split("?").join("(.)") +
+            "$",
+        );
+    }
+
     private _language: string = "en";
     private config: TranslatorConfig;
     private logHandler: TranslateLogHandler;
@@ -94,10 +105,11 @@ export class Translator {
      * @param {string|string[]} keys
      * @param {any?} params
      * @param {string?} language
-     * @returns {Promise<string|string[]>|Promise}
+     * @returns {Promise<string|object|Array<string|object>>|Promise}
      */
-    public translate(keys: string | string[], params: any = {}, language?: string): Promise<string | string[]> {
-        return new Promise<string | string[]>((resolve) => {
+    public translate(keys: string|string[], params: any = {}, language?: string):
+            Promise<string|object|Array<string|object>> {
+        return new Promise<string|object|Array<string|object>>((resolve) => {
             language = this.getSelectedLanguage(language);
             if (!language) {
                 resolve(keys);
@@ -142,9 +154,9 @@ export class Translator {
      * @param {string|string[]} keys
      * @param {any?} params
      * @param {string?} language
-     * @returns {string|string[]}
+     * @returns {string|object|Array<string|object>}
      */
-    public instant(keys: string | string[], params: any = {}, language?: string): string | string[] {
+    public instant(keys: string | string[], params: any = {}, language?: string): string|object|Array<string|object> {
         if (typeof keys === "string") {
             return this.instant([keys], params, language)[0];
         }
@@ -154,13 +166,18 @@ export class Translator {
             return keys;
         }
 
-        let result: string[] = [];
+        let result: Array<string|object> = [];
         let i = keys.length;
         let t: string;
         while (i--) {
             if (!this.translations[language] || !this.translations[language][keys[i]]) {
-                this.logHandler.info(this.generateMessage("missing", { key: keys[i], language }));
-                result.unshift(keys[i]);
+                let foundTranslations = this.search(keys[i] + "*", params, language);
+                if (Object.keys(foundTranslations).length === 0) {
+                    this.logHandler.info(this.generateMessage("missing", { key: keys[i], language }));
+                    result.unshift(keys[i]);
+                    continue;
+                }
+                result.unshift(foundTranslations);
                 continue;
             }
             t = this.translations[language][keys[i]];
@@ -183,6 +200,38 @@ export class Translator {
             });
 
             result.unshift(t);
+        }
+
+        return result;
+    }
+
+    public search(pattern: string, params: any = {}, language?: string): object {
+        let result: object = {};
+
+        language = this.getSelectedLanguage(language);
+        if (!language || !this.translations[language]) {
+            return result;
+        }
+
+        let regExp: RegExp = Translator.regExpFromPattern(pattern);
+
+        let keys: string[] = Object.keys(this.translations[language]).filter((key) => {
+            return key.match(regExp) !== null;
+        });
+
+        if (keys.length === 0) {
+            return result;
+        }
+
+        let i = keys.length;
+        let translations: string[] = this.instant(keys, params, language) as string[];
+        while (i--) {
+            let k = keys[i].replace(regExp, function(substring: string, ...args: any[]): string {
+                args.pop(); // pop out the search string
+                args.pop(); // pop out the offset
+                return args.length > 0 ? args.join("") : substring;
+            });
+            result[k] = translations[i];
         }
 
         return result;

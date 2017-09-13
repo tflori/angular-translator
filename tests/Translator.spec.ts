@@ -692,6 +692,23 @@ describe("Translator", () => {
                 expect(translation).toBe("The count is 0");
             }));
 
+            it("searches key* when not found", fakeAsync(() => {
+                translator.waitForTranslation();
+                loaderPromiseResolve({
+                    "date.days.mon": "Monday",
+                    "date.months.jan": "January",
+                    "date.months.feb": "February",
+                });
+                JasminePromise.flush();
+
+                let translations: any = translator.instant("date.months.");
+
+                expect(translations).toEqual({
+                    "jan": "January",
+                    "feb": "February",
+                });
+            }));
+
             describe("referenced translations", () => {
                 it("removes valid translation references", fakeAsync(() => {
                     translator.waitForTranslation();
@@ -1370,6 +1387,118 @@ describe("Translator", () => {
                     expect(uppercasePipe.transform).toHaveBeenCalledWith("anything");
                 }));
             });
+        });
+
+        describe("search", () => {
+            let loaderPromiseResolve: (...params: any[]) => void;
+
+            beforeEach(fakeAsync(() => {
+                spyOn(translationLoader, "load").and.callFake(() => {
+                    return new Promise<object>((resolve) => {
+                        loaderPromiseResolve = resolve;
+                    });
+                });
+            }));
+
+            it("returns empty object if language is not provided", () => {
+                spyOn(translateLogHandler, "error");
+
+                let translations = translator.search("TEXT*", {}, "ru");
+
+                expect(translations).toEqual({});
+                expect(translateLogHandler.error).toHaveBeenCalledWith("Language ru not provided");
+            });
+
+            it("returns empty object if nothing matched", fakeAsync(() => {
+                translator.waitForTranslation();
+                loaderPromiseResolve({ "HELLO WORLD": "Hello World" });
+                JasminePromise.flush();
+
+                let translations = translator.search("TEXT*");
+
+                expect(translations).toEqual({});
+            }));
+
+            it("returns an object of matched keys", fakeAsync(() => {
+                translator.waitForTranslation();
+                loaderPromiseResolve({
+                    DONT_PANIC: "Don't panic!",
+                    DONT_WORRY: "Don't worry!",
+                    BE_HAPPY: "Be happy!",
+                });
+                JasminePromise.flush();
+
+                let translations = translator.search("DONT_*");
+
+                expect(translations).toEqual({
+                    PANIC: "Don't panic!",
+                    WORRY: "Don't worry!",
+                });
+            }));
+
+            it("matches one character for question mark", fakeAsync(() => {
+                translator.waitForTranslation();
+                loaderPromiseResolve({
+                    "DONT_PANIC": "underscore",
+                    "DONT-PANIC": "minus",
+                    "DONT##PANIC": "no match",
+                });
+                JasminePromise.flush();
+
+                let translations = translator.search("DONT?PANIC");
+
+                expect(translations).toEqual({
+                    "_": "underscore",
+                    "-": "minus",
+                });
+            }));
+
+            it("matches case sensitive", fakeAsync(() => {
+                translator.waitForTranslation();
+                loaderPromiseResolve({
+                    "date.month": "match",
+                    "date.MONTH": "no match",
+                });
+                JasminePromise.flush();
+
+                let translations = translator.search("date?month");
+
+                expect(translations).toEqual({
+                    ".": "match",
+                });
+            }));
+
+            it("uses keys without wildcards", fakeAsync(() => {
+                translator.waitForTranslation();
+                loaderPromiseResolve({
+                    "date.month": "match",
+                });
+                JasminePromise.flush();
+
+                let translations = translator.search("date.month");
+
+                expect(translations).toEqual({
+                    "date.month": "match",
+                });
+            }));
+
+            it("searches for any character for special characters", fakeAsync(() => {
+                translator.waitForTranslation();
+                loaderPromiseResolve({
+                    "date.month.": "match",
+                    "date[month]": "match",
+                    "date_month_": "match",
+                });
+                JasminePromise.flush();
+
+                let translations = translator.search("date[month]");
+
+                expect(translations).toEqual({
+                    "date.month.": "match",
+                    "date[month]": "match",
+                    "date_month_": "match",
+                });
+            }));
         });
     });
 
