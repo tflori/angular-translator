@@ -21,7 +21,7 @@ export class TranslatePipe implements PipeTransform {
         return {};
     }
 
-    private promise: Promise<string | string[]>;
+    private promise: Promise<string>;
     private translation: string = "";
     private translated: { key: string, params: any, module: string };
     private subscription: Subscription;
@@ -94,7 +94,7 @@ export class TranslatePipe implements PipeTransform {
         if (!this.translated || !this.translated.key) {
             return;
         }
-        this.promise = this.translator.translate(this.translated.key, this.translated.params);
+        this.promise = this.translator.translate(this.translated.key, this.translated.params) as Promise<string>;
         this.promise.then((translation) => this.translation = String(translation));
     }
 }

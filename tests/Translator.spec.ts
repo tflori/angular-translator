@@ -704,8 +704,8 @@ describe("Translator", () => {
                 let translations: any = translator.instant("date.months.");
 
                 expect(translations).toEqual({
-                    "jan": "January",
-                    "feb": "February",
+                    jan: "January",
+                    feb: "February",
                 });
             }));
 
