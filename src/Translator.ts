@@ -110,15 +110,18 @@ export class Translator {
      * @returns {Promise<string|string[]>|Promise}
      */
     public translate(keys: string|string[], params: any = {}, language?: string): Promise<string|string[]> {
-        return new Promise<string|string[]>((resolve) => {
-            language = this.getSelectedLanguage(language);
-            if (!language) {
-                resolve(keys);
-                return;
-            }
+        language = this.getSelectedLanguage(language);
+        if (!language) {
+            return Promise.resolve(keys);
+        }
 
+        if (Array.isArray(keys)) {
+            return this.translateArray(keys, params, language);
+        }
+
+        return new Promise<string>((resolve) => {
             this.loadLanguage(language).then(() => {
-                resolve(this.instant(keys, params, language));
+                resolve(this.instant(keys, params, language) as string);
             }, () => {
                 resolve(keys);
             });
@@ -136,13 +139,12 @@ export class Translator {
      * @returns {Promise<string[]>|Promise}
      */
     public translateArray(keys: string[], params: any = {}, language?: string): Promise<string[]> {
-        return new Promise<string[]>((resolve) => {
-            language = this.getSelectedLanguage(language);
-            if (!language) {
-                resolve(keys);
-                return;
-            }
+        language = this.getSelectedLanguage(language);
+        if (!language) {
+            return Promise.resolve(keys);
+        }
 
+        return new Promise<string[]>((resolve) => {
             this.loadLanguage(language).then(() => {
                 resolve(this.instantArray(keys, params, language));
             }, () => {
@@ -189,8 +191,12 @@ export class Translator {
      * @returns {Observable<string|string[]>}
      */
     public observe(keys: string|string[], params: any = {}): Observable<string|string[]> {
-        return new Observable<string|string[]>((observer: Observer<string|string[]>) => {
-            const next = (translations: string | string[]) => {
+        if (Array.isArray(keys)) {
+            return this.observeArray(keys, params);
+        }
+
+        return new Observable<string>((observer: Observer<string>) => {
+            const next = (translations: string) => {
                 observer.next(translations);
             };
 

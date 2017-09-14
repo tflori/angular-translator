@@ -393,7 +393,7 @@ describe("Translator", () => {
             it("resolves keys if laguage could not be loaded", fakeAsync(() => {
                 translateLogHandler.error = () => {};
 
-                let promise = translator.translate(["TEXT", "OTHER_TEXT"]);
+                let promise = translator.translateArray(["TEXT", "OTHER_TEXT"]);
                 loaderPromiseReject();
                 JasminePromise.flush();
 
@@ -417,6 +417,15 @@ describe("Translator", () => {
                 loaderPromiseResolve({TEXT: "This is a text"});
 
                 expect(promise).toBeResolvedWith("This is a text");
+            }));
+
+            it("resolves with the return value from instantArray", fakeAsync(() => {
+                spyOn(translator, "instantArray").and.returnValue(["This is a text"]);
+
+                let promise = translator.translate(["TEXT"]);
+                loaderPromiseResolve({TEXT: "This is a text"});
+
+                expect(promise).toBeResolvedWith(["This is a text"]);
             }));
         });
 
