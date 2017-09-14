@@ -692,23 +692,6 @@ describe("Translator", () => {
                 expect(translation).toBe("The count is 0");
             }));
 
-            it("searches key* when not found", fakeAsync(() => {
-                translator.waitForTranslation();
-                loaderPromiseResolve({
-                    "date.days.mon": "Monday",
-                    "date.months.jan": "January",
-                    "date.months.feb": "February",
-                });
-                JasminePromise.flush();
-
-                let translations: any = translator.instant("date.months.");
-
-                expect(translations).toEqual({
-                    jan: "January",
-                    feb: "February",
-                });
-            }));
-
             describe("referenced translations", () => {
                 it("removes valid translation references", fakeAsync(() => {
                     translator.waitForTranslation();
