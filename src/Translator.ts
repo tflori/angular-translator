@@ -321,13 +321,7 @@ export class Translator {
             return keys;
         }
 
-        let result: string[] = [];
-        let i = keys.length;
-        while (i--) {
-            result.unshift(this.instant(keys[i], params, language) as string);
-        }
-
-        return result;
+        return keys.map((key) => this.instant(key, params, language) as string);
     }
 
     /**

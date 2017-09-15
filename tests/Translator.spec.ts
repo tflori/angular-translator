@@ -344,144 +344,6 @@ describe("Translator", () => {
             }));
         });
 
-        describe("translate", () => {
-            let loaderPromiseResolve: (...params: any[]) => void;
-            let loaderPromiseReject: (reason?: string) => void;
-
-            beforeEach(() => {
-                spyOn(translationLoader, "load").and.returnValue(new Promise<object>((resolve, reject) => {
-                    loaderPromiseResolve = resolve;
-                    loaderPromiseReject = reject;
-                }));
-            });
-
-            it("loads the current language", () => {
-                translator.translate("TEXT");
-
-                expect(translationLoader.load).toHaveBeenCalledWith({ module: "default", language: "en" });
-            });
-
-            it("loads the given language", () => {
-                translatorConfig.setOptions({ providedLanguages: ["en", "de"] });
-
-                translator.translate("TEXT", {}, "de");
-
-                expect(translationLoader.load).toHaveBeenCalledWith({ module: "default", language: "de" });
-            });
-
-            it("checks if the language is provided", () => {
-                spyOn(translatorConfig, "providedLanguage");
-
-                translator.translate("TEXT", {}, "de");
-
-                expect(translatorConfig.providedLanguage).toHaveBeenCalledWith("de", true);
-            });
-
-            it("loads a language only once", () => {
-                translator.translate("TEXT");
-                translator.translate("OTHER_TEXT");
-
-                expect(JasmineHelper.calls(translationLoader.load).count()).toBe(1);
-            });
-
-            it("resolves keys if language is not provided", () => {
-                let promise = translator.translate("TEXT", {}, "ru");
-
-                expect(promise).toBeResolvedWith("TEXT");
-            });
-
-            it("resolves keys if laguage could not be loaded", fakeAsync(() => {
-                translateLogHandler.error = () => {};
-
-                let promise = translator.translateArray(["TEXT", "OTHER_TEXT"]);
-                loaderPromiseReject();
-                JasminePromise.flush();
-
-                expect(promise).toBeResolvedWith(["TEXT", "OTHER_TEXT"]);
-            }));
-
-            it("uses instant to translate after loader resolves", fakeAsync(() => {
-                spyOn(translator, "instant");
-                translator.translate("TEXT");
-
-                loaderPromiseResolve({TEXT: "This is a text"});
-                JasminePromise.flush();
-
-                expect(translator.instant).toHaveBeenCalledWith("TEXT", {}, translator.language);
-            }));
-
-            it("resolves with the return value from instant", fakeAsync(() => {
-                spyOn(translator, "instant").and.returnValue("This is a text");
-
-                let promise = translator.translate("TEXT");
-                loaderPromiseResolve({TEXT: "This is a text"});
-
-                expect(promise).toBeResolvedWith("This is a text");
-            }));
-
-            it("resolves with the return value from instantArray", fakeAsync(() => {
-                spyOn(translator, "instantArray").and.returnValue(["This is a text"]);
-
-                let promise = translator.translate(["TEXT"]);
-                loaderPromiseResolve({TEXT: "This is a text"});
-
-                expect(promise).toBeResolvedWith(["This is a text"]);
-            }));
-        });
-
-        describe("observe", () => {
-            let translateSpy: jasmine.Spy;
-
-            beforeEach(() => {
-                translateSpy = spyOn(translator, "translate").and.callFake((keys: string|string[], params?: any) => {
-                    return Promise.resolve(keys);
-                });
-            });
-
-            it("returns an observable", () => {
-                let result = translator.observe("HELLO");
-
-                expect(result).toEqual(jasmine.any(Observable));
-            });
-
-            it("is using translate", () => {
-                translator.observe("HELLO").subscribe();
-
-                expect(translator.translate).toHaveBeenCalledWith("HELLO", {});
-            });
-
-            it("pushes the result from translate to observable", fakeAsync(() => {
-                let spy = jasmine.createSpy("subscriber");
-                translator.observe("HELLO").subscribe(spy);
-
-                JasminePromise.flush();
-
-                expect(spy).toHaveBeenCalledWith("HELLO");
-            }));
-
-            it("translates again when language got changed", () => {
-                translatorConfig.setOptions({ providedLanguages: ["en", "de"]});
-
-                translator.observe("HELLO").subscribe();
-                translator.language = "de";
-
-                expect(translator.translate).toHaveBeenCalledTimes(2);
-            });
-
-            it("pushes the result for the new language", fakeAsync(() => {
-                let spy = jasmine.createSpy("subscriber");
-                translator.observe("HELLO").subscribe(spy);
-
-                JasminePromise.flush();
-                translateSpy.and.returnValue(Promise.resolve("Hallo"));
-                translator.language = "de";
-                JasminePromise.flush();
-
-                expect(spy).toHaveBeenCalledWith("HELLO");
-                expect(spy).toHaveBeenCalledWith("Hallo");
-            }));
-        });
-
         describe("instant", () => {
             let loaderPromiseResolve: (...params: any[]) => void;
 
@@ -493,7 +355,7 @@ describe("Translator", () => {
                 });
             }));
 
-            it("returns keys if language is not provided", () => {
+            it("returns key if language is not provided", () => {
                 spyOn(translateLogHandler, "error");
 
                 let translation = translator.instant("TEXT", {}, "ru");
@@ -1038,7 +900,7 @@ describe("Translator", () => {
                     loaderPromiseResolve({
                         GREETING:   "Hello [[SALUTATION:name=u]]!",
                         SALUTATION: "{{name.title ? name.title + ' ' : (name.gender === 'w' ? 'Ms.' : 'Mr.')}}" +
-                        "{{name.first}} {{name.last}}",
+                                    "{{name.first}} {{name.last}}",
                     });
                     JasminePromise.flush();
 
@@ -1198,7 +1060,7 @@ describe("Translator", () => {
                     loaderPromiseResolve({
                         NEW_COMMENT: "New comment from [[ SALUTATION : name = comment.author ]].",
                         SALUTATION: "{{name.title ? name.title : (name.gender === 'w' ? 'Ms.' : 'Mr.')}} " +
-                        "{{name.first}} {{name.last}}",
+                                     "{{name.first}} {{name.last}}",
                     });
                     JasminePromise.flush();
 
@@ -1221,7 +1083,7 @@ describe("Translator", () => {
                     loaderPromiseResolve({
                         NEW_COMMENT: "New comment from [[ SALUTATION : = comment.author ]].",
                         SALUTATION: "{{title ? title : (gender === 'w' ? 'Mrs.' : 'Mr.')}} " +
-                        "{{first}} {{last}}",
+                                     "{{first}} {{last}}",
                     });
                     JasminePromise.flush();
 
@@ -1379,6 +1241,28 @@ describe("Translator", () => {
                     expect(uppercasePipe.transform).toHaveBeenCalledWith("anything");
                 }));
             });
+
+            describe("instantArray", () => {
+                it("returns keys if language is not provided", () => {
+                    spyOn(translateLogHandler, "error");
+
+                    let translations = translator.instantArray(["K1", "K2"], {}, "ru");
+
+                    expect(translations).toEqual(["K1", "K2"]);
+                    expect(translateLogHandler.error).toHaveBeenCalledWith("Language ru not provided");
+                });
+
+                it("uses instant to translate each key", () => {
+                    spyOn(translator, "instant").and.callFake((k) => k.toLowerCase());
+
+                    let translations = translator.instantArray(["A", "B", "C"]);
+
+                    expect(translator.instant).toHaveBeenCalledWith("A", {}, "en");
+                    expect(translator.instant).toHaveBeenCalledWith("B", {}, "en");
+                    expect(translator.instant).toHaveBeenCalledWith("C", {}, "en");
+                    expect(translations).toEqual(["a", "b", "c"]);
+                });
+            });
         });
 
         describe("search", () => {
@@ -1491,6 +1375,152 @@ describe("Translator", () => {
                     "date_month_": "match",
                 });
             }));
+        });
+
+        describe("translate", () => {
+            let loaderPromiseResolve: (...params: any[]) => void;
+            let loaderPromiseReject: (reason?: string) => void;
+
+            beforeEach(() => {
+                spyOn(translationLoader, "load").and.returnValue(new Promise<object>((resolve, reject) => {
+                    loaderPromiseResolve = resolve;
+                    loaderPromiseReject = reject;
+                }));
+            });
+
+            it("loads the current language", () => {
+                translator.translate("TEXT");
+
+                expect(translationLoader.load).toHaveBeenCalledWith({ module: "default", language: "en" });
+            });
+
+            it("loads the given language", () => {
+                translatorConfig.setOptions({ providedLanguages: ["en", "de"] });
+
+                translator.translate("TEXT", {}, "de");
+
+                expect(translationLoader.load).toHaveBeenCalledWith({ module: "default", language: "de" });
+            });
+
+            it("checks if the language is provided", () => {
+                spyOn(translatorConfig, "providedLanguage");
+
+                translator.translate("TEXT", {}, "de");
+
+                expect(translatorConfig.providedLanguage).toHaveBeenCalledWith("de", true);
+            });
+
+            it("loads a language only once", () => {
+                translator.translate("TEXT");
+                translator.translate("OTHER_TEXT");
+
+                expect(JasmineHelper.calls(translationLoader.load).count()).toBe(1);
+            });
+
+            it("resolves keys if language is not provided", () => {
+                let promise = translator.translate("TEXT", {}, "ru");
+
+                expect(promise).toBeResolvedWith("TEXT");
+            });
+
+            it("resolves keys if laguage could not be loaded", fakeAsync(() => {
+                translateLogHandler.error = () => {};
+
+                let promise = translator.translateArray(["TEXT", "OTHER_TEXT"]);
+                loaderPromiseReject();
+                JasminePromise.flush();
+
+                expect(promise).toBeResolvedWith(["TEXT", "OTHER_TEXT"]);
+            }));
+
+            it("uses instant to translate after loader resolves", fakeAsync(() => {
+                spyOn(translator, "instant");
+                translator.translate("TEXT");
+
+                loaderPromiseResolve({TEXT: "This is a text"});
+                JasminePromise.flush();
+
+                expect(translator.instant).toHaveBeenCalledWith("TEXT", {}, translator.language);
+            }));
+
+            it("resolves with the return value from instant", fakeAsync(() => {
+                spyOn(translator, "instant").and.returnValue("This is a text");
+
+                let promise = translator.translate("TEXT");
+                loaderPromiseResolve({TEXT: "This is a text"});
+
+                expect(promise).toBeResolvedWith("This is a text");
+            }));
+
+            it("resolves with the return value from instantArray", fakeAsync(() => {
+                spyOn(translator, "instantArray").and.returnValue(["This is a text"]);
+
+                let promise = translator.translate(["TEXT"]);
+                loaderPromiseResolve({TEXT: "This is a text"});
+
+                expect(promise).toBeResolvedWith(["This is a text"]);
+            }));
+
+            describe("translateArray", () => {});
+
+            describe("translateSearch", () => {});
+        });
+
+        describe("observe", () => {
+            let translateSpy: jasmine.Spy;
+
+            beforeEach(() => {
+                translateSpy = spyOn(translator, "translate").and.callFake((keys: string|string[], params?: any) => {
+                    return Promise.resolve(keys);
+                });
+            });
+
+            it("returns an observable", () => {
+                let result = translator.observe("HELLO");
+
+                expect(result).toEqual(jasmine.any(Observable));
+            });
+
+            it("is using translate", () => {
+                translator.observe("HELLO").subscribe();
+
+                expect(translator.translate).toHaveBeenCalledWith("HELLO", {});
+            });
+
+            it("pushes the result from translate to observable", fakeAsync(() => {
+                let spy = jasmine.createSpy("subscriber");
+                translator.observe("HELLO").subscribe(spy);
+
+                JasminePromise.flush();
+
+                expect(spy).toHaveBeenCalledWith("HELLO");
+            }));
+
+            it("translates again when language got changed", () => {
+                translatorConfig.setOptions({ providedLanguages: ["en", "de"]});
+
+                translator.observe("HELLO").subscribe();
+                translator.language = "de";
+
+                expect(translator.translate).toHaveBeenCalledTimes(2);
+            });
+
+            it("pushes the result for the new language", fakeAsync(() => {
+                let spy = jasmine.createSpy("subscriber");
+                translator.observe("HELLO").subscribe(spy);
+
+                JasminePromise.flush();
+                translateSpy.and.returnValue(Promise.resolve("Hallo"));
+                translator.language = "de";
+                JasminePromise.flush();
+
+                expect(spy).toHaveBeenCalledWith("HELLO");
+                expect(spy).toHaveBeenCalledWith("Hallo");
+            }));
+
+            describe("observeArray", () => {});
+
+            describe("observeSearch", () => {});
         });
     });
 
