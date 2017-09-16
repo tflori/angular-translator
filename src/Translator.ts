@@ -164,13 +164,12 @@ export class Translator {
      * @returns {Promise<object>|Promise}
      */
     public translateSearch(pattern: string, params: any = {}, language?: string): Promise<object> {
-        return new Promise<object>((resolve) => {
-            language = this.getSelectedLanguage(language);
-            if (!language) {
-                resolve({});
-                return;
-            }
+        language = this.getSelectedLanguage(language);
+        if (!language) {
+            return Promise.resolve({});
+        }
 
+        return new Promise<object>((resolve) => {
             this.loadLanguage(language).then(() => {
                 resolve(this.search(pattern, params, language));
             }, () => {

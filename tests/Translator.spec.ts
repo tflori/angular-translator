@@ -1426,11 +1426,11 @@ describe("Translator", () => {
             it("resolves keys if laguage could not be loaded", fakeAsync(() => {
                 translateLogHandler.error = () => {};
 
-                let promise = translator.translateArray(["TEXT", "OTHER_TEXT"]);
+                let promise = translator.translate("TEXT");
                 loaderPromiseReject();
                 JasminePromise.flush();
 
-                expect(promise).toBeResolvedWith(["TEXT", "OTHER_TEXT"]);
+                expect(promise).toBeResolvedWith("TEXT");
             }));
 
             it("uses instant to translate after loader resolves", fakeAsync(() => {
@@ -1452,18 +1452,61 @@ describe("Translator", () => {
                 expect(promise).toBeResolvedWith("This is a text");
             }));
 
-            it("resolves with the return value from instantArray", fakeAsync(() => {
-                spyOn(translator, "instantArray").and.returnValue(["This is a text"]);
+            describe("translateArray", () => {
+                it("resolves keys if language is not provided", () => {
+                    let promise = translator.translateArray(["K1", "K2"], {}, "ru");
 
-                let promise = translator.translate(["TEXT"]);
-                loaderPromiseResolve({TEXT: "This is a text"});
+                    expect(promise).toBeResolvedWith(["K1", "K2"]);
+                });
 
-                expect(promise).toBeResolvedWith(["This is a text"]);
-            }));
+                it("resolves keys if laguage could not be loaded", fakeAsync(() => {
+                    translateLogHandler.error = () => {};
 
-            describe("translateArray", () => {});
+                    let promise = translator.translateArray(["TEXT", "OTHER_TEXT"]);
+                    loaderPromiseReject();
+                    JasminePromise.flush();
 
-            describe("translateSearch", () => {});
+                    expect(promise).toBeResolvedWith(["TEXT", "OTHER_TEXT"]);
+                }));
+
+                it("resolves with the return value from instantArray", fakeAsync(() => {
+                    spyOn(translator, "instantArray").and.returnValue(["This is a text"]);
+
+                    let promise = translator.translateArray(["TEXT"]);
+                    loaderPromiseResolve({TEXT: "This is a text"});
+
+                    expect(promise).toBeResolvedWith(["This is a text"]);
+                    expect(translator.instantArray).toHaveBeenCalledWith(["TEXT"], {}, "en");
+                }));
+            });
+
+            describe("translateSearch", () => {
+                it("resolves empty object if language is not provided", () => {
+                    let promise = translator.translateSearch("key*", {}, "ru");
+
+                    expect(promise).toBeResolvedWith({});
+                });
+
+                it("resolves empty object if language could not be loaded", fakeAsync(() => {
+                    translateLogHandler.error = () => {};
+
+                    let promise = translator.translateSearch("key*");
+                    loaderPromiseReject();
+                    JasminePromise.flush();
+
+                    expect(promise).toBeResolvedWith({});
+                }));
+
+                it("resolves with the return value from search", fakeAsync(() => {
+                    spyOn(translator, "search").and.returnValue({"key1": "text 1"});
+
+                    let promise = translator.translateSearch("key*");
+                    loaderPromiseResolve({key1: "text 1"});
+
+                    expect(promise).toBeResolvedWith({"key1": "text 1"});
+                    expect(translator.search).toHaveBeenCalledWith("key*", {}, "en");
+                }));
+            });
         });
 
         describe("observe", () => {
