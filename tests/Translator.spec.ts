@@ -1452,6 +1452,15 @@ describe("Translator", () => {
                 expect(promise).toBeResolvedWith("This is a text");
             }));
 
+            it("returns the promise from instantArray", () => {
+                let promise = Promise.resolve(["K1", "K2"]);
+                spyOn(translator, "translateArray").and.returnValue(promise);
+
+                let result = translator.translate(["K1", "K2"]);
+
+                expect(result).toBe(promise);
+            });
+
             describe("translateArray", () => {
                 it("resolves keys if language is not provided", () => {
                     let promise = translator.translateArray(["K1", "K2"], {}, "ru");
@@ -1561,9 +1570,120 @@ describe("Translator", () => {
                 expect(spy).toHaveBeenCalledWith("Hallo");
             }));
 
-            describe("observeArray", () => {});
+            it("returns the observable from observeArray", () => {
+                let observable = new Observable() as Observable<string|string[]>;
+                spyOn(translator, "observeArray").and.returnValue(observable);
 
-            describe("observeSearch", () => {});
+                let result = translator.observe(["K1", "K2"]);
+
+                expect(result).toBe(observable);
+            });
+
+            describe("observeArray", () => {
+                let translateArraySpy;
+                beforeEach(() => {
+                    translateArraySpy = spyOn(translator, "translateArray")
+                        .and.callFake((keys: string[], params?: any) => {
+                            return Promise.resolve(keys);
+                        });
+                });
+
+                it("returns an observable", () => {
+                    let result = translator.observeArray(["K1", "K2"]);
+
+                    expect(result).toEqual(jasmine.any(Observable));
+                });
+
+                it("is using translateArray", () => {
+                    translator.observeArray(["K1", "K2"]).subscribe();
+
+                    expect(translator.translateArray).toHaveBeenCalledWith(["K1", "K2"], {});
+                });
+
+                it("pushes the result from translateArray to observable", fakeAsync(() => {
+                    let spy = jasmine.createSpy("subscriber");
+                    translator.observeArray(["HELLO"]).subscribe(spy);
+
+                    JasminePromise.flush();
+
+                    expect(spy).toHaveBeenCalledWith(["HELLO"]);
+                }));
+
+                it("translates again when language got changed", () => {
+                    translatorConfig.setOptions({ providedLanguages: ["en", "de"]});
+
+                    translator.observeArray(["HELLO"]).subscribe();
+                    translator.language = "de";
+
+                    expect(translator.translateArray).toHaveBeenCalledTimes(2);
+                });
+
+                it("pushes the result for the new language", fakeAsync(() => {
+                    let spy = jasmine.createSpy("subscriber");
+                    translator.observeArray(["HELLO"]).subscribe(spy);
+
+                    JasminePromise.flush();
+                    translateArraySpy.and.returnValue(Promise.resolve(["Hallo"]));
+                    translator.language = "de";
+                    JasminePromise.flush();
+
+                    expect(spy).toHaveBeenCalledWith(["HELLO"]);
+                    expect(spy).toHaveBeenCalledWith(["Hallo"]);
+                }));
+            });
+
+            describe("observeSearch", () => {
+                let translateSearchSpy;
+                beforeEach(() => {
+                    translateSearchSpy = spyOn(translator, "translateSearch")
+                        .and.callFake((pattern: string, params?: any) => {
+                            return Promise.resolve({});
+                        });
+                });
+
+                it("returns an observable", () => {
+                    let result = translator.observeSearch("key*");
+
+                    expect(result).toEqual(jasmine.any(Observable));
+                });
+
+                it("is using translateSearch", () => {
+                    translator.observeSearch("key*").subscribe();
+
+                    expect(translator.translateSearch).toHaveBeenCalledWith("key*", {});
+                });
+
+                it("pushes the result from translateSearch to observable", fakeAsync(() => {
+                    let spy = jasmine.createSpy("subscriber");
+                    translator.observeSearch("key*").subscribe(spy);
+
+                    JasminePromise.flush();
+
+                    expect(spy).toHaveBeenCalledWith({});
+                }));
+
+                it("translates again when language got changed", () => {
+                    translatorConfig.setOptions({ providedLanguages: ["en", "de"]});
+
+                    translator.observeSearch("key*").subscribe();
+                    translator.language = "de";
+
+                    expect(translator.translateSearch).toHaveBeenCalledTimes(2);
+                });
+
+                it("pushes the result for the new language", fakeAsync(() => {
+                    let spy = jasmine.createSpy("subscriber");
+                    translator.observeSearch("key*").subscribe(spy);
+
+                    JasminePromise.flush();
+                    translateSearchSpy.and.returnValue(Promise.resolve({key1: "value1"}));
+                    translator.language = "de";
+                    JasminePromise.flush();
+
+                    expect(spy).toHaveBeenCalledWith({});
+                    expect(spy).toHaveBeenCalledWith({key1: "value1"});
+                }));
+            });
         });
     });
 
