@@ -10,6 +10,17 @@ import { Observer } from "rxjs/Observer";
 import "rxjs/add/operator/share";
 
 export class Translator {
+    private static regExpFromPattern(pattern: string): RegExp {
+        return new RegExp(
+            "^" +
+            pattern.split(".").join("\\.")
+                   .replace(/[^a-z0-9.\\*?]/gi, ".")
+                   .split("*").join("(.*)")
+                   .split("?").join("(.)") +
+            "$",
+        );
+    }
+
     private _language: string = "en";
     private config: TranslatorConfig;
     private logHandler: TranslateLogHandler;
@@ -87,27 +98,82 @@ export class Translator {
     }
 
     /**
-     * Translate keys for current language or given language (lang) asynchronously.
+     * Translate keys for current language or given language asynchronously.
      *
      * Optionally you can pass params for translation to be interpolated.
+     *
+     * Using an array of keys is deprecated and will be removed in future. Please use translateArray instead.
      *
      * @param {string|string[]} keys
      * @param {any?} params
      * @param {string?} language
      * @returns {Promise<string|string[]>|Promise}
      */
-    public translate(keys: string | string[], params: any = {}, language?: string): Promise<string | string[]> {
-        return new Promise<string | string[]>((resolve) => {
-            language = this.getSelectedLanguage(language);
-            if (!language) {
-                resolve(keys);
-                return;
-            }
+    public translate(keys: string|string[], params: any = {}, language?: string): Promise<string|string[]> {
+        language = this.getSelectedLanguage(language);
+        if (!language) {
+            return Promise.resolve(keys);
+        }
 
+        if (Array.isArray(keys)) {
+            return this.translateArray(keys, params, language);
+        }
+
+        return new Promise<string>((resolve) => {
             this.loadLanguage(language).then(() => {
-                resolve(this.instant(keys, params, language));
+                resolve(this.instant(keys, params, language) as string);
             }, () => {
                 resolve(keys);
+            });
+        });
+    }
+
+    /**
+     * Translate keys for current language or given language asynchronously.
+     *
+     * Optionally you can pass params for translation to be interpolated.
+     *
+     * @param {string[]} keys
+     * @param {any?} params
+     * @param {string?} language
+     * @returns {Promise<string[]>|Promise}
+     */
+    public translateArray(keys: string[], params: any = {}, language?: string): Promise<string[]> {
+        language = this.getSelectedLanguage(language);
+        if (!language) {
+            return Promise.resolve(keys);
+        }
+
+        return new Promise<string[]>((resolve) => {
+            this.loadLanguage(language).then(() => {
+                resolve(this.instantArray(keys, params, language));
+            }, () => {
+                resolve(keys);
+            });
+        });
+    }
+
+    /**
+     * Search pattern for current language or given language asynchronously.
+     *
+     * Optionally you can pass params for translation to be interpolated.
+     *
+     * @param {string} pattern
+     * @param {any?} params
+     * @param {string?} language
+     * @returns {Promise<object>|Promise}
+     */
+    public translateSearch(pattern: string, params: any = {}, language?: string): Promise<object> {
+        language = this.getSelectedLanguage(language);
+        if (!language) {
+            return Promise.resolve({});
+        }
+
+        return new Promise<object>((resolve) => {
+            this.loadLanguage(language).then(() => {
+                resolve(this.search(pattern, params, language));
+            }, () => {
+                resolve({});
             });
         });
     }
@@ -117,72 +183,183 @@ export class Translator {
      *
      * The observable gets new translations if the language get changed.
      *
+     * Using an array of keys is deprecated and will be removed in future. Please use observeArray instead.
+     *
      * @param {string|string[]} keys
      * @param {any?} params
      * @returns {Observable<string|string[]>}
      */
-    public observe(keys: string | string[], params: any = {}): Observable<string | string[]> {
-        return new Observable<string | string[]>((observer: Observer<string | string[]>) => {
-            this.translate(keys, params).then((translations: string | string[]) => {
+    public observe(keys: string|string[], params: any = {}): Observable<string|string[]> {
+        if (Array.isArray(keys)) {
+            return this.observeArray(keys, params);
+        }
+
+        return new Observable<string>((observer: Observer<string>) => {
+            const next = (translations: string) => {
                 observer.next(translations);
-            });
+            };
+
+            this.translate(keys, params).then(next);
+
             this.languageChangedObservable.subscribe(() => {
-                this.translate(keys, params).then((translations: string | string[]) => {
-                    observer.next(translations);
-                });
+                this.translate(keys, params).then(next);
             });
         });
     }
 
     /**
-     * Translate keys for current language or given language (lang) synchronously.
+     * Translate keys for current language and return an observable.
+     *
+     * The observable gets new translations if the language get changed.
+     *
+     * @param {string[]} keys
+     * @param {any?} params
+     * @returns {Observable<string[]>}
+     */
+    public observeArray(keys: string[], params: any = {}): Observable<string[]> {
+        return new Observable<string[]>((observer: Observer<string[]>) => {
+            const next = (translations: string[]) => {
+                observer.next(translations);
+            };
+
+            this.translateArray(keys, params).then(next);
+
+            this.languageChangedObservable.subscribe(() => {
+                this.translateArray(keys, params).then(next);
+            });
+        });
+    }
+
+    /**
+     * Search pattern for current language and return an observable.
+     *
+     * The observable gets new translations if the language get changed.
+     *
+     * @param {string} pattern
+     * @param {any?} params
+     * @returns {Observable<Object>}
+     */
+    public observeSearch(pattern: string, params: any = {}): Observable<object> {
+        return new Observable<object>((observer: Observer<object>) => {
+            const next = (translations: object) => {
+                observer.next(translations);
+            };
+
+            this.translateSearch(pattern, params).then(next);
+
+            this.languageChangedObservable.subscribe(() => {
+                this.translateSearch(pattern, params).then(next);
+            });
+        });
+    }
+
+    /**
+     * Translate keys for current language or given language synchronously.
      *
      * Optionally you can pass params for translation to be interpolated.
      *
-     * @param {string|string[]} keys
+     * Using an array of keys is deprecated and will be removed in future. Please use instantArray instead.
+     *
+     * @param {string|string[]} key
      * @param {any?} params
      * @param {string?} language
      * @returns {string|string[]}
      */
-    public instant(keys: string | string[], params: any = {}, language?: string): string | string[] {
-        if (typeof keys === "string") {
-            return this.instant([keys], params, language)[0];
+    public instant(key: string|string[], params: any = {}, language?: string): string|string[] {
+        // backward compatibility
+        if (Array.isArray(key)) {
+            return this.instantArray(key, params, language);
         }
 
+        language = this.getSelectedLanguage(language);
+        if (!language) {
+            return key;
+        }
+
+        if (!this.translations[language] || !this.translations[language][key]) {
+            this.logHandler.info(this.generateMessage("missing", { key, language }));
+            return key;
+        }
+
+        let t = this.translations[language][key];
+
+        // resolve references to other translations
+        t = t.replace(/\[\[([\sA-Za-z0-9_.,=:-]*)]]/g, (sub: string, expression: string) => {
+            return this.translateReferenced(sub, expression, params, language);
+        });
+
+        // simple interpolation
+        t = t.replace(/{{\s*(.*?)\s*}}/g, (sub: string, expression: string) => {
+            try {
+                return String(this.interpolate(expression, params)) || "";
+            } catch (e) {
+                if (e && e.message && e.message.indexOf("is not defined") === -1) {
+                    this.logHandler.error("Parse error for expression '" + sub + "'");
+                    this.logHandler.error(e);
+                }
+                return "";
+            }
+        });
+
+        return t;
+    }
+
+    /**
+     * Translate keys for current language or given language synchronously.
+     *
+     * Optionally you can pass params for translation to be interpolated.
+     *
+     * @param {string[]} keys
+     * @param {any?} params
+     * @param {string?} language
+     * @returns {string[]}
+     */
+    public instantArray(keys: string[], params: any = {}, language?: string): string[] {
         language = this.getSelectedLanguage(language);
         if (!language) {
             return keys;
         }
 
-        let result: string[] = [];
+        return keys.map((key) => this.instant(key, params, language) as string);
+    }
+
+    /**
+     * Search pattern for current language or given language synchronously.
+     *
+     * Optionally you can pass params for translation to be interpolated.
+     *
+     * @param {string} pattern
+     * @param {any?} params
+     * @param {string?} language
+     * @returns {Object}
+     */
+    public search(pattern: string, params: any = {}, language?: string): object {
+        let result: object = {};
+
+        language = this.getSelectedLanguage(language);
+        if (!language || !this.translations[language]) {
+            return result;
+        }
+
+        let regExp: RegExp = Translator.regExpFromPattern(pattern);
+
+        let keys: string[] = Object.keys(this.translations[language]).filter((key) => {
+            return key.match(regExp) !== null;
+        });
+
+        if (keys.length === 0) {
+            return result;
+        }
+
         let i = keys.length;
-        let t: string;
+        let translations: string[] = this.instant(keys, params, language) as string[];
         while (i--) {
-            if (!this.translations[language] || !this.translations[language][keys[i]]) {
-                this.logHandler.info(this.generateMessage("missing", { key: keys[i], language }));
-                result.unshift(keys[i]);
-                continue;
-            }
-            t = this.translations[language][keys[i]];
-
-            t = t.replace(/\[\[([\sA-Za-z0-9_.,=:-]*)]]/g, (sub: string, expression: string) => {
-                return this.translateReferenced(sub, expression, params, language);
+            let k = keys[i].replace(regExp, function(substring: string, ...args: any[]): string {
+                args.pop(); // pop out the search string
+                args.pop(); // pop out the offset
+                return args.length > 0 ? args.join("") : substring;
             });
-
-            // simple interpolation
-            t = t.replace(/{{\s*(.*?)\s*}}/g, (sub: string, expression: string) => {
-                try {
-                    return String(this.interpolate(expression, params)) || "";
-                } catch (e) {
-                    if (e && e.message && e.message.indexOf("is not defined") === -1) {
-                        this.logHandler.error("Parse error for expression '" + sub + "'");
-                        this.logHandler.error(e);
-                    }
-                    return "";
-                }
-            });
-
-            result.unshift(t);
+            result[k] = translations[i];
         }
 
         return result;
