@@ -106,19 +106,3 @@ translator.observe(['STATUS_OPEN', 'STATUS_CLOSED']).subscribe((translations) =>
 });
 ```
 
-### instant(keys: string|string[], params?: any, language?: string): string|string[]
-
-Basically it is the same like `translate` but it does not wait for translation and can therefore be synchronous. When
-you take a look in the code you will see that `translate` is using `instant` after translations got loaded.
-
-```ts
-translator.waitForTranslation().then(() => {
-  this.translations = {
-    statuses: {
-      open: translator.instant('STATUS_OPEN'),
-      closed: translator.instant('STATUS_CLOSED')
-    }
-  }
-});
-```
-
