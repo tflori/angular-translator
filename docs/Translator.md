@@ -131,7 +131,7 @@ translator.translate('STATUS_CLOSED').then((translation) => this.translations['c
 public translateArray(keys: string[], params?: any, language?: string): Promise<string[]>
 ```
 
-Like translate but using `instantArray` for translating an array of `keys`.
+Like `translate` but using `instantArray` for translating an array of `keys`.
 
 #### translateSearch
 
@@ -139,17 +139,74 @@ Like translate but using `instantArray` for translating an array of `keys`.
 public translateSearch(pattern: string, params?: any, language?: string): Promise<object>
 ```
 
-Like translate but using `search` to search for translations matching the given `pattern`.
+Like `translate` but using `search` to search for translations matching the given `pattern`.
 
-### observe(keys: string|string[], params?: any): Observable<string|string[]>
+### Observable Methods
 
-Instead of using the language given it is using the current language and pushes the translation for the new language
-every time when the language got changed.
+These methods return an `Observable` that provides the translation(s) in the the current selected language. When the
+language got changed they receive the new value after the translation table got loaded.
+
+#### observe
 
 ```ts
-translator.observe(['STATUS_OPEN', 'STATUS_CLOSED']).subscribe((translations) => {
-  this.translations['open'] = translations[0];
-  this.translations['closed'] = translations[1];
-});
+public observe(key: string, params?: any): Observable<string>
 ```
 
+Translate `key` into the current language using `params` for interpolation. Once the language got changed and the
+translation table got loaded the observer receives the translation for the newly selected language.
+
+Like translate the observable always get's a new value - even if the key the loader rejects to load the language and
+especially when the `key` does not exist in translation table.
+
+```ts
+translator.observe('STATUS_OPEN')  .subscribe((translation) => this.translations['open']   = translation);
+translator.observe('STATUS_CLOSED').subscribe((translation) => this.translations['closed'] = translation);
+```
+
+> **Please note** that the signature changed in version 2.3 and the usage with array of keys is deprecated now. For
+> backward compatibility it is still supported but will be removed in version 3. Use `observeArray()` instead.
+
+#### observerArray
+
+```ts
+public observeArray(keys: string[], params?: any): Observable<string[]>
+```
+
+Like `observe` but using `instantArray` for translating an array of `keys`.
+
+#### observeSearch
+
+```ts
+public observeSearch(pattern: string, params?: any): Observable<object>
+```
+
+Like `observe` but using `search` to search for translations matching the given `pattern`.
+
+This has an interesting use case when you need multiple translations in a component. For example with statuses:
+
+```ts
+// translation table:
+translations = {
+  STATUS_OPEN: 'open',
+  STATUS_TO_DO: 'to do',
+  STATUS_IN_PROGRESS: 'in progress',
+  STATUS_RESOLVED: 'resolved',
+  STATUS_CLOSED: 'closed',
+};
+
+class Issue {
+    private statusTranslations: { [key: string]: string };
+    
+    constructor(private translator: Translator) {
+        translator.observeSearch('STATUS_*').subscribe((statusTranslations) => {
+            this.statusTranslations = statusTranslations;
+        });
+    }
+    
+    get status(): string {
+        // assume statusKey is one of ['OPEN', 'TO_DO', 'IN_PROGRESS', 'RESOLVED', 'CLOSED']
+        return this.statusTranslations[this.statusKey];
+    }
+}
+
+```
