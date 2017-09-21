@@ -26,15 +26,6 @@ Translations can use params for dynamization (see  [Dynamize translations with p
 These methods allow you to use the translations without passing a callback. The drawback is of course that they only
 work when the translations got loaded. Often you need to wait till the translation table for the language got loaded.
 
-#### waitForTranslation
-
-```ts
-public waitForTranslation(language?: string): Promise<void>
-```
-
-Waits for language to be loaded. If language is not given it loads the current language. Returns a promise that got be 
-resolved once language got loaded. You will need it when using the synchronous methods.
-
 #### instant
 
 ```ts
@@ -43,17 +34,10 @@ public instant(key: string, params?: any, language?: string): string
 
 Translates the `key` into `language` synchronously using `params` for interpolation. When the language is not loaded or
 the translation table does not have `key` it returns `key` - so make sure that the translation table is loaded
-before (e. g. by using `waitForTranslation()`):
+before (e. g. by using [`waitForTranslation()`](#prerequisite-waitfortranslation)):
 
 ```ts
-translator.waitForTranslation().then(() => {
-  this.translations = {
-    statuses: {
-      open: translator.instant('STATUS_OPEN'),
-      closed: translator.instant('STATUS_CLOSED')
-    }
-  }
-});
+expect(translator.instant('ISSUE_STATUS_IN_PROGRESS')).toEqual('in progress');
 ```
 
 This method is used from every other method that follows (`instantArray`, `search`, `translate`, `translateArray`, 
@@ -99,6 +83,32 @@ expect(translator.search('MONTH_*')).toEqual({
     "...": "and so on",
 });
 ``` 
+
+#### Prerequisite waitForTranslation 
+
+To make synchronous methods work you need to make sure the translation tables got loaded. For this propose we provide
+the following method:  
+
+```ts
+public waitForTranslation(language?: string): Promise<void>
+```
+
+Waits for language to be loaded. If language is not given it loads the current language. Returns a promise that gets
+resolved once the language got loaded.
+
+This method is not synchronous and when you are otherwise sure that the translations are loaded you can skip these
+method.
+
+```ts
+translator.waitForTranslation().then(() => {
+    showButton(translator.instant('BUTTON_TEXT'), actionCallback);
+});
+
+function actionCallback() {
+    // we know the translations are loaded here
+    showToast(translator.instant('SUCCESS_MESSAGE'));
+}
+```
 
 ### Thenable Methods 
 
