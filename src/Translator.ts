@@ -64,7 +64,7 @@ export class Translator {
         return this._module;
     }
 
-    get language() {
+    get language(): string {
         return this._language;
     }
 

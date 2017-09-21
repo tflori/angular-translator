@@ -36,7 +36,7 @@ export class MyService {
   
   constructor(private translator: Translator, private translatorContainer: TranslatorContainer) {
     // this comes from default module (assets/i18n/{{language}}.json)
-    translator.translate(['STATUS_PENDING', 'STATUS_DONE']).then((translations) => {
+    translator.translateArray(['STATUS_PENDING', 'STATUS_DONE']).then((translations) => {
         this.translations['STATUS_PENDING'] = translations[0];
         this.translations['STATUS_DONE'] = translations[1];
     });
