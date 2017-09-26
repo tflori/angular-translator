@@ -25,7 +25,7 @@ to do so.
 | Name                  | Type     | Default  | Description |
 |-----------------------|----------|----------|-------------|
 | defaultLanguage       | string   | `'en'`   | Defines the default language to be used if no language got set and language detection is disabled or does not detect a language. |
-| providedLanguages     | string[] | `['en']` | Defines a list of the languages that are supported from you. The provided languages has to match your file names. To make language detection work you should use the ISO format 639-1 (e.g. 'en') or the IETF language tag (e.g. 'de-AT'). You don't have to use "-" and don't have to care about case sensitive. A language 'en/us' will also match a browser language en-US and vise versa - but the file has to be *path*\*en/us\**extension* then. |
+| providedLanguages     | string[] | `['en']` | Defines a list of the languages that are supported from you. The provided languages has to match your file names. To make language detection work you should use the ISO format 639-1 (e.g. 'en') or the IETF language tag (e.g. 'de-AT'). You don't have to use "-" and don't have to care about case sensitive. A language 'en/us' will also match a browser language en-US and vise versa - but the file has to be *path**en/us**extension* then. |
 | detectLanguage        | boolean  | `true`   | Defines whether the language should be detected by navigator.language(s) when TranslateService got initialized or not. |
 | loader                | Type     | `TranslationLoaderJson` | The loader that is used for loading translations. |
 | loaderOptions         | any      | `{}`     | Options that are passed to the loader. |
@@ -38,14 +38,9 @@ to do so.
 Tries to find matching provided language and returns the provided language. The provided language and the language that
 is searched are getting normalized for matching. That means that `'EN/usa'` is getting `'en-US'`.
 
-Only valid language/region combinations are allowed. This is necessary to exclude finding provided language Breton
-if the browser says `"british"`. Valid in this case means to use this format: 
+Only valid language/region combinations are allowed for non-strict matching. This is necessary to exclude finding provided language Breton if the browser says `"british"`. Valid in this case means to use this format: 
 `<two letter language>[[divider]<two letter region>]`. Or - to be more precise - this regular expression: 
-`/^([A-Za-z]{2})(?:[\.\-_\/]?([A-Za-z]{2}))?$/`.
-
-Because the setter for `Translator.language` and `TranslatorContainer.language` is checking if the language is provided
-it is necessary that your provided languages matches against this regular expression too. Otherwise you will not be
-able to switch to this language.
+`/^([A-Za-z]{2})(?:[.\-_\/]?([A-Za-z]{2}))?$/`.
 
 Example:
 

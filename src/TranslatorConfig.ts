@@ -35,6 +35,8 @@ export const COMMON_PURE_PIPES: Array<Type<PipeTransform>> = [
 export class TranslatorConfig {
     public static navigator: any = window && window.navigator ? window.navigator : {};
 
+    private static isoRegEx = /^([A-Za-z]{2})(?:[.\-_\/]?([A-Za-z]{2}))?$/;
+
     /**
      * Normalize a language
      *
@@ -42,12 +44,11 @@ export class TranslatorConfig {
      * @returns {string}
      */
     private static normalizeLanguage(languageString: string): string {
-        let regExp = /^([A-Za-z]{2})(?:[.\-_\/]?([A-Za-z]{2}))?$/;
-        if (!languageString.match(regExp)) {
-            return "";
+        if (!languageString.match(TranslatorConfig.isoRegEx)) {
+            return languageString;
         }
         return languageString.replace(
-            regExp,
+            TranslatorConfig.isoRegEx,
             (substring: string, language: string, country: string = "") => {
                 language = language.toLowerCase();
                 country = country.toUpperCase();
@@ -200,33 +201,30 @@ export class TranslatorConfig {
      * @returns {string|boolean}
      */
     public providedLanguage(language: string, strict: boolean = false): string | boolean {
-        let provided: string | boolean = false;
-        let p: number;
-
         let providedLanguagesNormalized = this.providedLanguages.map(TranslatorConfig.normalizeLanguage);
         language = TranslatorConfig.normalizeLanguage(language);
 
-        if (language.length === 0) {
-            return provided;
-        }
-
-        p = providedLanguagesNormalized.indexOf(language);
+        let p: number = providedLanguagesNormalized.indexOf(language);
         if (p > -1) {
-            provided = this.providedLanguages[p];
-        } else if (!strict) {
+            return this.providedLanguages[p];
+        } else if (!strict && language.match(TranslatorConfig.isoRegEx)) {
             language = language.substr(0, 2);
             p = providedLanguagesNormalized.indexOf(language);
             if (p > -1) {
-                provided = this.providedLanguages[p];
+                return this.providedLanguages[p];
             } else {
-                p = providedLanguagesNormalized.map((l) => l.substr(0, 2)).indexOf(language);
+                p = providedLanguagesNormalized
+                    .map((l) => {
+                        return l.match(TranslatorConfig.isoRegEx) ? l.substr(0, 2) : l;
+                    })
+                    .indexOf(language);
                 if (p > -1) {
-                    provided = this.providedLanguages[p];
+                    return this.providedLanguages[p];
                 }
             }
         }
 
-        return provided;
+        return false;
     }
 
     /**
