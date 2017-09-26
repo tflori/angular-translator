@@ -204,10 +204,6 @@ export class TranslatorConfig {
         let providedLanguagesNormalized = this.providedLanguages.map(TranslatorConfig.normalizeLanguage);
         language = TranslatorConfig.normalizeLanguage(language);
 
-        if (language.length === 0) {
-            return false;
-        }
-
         let p: number = providedLanguagesNormalized.indexOf(language);
         if (p > -1) {
             return this.providedLanguages[p];
