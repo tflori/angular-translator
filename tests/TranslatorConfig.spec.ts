@@ -162,6 +162,36 @@ describe("TranslatorConfig", () => {
 
             expect(providedLanguage).toBeFalsy();
         });
+
+        it("allows full language names", () => {
+            translatorConfig = new TranslatorConfig(logHandler, {
+                providedLanguages: ["klingon", "en"],
+            });
+
+            let providedLanguage = translatorConfig.providedLanguage("klingon");
+
+            expect(providedLanguage).toBe("klingon");
+        });
+
+        it("full language names can not be found in non-strict mode", () => {
+            translatorConfig = new TranslatorConfig(logHandler, {
+                providedLanguages: ["klingon", "en"],
+            });
+
+            let providedLanguage = translatorConfig.providedLanguage("kl");
+
+            expect(providedLanguage).toBeFalsy();
+        });
+
+        it("finds languages within provided languages in non-strict mode", () => {
+            translatorConfig = new TranslatorConfig(logHandler, {
+                providedLanguages: ["klingon", "en_US"],
+            });
+
+            let providedLanguage = translatorConfig.providedLanguage("en");
+
+            expect(providedLanguage).toBe("en_US");
+        });
     });
 
     describe("navigatorLanguages", () => {
