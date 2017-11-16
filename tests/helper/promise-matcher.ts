@@ -3,6 +3,9 @@ import {flushMicrotasks} from "@angular/core/testing";
 /* tslint:disable */
 export class PromiseMatcher {
     public static getInstance() {
+        if (!PromiseMatcher._instance) {
+            PromiseMatcher._instance = new PromiseMatcher();
+        }
         return PromiseMatcher._instance;
     }
 
@@ -14,7 +17,7 @@ export class PromiseMatcher {
         PromiseMatcher.getInstance()._uninstall();
     }
 
-    private static _instance: PromiseMatcher = new PromiseMatcher();;
+    private static _instance: PromiseMatcher;
 
     private _originalPromise: any;
     private _global: any;
@@ -30,12 +33,17 @@ export class PromiseMatcher {
         }
         JasminePromise.NativePromise = this._originalPromise;
         JasminePromise.initialize();
-        this._global.Promise = JasminePromise;
+        Object.defineProperty(this._global, 'Promise', {
+            enumerable: false,
+            configurable: false,
+            writable: true,
+            value: JasminePromise,
+        });
 
         let createCompareFn = function(util, customs, state: string, withArgs: boolean = false) {
             return function(promise, ...args) {
                 if (!(promise instanceof JasminePromise)) {
-                    throw new Error("Promse is not a JasminePromise - did you run PromiseMatcher.install()?");
+                    throw new Error("Promise is not a JasminePromise - did you run PromiseMatcher.install()?");
                 }
                 return promise.verify(util, customs, state, withArgs ? args : null);
             };
