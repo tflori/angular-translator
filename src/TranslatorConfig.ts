@@ -13,12 +13,7 @@ import {
     TitleCasePipe,
     UpperCasePipe,
 } from "@angular/common";
-import * as compiler from "@angular/compiler";
 import { PipeTransform, Type } from "@angular/core";
-
-const PipeResolver = compiler.PipeResolver;
-// tslint:disable-next-line:no-string-literal
-const JitReflector = compiler["JitReflector"] ? compiler["JitReflector"] : void(0);
 
 export const COMMON_PURE_PIPES: Array<Type<PipeTransform>> = [
     CurrencyPipe,
@@ -31,6 +26,18 @@ export const COMMON_PURE_PIPES: Array<Type<PipeTransform>> = [
     TitleCasePipe,
     UpperCasePipe,
 ];
+
+export const COMMON_PURE_PIPES_MAP: { [key: string]: Type<PipeTransform> } = {
+    currency: CurrencyPipe,
+    date: DatePipe,
+    number: DecimalPipe,
+    json: JsonPipe,
+    lowercase: LowerCasePipe,
+    percent: PercentPipe,
+    slice: SlicePipe,
+    titlecase: TitleCasePipe,
+    uppercase: UpperCasePipe,
+};
 
 export class TranslatorConfig {
     public static navigator: any = window && window.navigator ? window.navigator : {};
@@ -64,13 +71,14 @@ export class TranslatorConfig {
         preferExactMatches: false,
         navigatorLanguages: ["en"],
         loader:             TranslationLoaderJson,
-        pipes:              COMMON_PURE_PIPES.slice(0),
+        pipes:               Object.keys(COMMON_PURE_PIPES_MAP).map((key) => COMMON_PURE_PIPES_MAP[key]),
         pipeMap:            (() => {
-            const pipeResolver = new PipeResolver(JitReflector ? new JitReflector() : void(0));
             let pipes = {};
-            COMMON_PURE_PIPES.map((pipe) => {
-                pipes[pipeResolver.resolve(pipe).name] = pipe;
-            });
+            for (let pipeName in COMMON_PURE_PIPES_MAP) {
+                if (COMMON_PURE_PIPES_MAP.hasOwnProperty(pipeName)) {
+                    pipes[pipeName] = COMMON_PURE_PIPES_MAP[pipeName];
+                }
+            }
             return pipes;
         })(),
     };
@@ -136,7 +144,6 @@ export class TranslatorConfig {
     get pipes(): { [key: string]: Type<PipeTransform> } {
         if (!this.pipeMap) {
             this.pipeMap = this.options.pipeMap;
-            const pipeResolver = new PipeResolver(JitReflector ? new JitReflector() : void(0));
             const mappedPipes = Object.keys(this.pipeMap).map((key) => this.pipeMap[key]);
             const unmappedPipes = this.options.pipes.filter((pipe) => mappedPipes.indexOf(pipe) === -1);
             while (unmappedPipes.length) {
@@ -144,12 +151,7 @@ export class TranslatorConfig {
                 if (pipe.pipeName) {
                     this.pipeMap[pipe.pipeName] = pipe;
                 } else {
-                    let pipeAnnotation = pipeResolver.resolve(pipe, false);
-                    if (pipeAnnotation) {
-                        this.pipeMap[pipeAnnotation.name] = pipe;
-                    } else {
-                        this.logHandler.error("Pipe name for " + pipe.name + " can not be resolved");
-                    }
+                    this.logHandler.error("Pipe name for " + pipe.name + " can not be resolved");
                 }
             }
         }

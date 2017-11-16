@@ -10,6 +10,7 @@ import { Subscription } from "rxjs/Subscription";
     pure: false,
 })
 export class TranslatePipe implements PipeTransform {
+    public static pipeName: string = "translate";
     private static _parseParams(arg: string): object {
         try {
             let o = eval("(" + arg + ")");
