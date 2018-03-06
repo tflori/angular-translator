@@ -7,6 +7,9 @@
 !/docs/*.md
 !/docs/images/
 
+/src/**/*.ts
+!/src/**/*.d.ts
+
 .gitignore
 .editorconfig
 karma.conf.js
