@@ -1,11 +1,11 @@
 import { TranslationLoader } from "../TranslationLoader";
 
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Http } from "@angular/http";
 
 @Injectable()
 export class TranslationLoaderJson extends TranslationLoader {
-    constructor(private  http: Http) {
+    constructor(private  http: HttpClient) {
         super();
     }
 
@@ -29,17 +29,13 @@ export class TranslationLoaderJson extends TranslationLoader {
             });
             this.http.get(file)
                 .subscribe(
-                    (response) => {
-                        if (response.status === 200) {
-                            let translations = {};
-                            this.flattenTranslations(translations, response.json());
-                            resolve(translations);
-                        } else {
-                            reject("StatusCode: " + response.status + "");
-                        }
+                    (data) => {
+                        let translations = {};
+                        this.flattenTranslations(translations, data);
+                        resolve(translations);
                     },
-                    (reason: Error) => {
-                        reject(reason.message);
+                    (response: HttpErrorResponse) => {
+                        reject(response.statusText);
                     },
                 );
         });

@@ -3,7 +3,7 @@ import { Translator } from "./Translator";
 import { TranslatorContainer } from "./TranslatorContainer";
 
 import { Inject, Pipe, PipeTransform } from "@angular/core";
-import { Subscription } from "rxjs/Subscription";
+import { Subscription } from "rxjs";
 
 @Pipe({
     name: "translate",

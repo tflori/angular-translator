@@ -4,10 +4,8 @@ import { TranslatorConfig } from "./TranslatorConfig";
 import { TranslatorContainer } from "./TranslatorContainer";
 
 import { Injectable, Injector, PipeTransform } from "@angular/core";
-import { Observable } from "rxjs/Observable";
-import { Observer } from "rxjs/Observer";
-
-import "rxjs/add/operator/share";
+import { Observable, Observer } from "rxjs";
+import { share } from "rxjs/operators";
 
 export class Translator {
     private static regExpFromPattern(pattern: string): RegExp {
@@ -49,7 +47,7 @@ export class Translator {
 
         this.languageChangedObservable = new Observable<string>((observer: Observer<string>) => {
             this.languageChangedObserver = observer;
-        }).share();
+        }).pipe(share());
 
         translatorContainer.languageChanged.subscribe((language) => {
             this.language = language;

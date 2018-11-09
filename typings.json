@@ -4,7 +4,6 @@
     "jasmine-es6-promise-matchers": "file:tests/helper/promise-matchers.d.ts"
   },
   "globalDependencies": {
-    "es6-shim": "registry:dt/es6-shim",
-    "node": "registry:dt/node"
+    "es6-shim": "registry:dt/es6-shim"
   }
 }

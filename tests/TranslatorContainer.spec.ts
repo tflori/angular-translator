@@ -7,7 +7,7 @@ import {
 
 import {ReflectiveInjector} from "@angular/core";
 import {TestBed} from "@angular/core/testing";
-import {Observable} from "rxjs/Observable";
+import {Observable} from "rxjs";
 import {TranslateLogHandlerMock, TranslationLoaderMock} from "./helper/TranslatorMocks";
 
 describe("TranslatorContainer", () => {

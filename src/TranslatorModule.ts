@@ -6,8 +6,8 @@ import { Translator } from "./Translator";
 import { COMMON_PURE_PIPES, TranslatorConfig } from "./TranslatorConfig";
 import { TranslatorContainer } from "./TranslatorContainer";
 
+import { HttpClientModule } from "@angular/common/http";
 import { InjectionToken, ModuleWithProviders, NgModule, PipeTransform, Provider, Type } from "@angular/core";
-import { HttpModule } from "@angular/http";
 
 export const TRANSLATOR_OPTIONS: InjectionToken<object> = new InjectionToken("TRANSLATOR_OPTIONS");
 export const TRANSLATOR_MODULE: InjectionToken<string> = new InjectionToken("TRANSLATOR_MODULE");
@@ -21,7 +21,7 @@ export const TRANSLATOR_MODULE: InjectionToken<string> = new InjectionToken("TRA
         TranslatePipe,
         TranslateComponent,
     ],
-    imports:      [HttpModule],
+    imports:      [HttpClientModule],
     providers:    [
         TranslationLoaderJson,
         TranslateLogHandler,

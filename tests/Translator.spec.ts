@@ -14,7 +14,7 @@ import { TranslateLogHandlerMock, TranslationLoaderMock } from "./helper/Transla
 import { DatePipe, UpperCasePipe } from "@angular/common";
 import { Injector } from "@angular/core";
 import { fakeAsync, TestBed } from "@angular/core/testing";
-import { Observable } from "rxjs/Observable";
+import { Observable } from "rxjs";
 
 describe("Translator", () => {
     it("is defined", () => {

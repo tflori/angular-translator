@@ -2,18 +2,11 @@ import {
     TranslationLoaderJson,
 } from "../../index";
 
-import {JasmineHelper} from "../helper/JasmineHelper";
 import {PromiseMatcher} from "../helper/promise-matcher";
 
+import { HttpClient } from "@angular/common/http";
+import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing";
 import {TestBed} from "@angular/core/testing";
-import {
-    HttpModule,
-    RequestMethod,
-    Response,
-    ResponseOptions,
-    XHRBackend,
-} from "@angular/http";
-import {MockBackend, MockConnection} from "@angular/http/testing";
 
 describe("TranslationLoaderJson", () => {
     it("is defined", () => {
@@ -22,26 +15,28 @@ describe("TranslationLoaderJson", () => {
 
     describe("load", () => {
         let loader: TranslationLoaderJson;
-        let backend: MockBackend;
-        let connection: MockConnection;
+        let httpClient: HttpClient;
+        let httpTestingController: HttpTestingController;
 
         beforeEach(() => {
             TestBed.configureTestingModule({
-                imports: [HttpModule],
+                imports: [HttpClientTestingModule],
                 providers: [
-                    {provide: XHRBackend, useClass: MockBackend},
                     TranslationLoaderJson,
                 ],
             });
 
-            backend = TestBed.get(XHRBackend);
+            httpClient = TestBed.get(HttpClient);
             loader = TestBed.get(TranslationLoaderJson);
-            backend.connections.subscribe((c: MockConnection) => connection = c);
+            httpTestingController = TestBed.get(HttpTestingController);
 
             PromiseMatcher.install();
         });
 
-        afterEach(PromiseMatcher.uninstall);
+        afterEach(() => {
+            PromiseMatcher.uninstall();
+            httpTestingController.verify();
+        });
 
         it("is defined", () => {
             expect(loader.load).toBeDefined();
@@ -51,42 +46,33 @@ describe("TranslationLoaderJson", () => {
         it("returns a promise", () => {
             let promise = loader.load({ language: "en" });
 
+            httpTestingController.expectOne("assets/i18n/./en.json");
             expect(promise instanceof Promise).toBeTruthy();
         });
 
         it("loads a language file", () => {
-            spyOn(backend, "createConnection").and.callThrough();
-
             loader.load({ language: "en" });
 
-            expect(backend.createConnection).toHaveBeenCalled();
-            let request = JasmineHelper.calls(backend.createConnection).mostRecent().args[0];
-            expect(request.url).toBe("assets/i18n/./en.json");
-            expect(request.method).toBe(RequestMethod.Get);
+            const request = httpTestingController.expectOne("assets/i18n/./en.json");
+            expect(request.request.method).toBe("GET");
         });
 
         it("can be configured", () => {
-            spyOn(backend, "createConnection").and.callThrough();
-
             loader.load({
                 language: "en",
                 module: "test",
                 path: "app/translations/{{module}}/{{language}}-lang.json",
             });
 
-            expect(backend.createConnection).toHaveBeenCalled();
-            let request = JasmineHelper.calls(backend.createConnection).mostRecent().args[0];
-            expect(request.url).toBe("app/translations/test/en-lang.json");
-            expect(request.method).toBe(RequestMethod.Get);
+            const request = httpTestingController.expectOne("app/translations/test/en-lang.json");
+            expect(request.request.method).toBe("GET");
         });
 
         it("resolves when connection responds", () => {
             let promise = loader.load({ language: "en" });
 
-            connection.mockRespond(new Response(new ResponseOptions({
-                body: JSON.stringify({TEXT: "This is a text"}),
-                status: 200,
-            })));
+            const request = httpTestingController.expectOne("assets/i18n/./en.json");
+            request.flush({TEXT: "This is a text"});
 
             expect(promise).toBeResolved();
         });
@@ -94,45 +80,31 @@ describe("TranslationLoaderJson", () => {
         it("transforms result to object", () => {
             let promise = loader.load({ language: "en" });
 
-            connection.mockRespond(new Response(new ResponseOptions({
-                body: JSON.stringify({TEXT: "This is a text"}),
-                status: 200,
-            })));
+            const request = httpTestingController.expectOne("assets/i18n/./en.json");
+            request.flush({TEXT: "This is a text"});
 
             expect(promise).toBeResolvedWith({TEXT: "This is a text"});
         });
 
-        it("rejectes when connection fails", () => {
+        it("rejects when connection fails", () => {
             let promise = loader.load({ language: "en" });
 
-            connection.mockRespond(new Response(new ResponseOptions({
-                status: 500,
-                statusText: "Internal Server Error",
-            })));
+            const request = httpTestingController.expectOne("assets/i18n/./en.json");
+            request.flush("", { status: 500, statusText: "Internal Server Error" });
 
-            expect(promise).toBeRejectedWith("StatusCode: 500");
-        });
-
-        it("rejects when connection throws", () => {
-            let promise = loader.load({ language: "en" });
-
-            connection.mockError(new Error("Some reason"));
-
-            expect(promise).toBeRejectedWith("Some reason");
+            expect(promise).toBeRejectedWith("Internal Server Error");
         });
 
         it("combines arrays to a string", () => {
             let promise = loader.load({ language: "en" });
 
-            connection.mockRespond(new Response(new ResponseOptions({
-                body: JSON.stringify({
-                    COOKIE_INFORMATION: [
-                        "We are using cookies to adjust our website to the needs of our customers. ",
-                        "By using our websites you agree to store cookies on your computer, tablet or smartphone.",
-                    ],
-                }),
-                status: 200,
-            })));
+            const request = httpTestingController.expectOne("assets/i18n/./en.json");
+            request.flush({
+                COOKIE_INFORMATION: [
+                    "We are using cookies to adjust our website to the needs of our customers. ",
+                    "By using our websites you agree to store cookies on your computer, tablet or smartphone.",
+                ],
+            });
 
             expect(promise).toBeResolvedWith({
                 COOKIE_INFORMATION: "We are using cookies to adjust our website to the needs of our customers. " +
@@ -148,10 +120,8 @@ describe("TranslationLoaderJson", () => {
                 },
             };
 
-            connection.mockRespond(new Response(new ResponseOptions({
-                body: JSON.stringify(nestedObj),
-                status: 200,
-            })));
+            const request = httpTestingController.expectOne("assets/i18n/./en.json");
+            request.flush(nestedObj);
 
             expect(promise).toBeResolvedWith({"TEXT.NESTED": "This is a text"});
         });
@@ -167,10 +137,8 @@ describe("TranslationLoaderJson", () => {
                 },
             };
 
-            connection.mockRespond(new Response(new ResponseOptions({
-                body: JSON.stringify(nestedObj),
-                status: 200,
-            })));
+            const request = httpTestingController.expectOne("assets/i18n/./en.json");
+            request.flush(nestedObj);
 
             expect(promise).toBeResolvedWith({"TEXT.NESTED": "This is a text", "TEXT.SECONDNEST.TEXT": "Second text"});
         });
@@ -187,10 +155,8 @@ describe("TranslationLoaderJson", () => {
                 },
             };
 
-            connection.mockRespond(new Response(new ResponseOptions({
-                body: JSON.stringify(nestedObj),
-                status: 200,
-            })));
+            const request = httpTestingController.expectOne("assets/i18n/./en.json");
+            request.flush(nestedObj);
 
             expect(promise).toBeResolvedWith({
                 "COOKIE_INFORMATION": "We are using cookies to adjust our website to " +
@@ -207,10 +173,8 @@ describe("TranslationLoaderJson", () => {
                 },
             };
 
-            connection.mockRespond(new Response(new ResponseOptions({
-                body: JSON.stringify(nestedObj),
-                status: 200,
-            })));
+            const request = httpTestingController.expectOne("assets/i18n/./en.json");
+            request.flush(nestedObj);
 
             expect(promise).toBeResolvedWith({"text.nestedText": "This is a text"});
         });
@@ -224,10 +188,8 @@ describe("TranslationLoaderJson", () => {
                 },
             };
 
-            connection.mockRespond(new Response(new ResponseOptions({
-                body: JSON.stringify(nestedObj),
-                status: 200,
-            })));
+            const request = httpTestingController.expectOne("assets/i18n/./en.json");
+            request.flush(nestedObj);
 
             expect(promise).toBeResolvedWith({"TEXT.NESTED": "This is a text"});
         });
@@ -243,10 +205,8 @@ describe("TranslationLoaderJson", () => {
                 },
             };
 
-            connection.mockRespond(new Response(new ResponseOptions({
-                body: JSON.stringify(nestedObj),
-                status: 200,
-            })));
+            const request = httpTestingController.expectOne("assets/i18n/./en.json");
+            request.flush(nestedObj);
 
             expect(promise).toBeResolvedWith({
                 "TEXT.COOKIE_INFORMATION": "We are using cookies to adjust our website " +
@@ -258,17 +218,15 @@ describe("TranslationLoaderJson", () => {
         it("merges translations to one dimension", () => {
             let promise = loader.load({ language: "en" });
 
-            connection.mockRespond(new Response(new ResponseOptions({
-                body: JSON.stringify({
-                    app: {
-                        componentA: {
-                            TEXT: "something else",
-                        },
-                        loginText: "Please login before continuing!",
+            const request = httpTestingController.expectOne("assets/i18n/./en.json");
+            request.flush({
+                app: {
+                    componentA: {
+                        TEXT: "something else",
                     },
-                }),
-                status: 200,
-            })));
+                    loginText: "Please login before continuing!",
+                },
+            });
 
             expect(promise).toBeResolvedWith({
                 "app.componentA.TEXT": "something else",
@@ -279,16 +237,14 @@ describe("TranslationLoaderJson", () => {
         it("filters non string values", () => {
             let promise = loader.load({ language: "en" });
 
-            connection.mockRespond(new Response(new ResponseOptions({
-                body: JSON.stringify({
-                    ANSWER: 42,
-                    COMBINED: [
-                        "7 multiplied by 6 is ",
-                        42,
-                    ],
-                }),
-                status: 200,
-            })));
+            const request = httpTestingController.expectOne("assets/i18n/./en.json");
+            request.flush({
+                ANSWER: 42,
+                COMBINED: [
+                    "7 multiplied by 6 is ",
+                    42,
+                ],
+            });
 
             expect(promise).toBeResolvedWith({COMBINED: "7 multiplied by 6 is "});
         });

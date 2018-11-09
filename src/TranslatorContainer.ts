@@ -1,12 +1,10 @@
 import { TranslateLogHandler } from "./TranslateLogHandler";
+import { Translator } from "./Translator";
 import { TranslatorConfig } from "./TranslatorConfig";
 
 import { Injectable, Injector } from "@angular/core";
-import { Observable } from "rxjs/Observable";
-import { Observer } from "rxjs/Observer";
-import { Translator } from "./Translator";
-
-import "rxjs/add/operator/share";
+import { Observable ,  Observer } from "rxjs";
+import { share } from "rxjs/operators";
 
 @Injectable()
 export class TranslatorContainer {
@@ -26,7 +24,7 @@ export class TranslatorContainer {
         }
         this.languageChangedObservable = new Observable<string>((observer: Observer<string>) => {
             this.languageChangedObserver = observer;
-        }).share();
+        }).pipe(share());
     }
 
     get languageChanged(): Observable<string> {
