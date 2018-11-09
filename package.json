@@ -1,6 +1,6 @@
 {
   "name": "angular-translator",
-  "version": "2.4.2",
+  "version": "3.0.0-rc.2",
   "description": "A translate-service, translate-pipe and translate-component for angular2",
   "repository": {
     "type": "git",
@@ -9,7 +9,6 @@
   "scripts": {
     "test": "karma start",
     "tslint": "tslint -c tslint.json --exclude=\"**/*.d.ts\" --exclude=\"node_modules/**/*.ts\" \"**/*.ts\"",
-    "prepare": "typings install",
     "prepublishOnly": "npm test && npm run build",
     "coveralls": "cat coverage/lcov.info | coveralls",
     "build": "tsc && ngc && webpack"
@@ -51,6 +50,9 @@
     "@angular/http": "^7.0.3",
     "@angular/platform-browser": "^7.0.3",
     "@angular/platform-browser-dynamic": "^7.0.3",
+    "@types/es6-shim": "*",
+    "@types/jasmine": "^2.8.11",
+    "@types/node": "^10.12.3",
     "awesome-typescript-loader": "^3.5.0",
     "istanbul-instrumenter-loader": "^3.0.1",
     "jasmine-core": "2.5.*",
@@ -70,7 +72,6 @@
     "ts-helpers": "*",
     "tslint": "^4.5.1",
     "typescript": "^3.1.6",
-    "typings": "*",
     "webpack": "^2.7.0",
     "zone.js": "^0.8.26"
   }

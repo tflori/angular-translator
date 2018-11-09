@@ -7,7 +7,6 @@
 coverage/*
 docs/_site
 /bundles
-/typings
 /src/**/*.js*
 /src/**/*.d.ts
 /index.*
