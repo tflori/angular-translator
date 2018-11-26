@@ -274,12 +274,19 @@ export class Translator {
             return key;
         }
 
+        let t;
         if (!this.translations[language] || !this.translations[language][key]) {
             this.logHandler.info(this.generateMessage("missing", { key, language }));
-            return key;
+            if (language === this.config.defaultLanguage) {
+                // this key is not available in the default language, returns key
+                return key;
+            } else {
+                // use default language to translate the key
+                t = this.instant(key, params, this.config.defaultLanguage);
+            }
+        } else {
+            t = this.translations[language][key];
         }
-
-        let t = this.translations[language][key];
 
         // resolve references to other translations
         t = t.replace(/\[\[([\sA-Za-z0-9_.,=:-]*)]]/g, (sub: string, expression: string) => {
