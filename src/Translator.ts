@@ -284,10 +284,8 @@ export class Translator {
                 // use default language to translate the key
                 t = this.instant(key, params, this.config.defaultLanguage);
             }
-        } else if (this.translations[language][key]) {
-            t = this.translations[language][key];
         } else {
-            return key;
+            t = this.translations[language][key];
         }
 
         // resolve references to other translations
