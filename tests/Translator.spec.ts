@@ -374,6 +374,22 @@ describe("Translator", () => {
                 expect(translations).toEqual(["SOME_TEXT", "OTHER_TEXT"]);
             }));
 
+            it("translates in default language if translation not found", fakeAsync(() => {
+                translator.waitForTranslation();
+                loaderPromiseResolve({
+                    HELLO_WORLD: "Hello world!",
+                });
+                JasminePromise.flush();
+
+                translator.waitForTranslation( "de" );
+                loaderPromiseResolve({});
+                JasminePromise.flush();
+
+                let translations = translator.instant("HELLO_WORLD", {}, "de");
+
+                expect(translations).toEqual("Hello world!");
+            }));
+
             it("translates in different language", fakeAsync(() => {
                 translator.waitForTranslation("de");
                 loaderPromiseResolve({
