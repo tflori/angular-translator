@@ -277,7 +277,7 @@ describe("Translator", () => {
                 expect(JasmineHelper.calls(translationLoader.load).count()).toBe(1);
             });
 
-            it("returns the already resolved promise", fakeAsync(() => {
+            it("returns the a new already resolved promise", fakeAsync(() => {
                 let firstPromise = translator.waitForTranslation();
                 loaderPromiseResolve({ TEXT: "This is a text" });
                 JasminePromise.flush();
@@ -285,7 +285,7 @@ describe("Translator", () => {
                 let secondPromise = translator.waitForTranslation();
 
                 expect(secondPromise).toBeResolved();
-                expect(secondPromise).toBe(firstPromise);
+                expect(secondPromise).not.toBe(firstPromise);
             }));
 
             it("loads given language", () => {

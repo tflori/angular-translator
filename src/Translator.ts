@@ -92,7 +92,7 @@ export class Translator {
             return Promise.reject("Language " + arguments[0] + " not provided");
         }
 
-        return this.loadLanguage(language);
+        return new Promise((resolve, reject) => this.loadLanguage(language).then(resolve, reject));
     }
 
     /**
