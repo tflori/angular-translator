@@ -25,16 +25,18 @@ module.exports = function(config) {
             type: 'in-memory'
         },
 
-        remapCoverageReporter: {
-            'text-summary': null, // stdout
-            html: './coverage/html',
-            'lcovonly': './coverage/lcov.info',
+        remapIstanbulReporter: {
+            reports: {
+                'text-summary': null, // stdout
+                html: './coverage/html',
+                'lcovonly': './coverage/lcov.info',
+            },
         },
 
         // Webpack please don't spam the console when running in karma!
         webpackMiddleware: { stats: 'errors-only'},
 
-        reporters: [ 'spec', 'coverage', 'remap-coverage' ],
+        reporters: [ 'spec', 'coverage', 'karma-remap-istanbul' ],
 
         specReporter: {
             showSpecTiming: true
