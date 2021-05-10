@@ -161,7 +161,8 @@ describe("TranslationLoaderJson", () => {
             expect(promise).toBeResolvedWith({
                 "COOKIE_INFORMATION": "We are using cookies to adjust our website to " +
                 "the needs of our customers. By using our websites you agree to store cookies on your computer, " +
-                "tablet or smartphone.", "TEXT.NESTED": "This is a text",
+                "tablet or smartphone.",
+                "TEXT.NESTED": "This is a text",
             });
         });
 

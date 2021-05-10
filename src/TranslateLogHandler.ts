@@ -1,3 +1,4 @@
+// tslint:disable:no-console
 export class TranslateLogHandler {
     public error(message: string | Error): void {
         if (console && console.error) {

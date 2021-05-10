@@ -17,7 +17,7 @@ describe("TranslateLogHandler", () => {
         let error = console.error;
 
         delete console.error;
-        let action = function action() {
+        let action = () => {
             logHandler.error("This was bad");
         };
 

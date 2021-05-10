@@ -3,8 +3,11 @@
   "rules": {
     "no-empty": false,
     "no-eval": false,
+    "no-console": [true, "log", "info", "debug"],
     "switch-default": false,
-    "variable-name": "allow-leading-underscore",
+    "whitespace": false,
+    "no-submodule-imports": [true, "rxjs", "@angular/common", "@angular/platform-browser", "@angular/core/testing"],
+    "variable-name": [true, "allow-leading-underscore"],
     "only-arrow-functions": false,
     "object-literal-sort-keys": false,
     "prefer-const": false

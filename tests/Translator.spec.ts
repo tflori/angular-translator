@@ -381,7 +381,7 @@ describe("Translator", () => {
                 });
                 JasminePromise.flush();
 
-                translator.waitForTranslation( "de" );
+                translator.waitForTranslation("de");
                 loaderPromiseResolve({});
                 JasminePromise.flush();
 
@@ -1523,12 +1523,12 @@ describe("Translator", () => {
                 }));
 
                 it("resolves with the return value from search", fakeAsync(() => {
-                    spyOn(translator, "search").and.returnValue({"key1": "text 1"});
+                    spyOn(translator, "search").and.returnValue({key1: "text 1"});
 
                     let promise = translator.translateSearch("key*");
                     loaderPromiseResolve({key1: "text 1"});
 
-                    expect(promise).toBeResolvedWith({"key1": "text 1"});
+                    expect(promise).toBeResolvedWith({key1: "text 1"});
                     expect(translator.search).toHaveBeenCalledWith("key*", {}, "en");
                 }));
             });

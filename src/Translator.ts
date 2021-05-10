@@ -39,11 +39,7 @@ export class Translator {
         this.config = _module === "default" ? translatorConfig : translatorConfig.module(_module);
 
         let providedLanguage = this.config.providedLanguage(translatorContainer.language);
-        if (typeof providedLanguage === "string") {
-            this._language = providedLanguage;
-        } else {
-            this._language = this.config.defaultLanguage;
-        }
+        this._language = typeof providedLanguage === "string" ? providedLanguage : this.config.defaultLanguage;
 
         this.languageChangedObservable = new Observable<string>((observer: Observer<string>) => {
             this.languageChangedObserver = observer;
@@ -421,11 +417,11 @@ export class Translator {
         return this.loadedLanguages[language];
     }
 
-    private interpolate(expression: string, __context: any): any {
+    private interpolate(expression: string, context: any): any {
         let expressions: string[] = expression.split("|");
-        let result = this.parse(expressions.shift(), __context);
+        let result = this.parse(expressions.shift(), context);
         while (expressions.length) {
-            result = this.pipeTransform(result, expressions.shift().trim(), __context);
+            result = this.pipeTransform(result, expressions.shift().trim(), context);
         }
         return result;
     }
@@ -438,6 +434,7 @@ export class Translator {
      * @returns {any}
      * @private
      */
+    // tslint:disable-next-line:variable-name
     private parse(expression: string, __context: any): any {
         let func: string[] = [];
         let varName: string;
@@ -465,10 +462,10 @@ export class Translator {
      *
      * @param {any} value
      * @param {string} pipeExpression
-     * @param {any} __context
+     * @param {any} context
      * @returns {any}
      */
-    private pipeTransform(value: any, pipeExpression: string, __context: any): any {
+    private pipeTransform(value: any, pipeExpression: string, context: any): any {
         let argExpressions = pipeExpression.split(":");
         let pipeName = argExpressions.shift();
         let args = [];
@@ -476,7 +473,7 @@ export class Translator {
         while (argExpressions.length) {
             argExpression += argExpressions.shift();
             try {
-                let arg: any = this.parse(argExpression, __context);
+                let arg: any = this.parse(argExpression, context);
                 argExpression = "";
                 args.push(arg);
             } catch (e) {
