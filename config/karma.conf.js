@@ -58,8 +58,21 @@ module.exports = function(config) {
             'FirefoxHeadless'
         ],
 
+        customLaunchers: {
+            ChromeTravisCi: {
+                base: 'ChromeHeadless',
+                flags: ['--no-sandbox']
+            },
+        },
+
         singleRun: true
     };
+
+    if (process.env.TRAVIS){
+        configuration.browsers = [
+            'ChromeTravisCi'
+        ];
+    }
 
     config.set(configuration);
 };
