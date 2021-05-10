@@ -54,31 +54,12 @@ module.exports = function(config) {
         autoWatch: false,
 
         browsers: [
-            'smallerChrome',
-            'Firefox'
+            'ChromeHeadless',
+            'FirefoxHeadless'
         ],
-
-        customLaunchers: {
-            ChromeTravisCi: {
-                base: 'Chrome',
-                flags: ['--no-sandbox']
-            },
-            smallerChrome: {
-                base: "Chrome",
-                flags: [
-                    "--window-size=1024,768"
-                ]
-            }
-        },
 
         singleRun: true
     };
-
-    if (process.env.TRAVIS){
-        configuration.browsers = [
-            'ChromeTravisCi'
-        ];
-    }
 
     config.set(configuration);
 };
