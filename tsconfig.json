@@ -18,6 +18,7 @@
     "node_modules"
   ],
   "angularCompilerOptions": {
+    "disableTypeScriptVersionCheck": true,
     "skipTemplateCodegen": true
   }
 }

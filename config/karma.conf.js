@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = function(config) {
     var testWebpackConfig = require('./webpack.test.js');
 
@@ -25,18 +27,18 @@ module.exports = function(config) {
             type: 'in-memory'
         },
 
-        remapIstanbulReporter: {
-            reports: {
-                'text-summary': null, // stdout
-                html: './coverage/html',
-                'lcovonly': './coverage/lcov.info',
-            },
+        coverageIstanbulReporter: {
+            reports: ['html', 'lcovonly', 'text-summary'],
+            dir: path.join(__dirname, '..', 'coverage'),
+            'report-config': {
+                html: {subdir: 'html'}
+            }
         },
 
         // Webpack please don't spam the console when running in karma!
         webpackMiddleware: { stats: 'errors-only'},
 
-        reporters: [ 'spec', 'coverage', 'karma-remap-istanbul' ],
+        reporters: [ 'spec', 'coverage-istanbul' ],
 
         specReporter: {
             showSpecTiming: true

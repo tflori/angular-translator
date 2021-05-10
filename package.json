@@ -11,7 +11,7 @@
     "tslint": "tslint -c tslint.json --exclude \"**/*.d.ts\" --exclude \"node_modules/**/*.ts\" \"**/*.ts\"",
     "prepublishOnly": "npm test && npm run build",
     "coveralls": "cat coverage/lcov.info | coveralls",
-    "build": "tsc && ngc && webpack"
+    "build": "tsc && ngc && webpack --mode production"
   },
   "keywords": [
     "angular2",
@@ -52,19 +52,20 @@
     "@angular/platform-browser": "^7.2.16",
     "@angular/platform-browser-dynamic": "^7.2.16",
     "@types/jasmine": "^2.8.17",
-    "@types/node": "^10.17.59",
-    "awesome-typescript-loader": "^3.5.0",
-    "istanbul-instrumenter-loader": "^3.0.1",
+    "@types/node": "^15.0.2",
+    "awesome-typescript-loader": "^5.2.1",
+    "core-js": "^3.12.1",
+    "coverage-istanbul-loader": "^3.0.5",
     "jasmine-core": "2.5.*",
     "karma": "^6.3.2",
     "karma-chrome-launcher": "^2.2.0",
     "karma-coverage": "^2.0.3",
+    "karma-coverage-istanbul-reporter": "^3.0.3",
     "karma-firefox-launcher": "^2.1.0",
     "karma-jasmine": "^1.1.2",
-    "karma-remap-istanbul": "^0.6.0",
     "karma-sourcemap-loader": "^0.3.8",
     "karma-spec-reporter": "0.0.31",
-    "karma-webpack": "^2.0.13",
+    "karma-webpack": "^5.0.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^6.6.7",
     "rxjs-compat": "^6.6.7",
@@ -72,7 +73,8 @@
     "ts-helpers": "*",
     "tslint": "^5.20.1",
     "typescript": "^3.9.9",
-    "webpack": "^2.7.0",
+    "webpack": "^5.36.2",
+    "webpack-cli": "^4.7.0",
     "zone.js": "^0.8.29"
   }
 }
