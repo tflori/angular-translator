@@ -1,21 +1,16 @@
 language: node_js
-
-cache: yarn
-
+addons:
+  chrome: stable
+cache: npm
 sudo: false
-
 node_js:
   - '8'
 
 matrix:
   fast_finish: true
 
-before_install:
-  - export CHROME_BIN=chromium-browser
-
 before_script:
-  - npm prune
-  - export DISPLAY=:99.0
+  - npm ci
   - npm install coveralls
 
 script:

@@ -70,7 +70,8 @@ module.exports = function(config) {
 
     if (process.env.TRAVIS){
         configuration.browsers = [
-            'ChromeTravisCi'
+            'ChromeTravisCi',
+            'FirefoxHeadless',
         ];
     }
 
