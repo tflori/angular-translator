@@ -4,7 +4,7 @@ addons:
 cache: npm
 sudo: false
 node_js:
-  - '8'
+  - '10'
 
 matrix:
   fast_finish: true
