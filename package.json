@@ -1,6 +1,6 @@
 {
   "name": "angular-translator",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "A translate-service, translate-pipe and translate-component for angular2",
   "repository": {
     "type": "git",
@@ -52,7 +52,7 @@
     "@angular/platform-browser": "^7.2.16",
     "@angular/platform-browser-dynamic": "^7.2.16",
     "@types/jasmine": "^2.8.17",
-    "@types/node": "^15.0.2",
+    "@types/node": "~14.0.4",
     "awesome-typescript-loader": "^5.2.1",
     "core-js": "^3.12.1",
     "coverage-istanbul-loader": "^3.0.5",
@@ -72,7 +72,7 @@
     "source-map-loader": "^0.2.4",
     "ts-helpers": "*",
     "tslint": "^5.20.1",
-    "typescript": "^3.9.9",
+    "typescript": "^3.2.4",
     "webpack": "^5.36.2",
     "webpack-cli": "^4.7.0",
     "zone.js": "^0.8.29"
