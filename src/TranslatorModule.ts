@@ -30,7 +30,7 @@ export const TRANSLATOR_MODULE: InjectionToken<string> = new InjectionToken("TRA
     ],
 })
 export class TranslatorModule {
-    public static forRoot(options: any = {}, module: string = "default"): ModuleWithProviders {
+    public static forRoot(options: any = {}, module: string = "default"): ModuleWithProviders<TranslatorModule> {
         return {
             ngModule:  TranslatorModule,
             providers: [
